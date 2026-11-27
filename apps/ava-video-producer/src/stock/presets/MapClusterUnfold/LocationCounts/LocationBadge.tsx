@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { LocationCountsShared } from "./LocationCountsShared/LocationCountsShared";
+import type { LocationCountsShared } from "./LocationCountsShared/LocationCountsShared";
 import type { ReactNode } from "react";
 
 type Props = {

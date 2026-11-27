@@ -1,6 +1,4 @@
-/**
- * Temporary git repository helpers shared by the `ShouldSkipCi` test files.
- */
+/** Temporary git repository helpers shared by the `ShouldSkipCi` test files. */
 import { execFileSync } from "node:child_process";
 import {
   mkdirSync,

@@ -3,7 +3,7 @@ import { PIPELINE_DOWNLOAD_MISSING_ERROR_NAME } from "@pipeline-server/openDataP
 import { SourceDownloadFailedError } from "@pipeline-server/openDataParquetCache/streamUrlToFile/streamUrlToFile";
 import { toParquetCopyFailure } from "@pipeline-server/openDataParquetCache/toParquetCopyFailure/toParquetCopyFailure";
 import { describe, expect, it } from "vitest";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors";
 
 function _namedError(name: string, message = "failed"): Error {
   const error = new Error(message);
@@ -15,7 +15,7 @@ describe("toParquetCopyFailure", () => {
   it.each([
     [
       "a missing CKAN resource",
-      new OpenDataAcquisitionFailed({
+      new OpenDataAcquisitionFailedError({
         code: "resource-not-found",
         ckanResourceId: "r",
       }),
@@ -23,7 +23,10 @@ describe("toParquetCopyFailure", () => {
     ],
     [
       "a CKAN outage, which says nothing about the dataset",
-      new OpenDataAcquisitionFailed({ code: "ckan-unreachable", action: "a" }),
+      new OpenDataAcquisitionFailedError({
+        code: "ckan-unreachable",
+        action: "a",
+      }),
       { code: "ckan-unreachable" },
     ],
     [

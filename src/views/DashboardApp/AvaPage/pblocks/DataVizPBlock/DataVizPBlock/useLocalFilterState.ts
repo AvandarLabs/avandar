@@ -20,7 +20,10 @@ export type LocalFilterStateApi = {
 };
 
 /**
- * Returns viewer-selected values for a visualization's local filters.
+ * Tracks values for a visualization's local filters and provides controls to
+ * update or reset them.
+ * Use it, for example, to manage a viewer's filter selections in a
+ * visualization.
  */
 export function useLocalFilterState(
   localFilters: readonly LocalFilter[],

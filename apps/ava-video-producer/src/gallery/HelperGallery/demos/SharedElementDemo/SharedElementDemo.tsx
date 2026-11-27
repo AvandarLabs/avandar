@@ -1,10 +1,10 @@
-import { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import { MotionSettings } from "../../../../motion-components/MotionSettings/MotionSettings";
 import { SharedElement } from "../../../../motion-components/SharedElement";
 import { DemoTheme } from "../DemoTheme";
 import { HelperDemoFrame } from "../HelperDemoFrame/HelperDemoFrame";
 import { RectOutline } from "../RectOutline/RectOutline";
 import css from "./SharedElementDemo.module.css";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import type { HelperDemoProps } from "../helperDemo.types";
 import type { ReactNode } from "react";
 

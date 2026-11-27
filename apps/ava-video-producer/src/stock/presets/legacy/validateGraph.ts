@@ -1,4 +1,4 @@
-import { z } from "zod";
+import type { z } from "zod";
 
 /** Index references must stay within the bounded authored node collection. */
 export function validateGraph({

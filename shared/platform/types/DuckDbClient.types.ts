@@ -40,9 +40,7 @@ export type UploadSource =
   | { kind: "browser-file"; file: File }
   | { kind: "filesystem-path"; path: string };
 
-/**
- * Configuration for ingesting an upload into DuckDB.
- */
+/** Configuration for ingesting an upload into DuckDB. */
 export type DatasetImportOptions = {
   datasetId: string;
   format: "csv" | "xlsx" | "parquet";
@@ -50,9 +48,7 @@ export type DatasetImportOptions = {
   hasHeader?: boolean;
 };
 
-/**
- * Result of a successful dataset import.
- */
+/** Result of a successful dataset import. */
 export type DatasetImportResult = {
   datasetId: string;
   rowCount: number;

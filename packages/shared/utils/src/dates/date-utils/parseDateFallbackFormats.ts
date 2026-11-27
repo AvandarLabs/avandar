@@ -23,9 +23,7 @@ export const PARSE_TIME_PORTION_FORMATS: readonly string[] = [
   "H-m-s",
 ];
 
-/**
- * Appended after date (and time if present) with a `-` before `Z`.
- */
+/** Appended after date (and time if present) with a `-` before `Z`. */
 export const PARSE_TIMEZONE_SUFFIX_FORMATS: readonly string[] = ["", "Z"];
 
 export type NormalizedInputClassification = {
@@ -49,7 +47,9 @@ export function classifyNormalizedInput(
 }
 
 /**
- * Lower bound on character length for a format to possibly match `input`.
+ * Returns a lower bound on the input length for a format to possibly match.
+ * Use it, for example, to skip candidates whose minimum input length is too
+ * large.
  */
 export function minCharsForFormatPattern(format: string): number {
   let min = 0;

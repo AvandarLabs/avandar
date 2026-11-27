@@ -49,15 +49,17 @@ export async function createPrivateVideoProject({
 }>): Promise<string> {
   const source = await _readStarter({ root, name });
   await fs.mkdir(privateRoot, { recursive: true });
-  if ((await fs.lstat(privateRoot)).isSymbolicLink())
+  if ((await fs.lstat(privateRoot)).isSymbolicLink()) {
     throw new Error(".videos cannot be a symlink");
+  }
   const project = path.join(privateRoot, name);
   await fs.mkdir(project);
   const ownedProject = await OwnedProjectArtifacts.readIdentity(project);
-  if (!ownedProject)
+  if (!ownedProject) {
     throw new Error(
       `Project ownership changed at ${project}. No existing contents were removed.`,
     );
+  }
   let ownedPublic: OwnedProjectArtifact | undefined;
   let ownedStoryboard: OwnedProjectArtifact | undefined;
   try {

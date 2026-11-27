@@ -29,9 +29,7 @@ export type OpenDataDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the OpenDataDataset model.
- */
+/** CRUD type definitions for the OpenDataDataset model. */
 export type OpenDataDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__open_data";

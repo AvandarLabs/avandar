@@ -44,9 +44,7 @@ export type VirtualDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the VirtualDataset model.
- */
+/** CRUD type definitions for the VirtualDataset model. */
 export type VirtualDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__virtual";

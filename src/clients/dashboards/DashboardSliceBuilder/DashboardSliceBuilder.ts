@@ -2,9 +2,9 @@ import { isDefined, isPlainObject, isString, traverse } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { Parser } from "node-sql-parser";
 import { match } from "ts-pattern";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
-import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 
 const UUID_REGEX = new RegExp(
   [
@@ -305,7 +305,10 @@ function _writeDashboardPublishConfig(
 }
 
 /**
- * Builds publication SQL and persists slice configuration for dashboards.
+ * Builds dataset slice SQL and reads or updates dashboard publication
+ * configuration.
+ * Use it, for example, when preparing dataset slices for a dashboard
+ * publication.
  */
 export const DashboardSliceBuilder = {
   /** Returns referenced columns for visualizations and filters. */

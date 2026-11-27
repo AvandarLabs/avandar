@@ -1,7 +1,7 @@
 import { ObjectDescriptionList } from "@avandar/ui";
 import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ScrollArea, Stack, StackProps } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -9,6 +9,7 @@ import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppV
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { StackProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
 /**

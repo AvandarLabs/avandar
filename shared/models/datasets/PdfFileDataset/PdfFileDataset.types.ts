@@ -167,9 +167,7 @@ export type PdfFileDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the PdfFileDataset model.
- */
+/** CRUD type definitions for the PdfFileDataset model. */
 export type PdfFileDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__pdf_file";

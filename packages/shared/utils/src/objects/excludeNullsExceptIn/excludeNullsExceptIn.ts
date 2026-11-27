@@ -3,9 +3,7 @@ import { objectKeys } from "@utils/objects/objectKeys.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { StringKeyOf } from "@utils/types/utilities.types.ts";
 
-/**
- * The result type of `excludeNullsExceptIn`.
- */
+/** The result type of `excludeNullsExceptIn`. */
 export type ExcludeNullsExceptIn<
   T extends UnknownObject,
   KeysToNotChange extends StringKeyOf<T>,

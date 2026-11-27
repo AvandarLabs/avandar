@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Point-in-polygon aggregation compilation for compileMapLayerSpatialQuery.
- */
+/** Point-in-polygon aggregation compilation for compileMapLayerSpatialQuery. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";

@@ -33,6 +33,7 @@ const _INTEGER_FAMILY = new Set<string>([
 
 /**
  * Maps a DuckDB `DESCRIBE` `column_type` string to a sniffable type.
+ * Use it, for example, to assign cast types when preparing a Parquet relation.
  */
 export function duckDbDescribeColumnTypeToSniffable(
   columnType: string,

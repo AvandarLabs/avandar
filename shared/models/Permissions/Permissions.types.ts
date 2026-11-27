@@ -1,6 +1,4 @@
-/**
- * Workspace application surface (matches `public.app_type`).
- */
+/** Workspace application surface (matches `public.app_type`). */
 export type AppType =
   | "data_sources"
   | "data_explorer"
@@ -10,9 +8,7 @@ export type AppType =
   | "case_records"
   | "settings";
 
-/**
- * Role ordering matches Postgres enum `public.role_level`.
- */
+/** Role ordering matches Postgres enum `public.role_level`. */
 export type RoleLevel = "viewer" | "editor" | "admin";
 
 /**
@@ -91,9 +87,7 @@ export type UserAppRolesMatrix = Record<AppType, RoleLevel | undefined>;
  */
 export type UserAppRolesList = Array<{ app: AppType; role: RoleLevel }>;
 
-/**
- * Built-in role matrix preset segment in workspace permissions UI.
- */
+/** Built-in role matrix preset segment in workspace permissions UI. */
 export type BuiltinPresetType =
   | "global_admin"
   | "global_editor"

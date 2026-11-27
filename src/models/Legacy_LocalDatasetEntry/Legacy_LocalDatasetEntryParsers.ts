@@ -21,9 +21,7 @@ export const Legacy_LocalDatasetEntryParsers =
     fromModelUpdateToDBUpdate: identity,
   });
 
-/**
- * Do not remove these tests!
- */
+/** Do not remove these tests! */
 type CrudTypes = LegacyLocalDatasetEntryModel;
 // oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used

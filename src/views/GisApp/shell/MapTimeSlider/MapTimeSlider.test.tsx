@@ -1,6 +1,4 @@
-/**
- * Map clock range slider, play, and reduced-motion behavior.
- */
+/** Map clock range slider, play, and reduced-motion behavior. */
 import { useReducedMotion } from "@mantine/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";

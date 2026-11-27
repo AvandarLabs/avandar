@@ -1,5 +1,5 @@
 import { createModule } from "@avandar/modules";
-import { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 
 /**
  * Creates a base service client module with a `getClientName` function.

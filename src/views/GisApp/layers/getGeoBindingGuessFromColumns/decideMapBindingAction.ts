@@ -1,9 +1,7 @@
 import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
 import type { GeometryBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeometryBindingGuessFromColumns";
 
-/**
- * The binding a layer should gain from column names and sampled geometry.
- */
+/** The binding a layer should gain from column names and sampled geometry. */
 export type MapBindingAction =
   | {
       type: "latLngColumns";

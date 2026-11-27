@@ -28,8 +28,6 @@ export type IResendClient = {
   /** Get a contact from Resend */
   getContact: Resend["contacts"]["get"];
 
-  /**
-   * List the available topics that can be used for an email broadcast
-   */
+  /** List the available topics that can be used for an email broadcast */
   listTopics: Resend["topics"]["list"];
 };

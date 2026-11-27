@@ -108,16 +108,12 @@ export const OfflineSqlHallucinationSubstitutions = {
    * Avandar SQL uses double-quoted identifiers; models often emit backticks.
    */
   normalizeBacktickIdentifiers: _normalizeBacktickIdentifiers,
-  /**
-   * Converts T-SQL `SELECT TOP n` into DuckDB `LIMIT n` (parser + runtime).
-   */
+  /** Converts T-SQL `SELECT TOP n` into DuckDB `LIMIT n` (parser + runtime). */
   normalizeSelectTopToLimit: _normalizeSelectTopToLimit,
   /**
    * Quotes a bare identifier after FROM/JOIN so node-sql-parser can read it.
    */
   quoteUnquotedFromTable: _quoteUnquotedFromTable,
-  /**
-   * Applies the hallucination substitution dictionary in a stable order.
-   */
+  /** Applies the hallucination substitution dictionary in a stable order. */
   apply: _apply,
 };

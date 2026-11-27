@@ -4,7 +4,6 @@ import { assertIsDefined, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -15,6 +14,7 @@ import { EntryDescription } from "@/views/DataManagerApp/DatasetMetaView/Dataset
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";

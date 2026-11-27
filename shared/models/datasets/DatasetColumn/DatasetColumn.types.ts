@@ -99,9 +99,7 @@ export type ImportedDatasetColumn = Pick<
   | "columnIdx"
 >;
 
-/**
- * CRUD type definitions for the DatasetColumn model.
- */
+/** CRUD type definitions for the DatasetColumn model. */
 export type DatasetColumnModel = SupabaseCrudModelSpec<
   {
     tableName: "dataset_columns";

@@ -3,10 +3,6 @@ import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import {
-  SpotlightActionData,
-  SpotlightActionGroupData,
-} from "@mantine/spotlight";
 import { IconDatabase, IconInfoCircle, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -16,6 +12,10 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
+import type {
+  SpotlightActionData,
+  SpotlightActionGroupData,
+} from "@mantine/spotlight";
 
 /** Returns workspace navigation, app information, and development commands. */
 export function useSpotlightActions(

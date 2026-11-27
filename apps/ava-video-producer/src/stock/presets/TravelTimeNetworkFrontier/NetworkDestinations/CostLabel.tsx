@@ -1,5 +1,5 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getTravelCostsFromInput } from "../getTravelCostsFromInput";
+import type { getTravelCostsFromInput } from "../getTravelCostsFromInput";
 import type { ReactNode } from "react";
 
 type Props = {

@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type {
   FreshnessProbe,
@@ -10,7 +10,7 @@ import type {
 const FRESHNESS_PROBE_MAX_BYTES = 1024 * 1024;
 
 function _fail(problem: FreshnessProbeProblem): never {
-  throw new OpenDataAcquisitionFailed({
+  throw new OpenDataAcquisitionFailedError({
     code: "freshness-probe-invalid",
     problem,
   });
@@ -83,8 +83,8 @@ function _readJsonPathsToken(
  *   it.
  * @param params.http - Reads the probe's body.
  * @returns The token.
- * @throws `OpenDataAcquisitionFailed` with `freshness-probe-invalid` when the
- * URL is not allowed, the body is over 1 MB, or the body does not fit the
+ * @throws `OpenDataAcquisitionFailedError` with `freshness-probe-invalid` when
+ * the URL is not allowed, the body is over 1 MB, or the body does not fit the
  * probe's rule. An HTTP failure is thrown as the client threw it.
  */
 export async function readFreshnessProbeToken(

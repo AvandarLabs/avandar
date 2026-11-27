@@ -1,6 +1,4 @@
-/**
- * Temporary-git-repo tests for `ShouldSkipCi.evaluateGitRange`.
- */
+/** Temporary-git-repo tests for `ShouldSkipCi.evaluateGitRange`. */
 import { execFileSync } from "node:child_process";
 import { unlinkSync } from "node:fs";
 import { join } from "node:path";

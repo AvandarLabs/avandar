@@ -4,7 +4,7 @@ const { render, items: _items } = QueueReliefTestState;
 
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../QueueRelief.fixtures";
+import type { fixtures } from "../../QueueRelief.fixtures";
 
 /**
  * Asserts actual bay outlines unfold and all dense item bounds fit setup

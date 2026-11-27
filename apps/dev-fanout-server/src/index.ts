@@ -24,7 +24,9 @@ function _getHost(): string {
 }
 
 /**
- * This is the main entry point for the Fastify server.
+ * Starts the Fastify fanout server, for example when launching the development
+ * server.
+ * Resolves once the server is listening.
  */
 async function main(): Promise<void> {
   const server = Fastify({

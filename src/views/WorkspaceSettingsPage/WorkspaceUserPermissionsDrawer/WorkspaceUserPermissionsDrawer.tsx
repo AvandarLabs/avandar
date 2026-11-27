@@ -15,7 +15,8 @@ type Props = {
 };
 
 /**
- * Drawer for editing a member’s role preset / per-app matrix and tags.
+ * Provides a drawer for editing a member's role assignments and tags.
+ * Use it, for example, when editing a workspace member's access.
  */
 export function WorkspaceUserPermissionsDrawer({
   isOpen,

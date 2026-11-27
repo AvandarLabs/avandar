@@ -3,6 +3,7 @@ packages:
   - "packages/shared/*"
   - "packages/web/*"
   - "packages/node/*"
+  - "packages/lint/*"
   - "plugins/*"
 
 # Singleton runtime dependencies. These must resolve to exactly one copy across

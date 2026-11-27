@@ -1,6 +1,6 @@
 import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getMeasurementStripFromFrame } from "../getMeasurementStripFromFrame";
+import type { getMeasurementStripFromFrame } from "../getMeasurementStripFromFrame";
 import type { ReactNode } from "react";
 
 type Props = {

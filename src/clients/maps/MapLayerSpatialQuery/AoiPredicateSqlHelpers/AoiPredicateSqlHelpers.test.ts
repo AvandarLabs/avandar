@@ -1,6 +1,4 @@
-/**
- * AOI geometry SQL and ST_Intersects predicates.
- */
+/** AOI geometry SQL and ST_Intersects predicates. */
 import { quoteSqlLiteral } from "@avandar/utils/sql";
 import { describe, expect, it } from "vitest";
 import {

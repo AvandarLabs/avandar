@@ -1,6 +1,6 @@
 import { prop, where } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -43,8 +43,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * @param options.workspaceId The workspace the statement was submitted against.
  * @param options.referencedDatasetIds Bare-UUID table references from the SQL.
  * @returns The referenced relations, deduplicated, all of them authorized.
- * @throws WorkspaceRelationsDenied if any reference is outside the workspace.
- * Rethrows the underlying error if the dataset list could not be read.
+ * @throws WorkspaceRelationsDeniedError if any reference is outside the
+ * workspace. Rethrows the underlying error if the dataset list could not be
+ * read.
  */
 export async function assertWorkspaceRelations(
   options: Readonly<{
@@ -77,7 +78,7 @@ export async function assertWorkspaceRelations(
   // An empty workspace list is an answer (deny every reference), never a cache
   // miss worth retrying, exactly as it is for membership.
   if (deniedDatasetIds.length > 0) {
-    throw new WorkspaceRelationsDenied({
+    throw new WorkspaceRelationsDeniedError({
       workspaceId: options.workspaceId,
       deniedDatasetIds,
     });

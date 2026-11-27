@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { SessionExpiredError } from "$/ServerApiClient";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
+import { WorkspaceMembershipDeniedError } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDeniedError";
+import { ConceptRelationDeniedError } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDeniedError";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -45,7 +45,7 @@ describe("AvaQueryClient retry policy", () => {
     // A denial is a decision, not a fault: the retry would repeat the same
     // membership read, reach the same answer, and only delay the error.
     const retry = _getRetryPredicate();
-    const denial = new WorkspaceMembershipDenied({
+    const denial = new WorkspaceMembershipDeniedError({
       code: "not-a-member",
       workspaceId: WORKSPACE_ID,
     });
@@ -59,7 +59,10 @@ describe("AvaQueryClient retry policy", () => {
       expect(
         retry(
           0,
-          new WorkspaceMembershipDenied({ code, workspaceId: WORKSPACE_ID }),
+          new WorkspaceMembershipDeniedError({
+            code,
+            workspaceId: WORKSPACE_ID,
+          }),
         ),
       ).toBe(false);
     },
@@ -69,7 +72,7 @@ describe("AvaQueryClient retry policy", () => {
     // Like the workspace refusals, this is a decision: the same query would
     // name the same concept and be refused again.
     const retry = _getRetryPredicate();
-    const denial = new ConceptRelationDenied({
+    const denial = new ConceptRelationDeniedError({
       conceptId: "22222222-2222-4222-8222-222222222222" as Concept.Id,
     });
     expect(retry(0, denial)).toBe(false);

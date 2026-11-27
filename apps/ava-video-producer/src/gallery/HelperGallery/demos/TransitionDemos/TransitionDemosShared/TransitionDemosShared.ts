@@ -1,4 +1,4 @@
-import { SceneTransitionKind } from "../../../../../motion-components/getSceneTransitionStyle";
+import type { SceneTransitionKind } from "../../../../../motion-components/getSceneTransitionStyle";
 
 const SCENE_KINDS: SceneTransitionKind[] = [
   "dissolve",

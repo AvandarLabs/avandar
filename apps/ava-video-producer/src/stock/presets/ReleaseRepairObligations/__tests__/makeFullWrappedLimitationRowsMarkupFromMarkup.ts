@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { render } from "./ReleaseRepairObligationsTestHelpers";
+import type { render } from "./ReleaseRepairObligationsTestHelpers";
 
 /**
  * Makes fresh fixture state for full wrapped limitation rows remain separate

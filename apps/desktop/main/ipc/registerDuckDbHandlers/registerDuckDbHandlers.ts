@@ -105,11 +105,9 @@ export function registerDuckDbHandlers(
         [],
       );
     } else if (req.format === "xlsx") {
-      /*
-       * `read_xlsx` lives in the `excel` community extension. Install
-       * and load are idempotent; doing it at every call is cheap and
-       * means the binding boots cleanly even on a fresh DuckDB file.
-       */
+      // `read_xlsx` lives in the `excel` community extension. Install
+      // and load are idempotent; doing it at every call is cheap and
+      // means the binding boots cleanly even on a fresh DuckDB file.
       await duckDbService.runRawQuery(`install excel; load excel;`, []);
       await duckDbService.runRawQuery(
         `copy (select * from read_xlsx(${srcLit}))

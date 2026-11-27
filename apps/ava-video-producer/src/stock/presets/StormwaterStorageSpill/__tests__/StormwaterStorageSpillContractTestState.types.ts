@@ -1,6 +1,6 @@
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
-import { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
-import { _render } from "./StormwaterStorageSpillTestHelpers";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
+import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
+import type { _render } from "./StormwaterStorageSpillTestHelpers";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

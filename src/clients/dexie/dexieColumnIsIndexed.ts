@@ -37,6 +37,7 @@ export function dexieColumnIsIndexed(
 
 /**
  * Throws if any `columnNames` entry is not indexed on `dbTable`.
+ * Use it, for example, to validate columns before filtering a Dexie table.
  */
 export function assertDexieColumnsAreIndexed(
   tableName: string,

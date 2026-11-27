@@ -8,9 +8,9 @@ import {
 import { DraftThemeResolution } from "../../DraftThemeResolution/DraftThemeResolution";
 import {
   EMPTY_THEME_DRAFT,
+  ThemeDrafts,
   type ThemeDraft,
   type ThemeEditScope,
-  ThemeDrafts,
 } from "../../ThemeDrafts/ThemeDrafts";
 import { TokenRows } from "../TokenRows";
 import { type TokenRow } from "../TokenRows.types";

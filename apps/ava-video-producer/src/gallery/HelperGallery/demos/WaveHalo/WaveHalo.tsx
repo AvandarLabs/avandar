@@ -1,6 +1,6 @@
 import { Motion } from "../../../../motion";
-import { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
-import { DemoTheme } from "../DemoTheme";
+import type { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
+import type { DemoTheme } from "../DemoTheme";
 import type { ReactNode } from "react";
 
 const HALO_OPACITY = { min: 0.15, max: 0.45 };

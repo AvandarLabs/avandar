@@ -81,9 +81,7 @@ export type NuxStep = {
    * the tooltip must attach to a smaller edge.
    */
   spotlightAnchor?: NuxAnchor;
-  /**
-   * When set, `<0>` in `body` renders as a download link to this href.
-   */
+  /** When set, `<0>` in `body` renders as a download link to this href. */
   bodyLinkHref?: string;
   /**
    * Hides Next. The tour advances on its own once this anchor is in the

@@ -1,15 +1,14 @@
-import { isArray, MIMEType } from "@avandar/utils";
+import { isArray } from "@avandar/utils";
 import { Box, Button, FileInput, Group } from "@mantine/core";
 import { useForm } from "@ui/hooks/useForm/useForm";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useRef, useState } from "react";
 import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
+import type { MIMEType } from "@avandar/utils";
 import type { FileInputProps } from "@mantine/core";
 
 type Props = {
-  /**
-   * Whether the file input should be clearable
-   */
+  /** Whether the file input should be clearable */
   clearable?: boolean;
 
   /**
@@ -18,19 +17,13 @@ type Props = {
    */
   accept: MIMEType | readonly MIMEType[];
 
-  /**
-   * Callback fired when a file is submitted
-   */
+  /** Callback fired when a file is submitted */
   onSubmit: (file: File | undefined) => void;
 
-  /**
-   * Whether the form is currently submitting
-   */
+  /** Whether the form is currently submitting */
   isSubmitting?: boolean;
 
-  /**
-   * Label for the submit button
-   */
+  /** Label for the submit button */
   submitButtonLabel?: string;
 
   /**

@@ -1,6 +1,4 @@
-/**
- * Shared map-tool fake for MapToolCluster and annotation gesture tests.
- */
+/** Shared map-tool fake for MapToolCluster and annotation gesture tests. */
 import { vi } from "vitest";
 import type { Map as MapLibreMap } from "maplibre-gl";
 

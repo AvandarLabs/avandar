@@ -1,8 +1,5 @@
-import {
-  Select as MantineSelect,
-  SelectProps as MantineSelectProps,
-  useMantineTheme,
-} from "@mantine/core";
+import { Select as MantineSelect, useMantineTheme } from "@mantine/core";
+import type { SelectProps as MantineSelectProps } from "@mantine/core";
 
 export type SelectOption<T extends NonNullable<string>> = {
   value: T;

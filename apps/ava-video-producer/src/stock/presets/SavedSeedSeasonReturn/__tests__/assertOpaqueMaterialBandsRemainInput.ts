@@ -1,5 +1,5 @@
-import { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertOpaqueMaterialBandsRemainFrame as _assertOpaqueMaterialBandsRemainFrame } from "./assertOpaqueMaterialBandsRemainFrame";
+import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 
 /**
  * Asserts opaque material bands remain disjoint and visible across

@@ -1,5 +1,4 @@
 import { Motion } from "../../motion";
-import { getOverlayPose } from "../../motion-components/getOverlayPose";
 import type { ContinuityBeat } from "../continuitySchema/continuitySchema";
 
 type GetConnectorProgressOptions = {

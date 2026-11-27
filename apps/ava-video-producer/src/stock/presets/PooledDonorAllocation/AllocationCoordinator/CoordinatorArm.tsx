@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getAllocationHandlingFromTokens } from "../getAllocationHandlingFromTokens";
+import type { getAllocationHandlingFromTokens } from "../getAllocationHandlingFromTokens";
 import type { ReactNode } from "react";
 
 type Props = {

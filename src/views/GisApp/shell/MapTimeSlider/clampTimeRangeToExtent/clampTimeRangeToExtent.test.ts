@@ -1,6 +1,4 @@
-/**
- * Intersection of a saved map clock window with a queried extent.
- */
+/** Intersection of a saved map clock window with a queried extent. */
 import { describe, expect, it } from "vitest";
 import { clampTimeRangeToExtent } from "./clampTimeRangeToExtent";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";

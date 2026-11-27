@@ -1,5 +1,5 @@
-import { SvgPaintAssertions } from "../../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
-import { DEFAULT_INPUT } from "../../PublicationSnapshotSlice.fixtures";
+import type { SvgPaintAssertions } from "../../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
+import type { DEFAULT_INPUT } from "../../PublicationSnapshotSlice.fixtures";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

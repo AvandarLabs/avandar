@@ -4,7 +4,7 @@ import {
 } from "$/connectors/open-data/ckanActionApiHelpers.ts";
 import { CkanPackageSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
 import { createCkanPackageFromWire } from "$/connectors/open-data/CkanClient/createCkanPackageFromWire/createCkanPackageFromWire.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanClient,
   CkanPackage,
@@ -40,7 +40,7 @@ export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
       } catch (cause) {
         // The URL is deliberately absent from the failure: CKAN redirects a
         // download to a presigned object-store URL, which is a credential.
-        throw new OpenDataAcquisitionFailed(
+        throw new OpenDataAcquisitionFailedError(
           { code: "resource-unreachable", ckanResourceId },
           cause,
         );

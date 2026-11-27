@@ -25,10 +25,8 @@ export const ConceptAttributeClient = createUsableServiceClient(
     dbTablePrimaryKey: "id",
     parsers: ConceptAttributeParsers,
     queries: ({ clientLogger }) => {
-      /**
-       * Given a list of concept attributes, fetch all the mappings that
-       * populate them.
-       */
+      // Given a list of concept attributes, fetch all the mappings that
+      // populate them.
       return {
         getAllAttributeMappings: async (params: {
           attributes: readonly ConceptAttribute.T[] | undefined;

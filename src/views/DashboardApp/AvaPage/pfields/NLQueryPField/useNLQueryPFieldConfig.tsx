@@ -1,10 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
-import {
-  NLQuery,
-  NLQueryPField,
-} from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import { NLQueryPField } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import type { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import type { CustomField } from "@puckeditor/core";
 
 /**
  * React hook that builds the Puck `CustomField` config for the NL query field.

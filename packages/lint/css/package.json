@@ -1,0 +1,52 @@
+{
+  "name": "@avandar/lint-css",
+  "version": "0.1.0",
+  "description": "Avandar css lint integration",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./stylelint": "./src/stylelint/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@avandar/lint": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      "./stylelint": {
+        "types": "./dist/stylelint.d.ts",
+        "default": "./dist/stylelint.js"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/lint/css"
+  },
+  "peerDependencies": {
+    "stylelint": "^17.4.0"
+  },
+  "peerDependenciesMeta": {
+    "stylelint": {
+      "optional": true
+    }
+  }
+}

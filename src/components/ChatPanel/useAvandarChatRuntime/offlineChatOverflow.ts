@@ -1,5 +1,7 @@
 /**
- * Detects a WebLLM prompt that exceeded the engine context window.
+ * Recognizes errors indicating that a WebLLM prompt exceeded the context
+ * window.
+ * For example, use it to select a context-window recovery message.
  */
 export function isOfflineContextWindowOverflow(error: unknown): boolean {
   if (!(error instanceof Error)) {

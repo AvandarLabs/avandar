@@ -1,5 +1,5 @@
-import { FIXTURES } from "../../PortableWorkTransfer.fixtures";
 import { assertUnloadingHandFollowsRigidId as _assertUnloadingHandFollowsRigidId } from "./assertUnloadingHandFollowsRigidId";
+import type { FIXTURES } from "../../PortableWorkTransfer.fixtures";
 
 /**
  * Asserts the unloading hand follows each rigid copy and stays above the

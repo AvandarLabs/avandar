@@ -1,13 +1,13 @@
+import { Model } from "@avandar/models";
+import { assertIsDefined } from "@avandar/utils";
+import { vi } from "vitest";
 /**
  * Shared mocks and factories for StyleSection tests. Each scenario file
  * imports this first so its `vi.mock` calls register before the module graph.
  */
-import { Model } from "@avandar/models";
-import { assertIsDefined } from "@avandar/utils";
-import { vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";

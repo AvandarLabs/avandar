@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
@@ -119,7 +119,7 @@ describe("SocrataClient.getRows", () => {
         maxRows: 100000,
       }),
     ).rejects.toSatisfy((error: unknown) => {
-      return OpenDataAcquisitionFailed.is(error, "socrata-unreachable");
+      return OpenDataAcquisitionFailedError.is(error, "socrata-unreachable");
     });
   });
 });

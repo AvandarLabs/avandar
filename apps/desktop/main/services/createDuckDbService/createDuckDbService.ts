@@ -57,13 +57,11 @@ export function createDuckDbService(filePath: string): DuckDbService {
           resolve(rows);
         }
       };
-      /*
-       * The `duckdb` Node binding's `Connection.all` is variadic:
-       * `(sql, ...bindings, callback)`. TS can't narrow `[sql,
-       * ...params, callback]` to the binding's tuple type, so dispatch
-       * via `Function.prototype.apply` to keep the call site honest
-       * about what's happening on the wire.
-       */
+      // The `duckdb` Node binding's `Connection.all` is variadic:
+      // `(sql, ...bindings, callback)`. TS can't narrow `[sql,
+      // ...params, callback]` to the binding's tuple type, so dispatch
+      // via `Function.prototype.apply` to keep the call site honest
+      // about what's happening on the wire.
       (conn.all as (...a: unknown[]) => void).apply(conn, [
         sql,
         ...params,

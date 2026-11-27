@@ -1,7 +1,5 @@
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-/**
- * Types for NUX prerequisite strategies that judge milestone completion.
- */
+/** Types for NUX prerequisite strategies that judge milestone completion. */
 import type {
   NuxEvent,
   NuxEventName,

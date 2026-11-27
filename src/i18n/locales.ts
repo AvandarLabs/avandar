@@ -48,14 +48,16 @@ export const LOCALE_META: Record<SupportedLocale, LocaleMeta> = {
 };
 
 /**
- * Type guard for narrowing an arbitrary string to a `SupportedLocale`.
+ * Checks whether a string is a supported locale and narrows its type.
+ * Use it, for example, when validating a stored language preference.
  */
 export function isSupportedLocale(value: string): value is SupportedLocale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);
 }
 
 /**
- * Returns the writing direction (`"ltr"` or `"rtl"`) for the given locale.
+ * Returns the writing direction for a supported locale.
+ * Use it, for example, when setting the document's text direction.
  */
 export function getLocaleDirection(locale: SupportedLocale): "ltr" | "rtl" {
   return LOCALE_META[locale].direction;

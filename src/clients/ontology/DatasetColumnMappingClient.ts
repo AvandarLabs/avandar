@@ -2,7 +2,8 @@ import { DatasetColumnMappingParsers } from "$/models/ontology/AttributeMapping/
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 
 /**
- * Client for managing dataset column value mapping configurations
+ * Manages dataset column value mapping configurations.
+ * Use it, for example, to read column mappings for a concept attribute.
  */
 export const DatasetColumnMappingClient = createRdbCrudClient({
   modelName: "DatasetColumnMapping",

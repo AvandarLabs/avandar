@@ -23,9 +23,7 @@ const MinimalPolarWebhookEventSchema = object({
  * function must have JWT verification disabled.
  */
 export const PolarPublicRoutes = defineRoutes<PolarPublicAPI>("polar-public", {
-  /**
-   * Handles all Polar webhook events.
-   */
+  /** Handles all Polar webhook events. */
   "/webhook": {
     POST: POST("/webhook")
       .disableJWTVerification()

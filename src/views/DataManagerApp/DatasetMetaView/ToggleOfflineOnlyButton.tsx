@@ -25,7 +25,9 @@ type Props = {
 };
 
 /**
- * A button to toggle the offline-only status of a dataset.
+ * Renders a control for changing a dataset's offline-only status.
+ * Use it, for example, in dataset metadata to enable online syncing or
+ * keep the dataset offline-only.
  */
 export function ToggleOfflineOnlyButton({
   isInCloudStorage,

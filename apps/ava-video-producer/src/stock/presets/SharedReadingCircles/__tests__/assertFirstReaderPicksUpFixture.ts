@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { denseInput } from "../SharedReadingCircles.fixtures";
 import { assertFirstReaderPicksUpGroup as _assertFirstReaderPicksUpGroup } from "./assertFirstReaderPicksUpGroup";
 import {
-  _render,
   _bookPositions,
-  _createRouteInputs,
+  _render,
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
+import type { denseInput } from "../SharedReadingCircles.fixtures";
+import type { _createRouteInputs } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /**
  * Asserts the first reader picks up and carries the single physical copy

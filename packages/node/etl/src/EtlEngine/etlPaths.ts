@@ -89,7 +89,8 @@ export function getEtlLoadDir(
 }
 
 /**
- * Directory the transform step reads from (extract output for this run).
+ * Returns the extract output directory for a pipeline run.
+ * Use it, for example, to locate files for the transform step.
  */
 export function getEtlInputDir(
   pipelineName: string,

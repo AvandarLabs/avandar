@@ -332,7 +332,7 @@ reuse predicate is `serves`. Column names compare case-sensitively.
 
 Both ports evict only when IndexedDB raises `QuotaExceededError`: they evict
 enough for the incoming payload, retry once, then throw
-`RelationCacheWriteFailed`. The legacy `LocalDataset` table (imported Parquet
+`RelationCacheWriteFailedError`. The legacy `LocalDataset` table (imported Parquet
 for offline use) has its own unrelated eviction.
 
 ### Whole-relation caching with column slices, not row slices

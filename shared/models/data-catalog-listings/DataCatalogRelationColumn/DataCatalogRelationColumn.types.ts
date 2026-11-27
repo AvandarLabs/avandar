@@ -33,9 +33,7 @@ export type DataCatalogRelationColumnRead = {
   castDataType: DuckDbDataType;
 };
 
-/**
- * CRUD type definitions for the DataCatalogRelationColumn model.
- */
+/** CRUD type definitions for the DataCatalogRelationColumn model. */
 export type DataCatalogRelationColumnModel = SupabaseCrudModelSpec<
   {
     tableName: "data_catalog_listings__relation_columns";

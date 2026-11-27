@@ -6,9 +6,7 @@ export type {
   DuckDbSpatialAvailability, // oxfmt-ignore
 } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 
-/**
- * The CSV Reject Scans Table returns the following information:
- */
+/** The CSV Reject Scans Table returns the following information: */
 export type DuckDbScan = {
   /** The internal ID used in DuckDB to represent that scanner */
   scan_id: bigint;
@@ -41,9 +39,7 @@ export type DuckDbScan = {
   user_arguments: string;
 };
 
-/**
- * The CSV Reject Errors Table returns the following information:
- */
+/** The CSV Reject Errors Table returns the following information: */
 export type DuckDbRejectedRow = {
   /**
    * The internal ID used in DuckDB to represent that scanner, used to join
@@ -78,9 +74,7 @@ export type LoadCsvErrors = {
   rejectedRows: DuckDbRejectedRow[];
 };
 
-/**
- * Schema for a column as returned by DuckDB's DESCRIBE statement.
- */
+/** Schema for a column as returned by DuckDB's DESCRIBE statement. */
 export type DuckDbColumnSchema = {
   /** The name of the column */
   column_name: string;

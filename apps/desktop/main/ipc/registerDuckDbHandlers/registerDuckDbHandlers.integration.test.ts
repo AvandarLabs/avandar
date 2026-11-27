@@ -45,11 +45,9 @@ async function callHandler<TReq>(
   };
   const repliesBefore = transport.replies.length;
   listeners[0]!(envelope);
-  /*
-   * Handlers reply via a Promise microtask; flush once with a 0ms timer.
-   * Handlers that touch DuckDB do real I/O, so wait until the reply
-   * envelope shows up rather than asserting on a fixed delay.
-   */
+  // Handlers reply via a Promise microtask; flush once with a 0ms timer.
+  // Handlers that touch DuckDB do real I/O, so wait until the reply
+  // envelope shows up rather than asserting on a fixed delay.
   while (transport.replies.length === repliesBefore) {
     await new Promise((resolve) => {
       return setTimeout(resolve, 5);

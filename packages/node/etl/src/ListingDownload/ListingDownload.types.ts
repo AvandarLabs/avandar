@@ -17,9 +17,7 @@ export type DownloadableListing = Readonly<{
   freshnessProbe?: FreshnessProbe;
 }>;
 
-/**
- * One column of a paged or JSON listing, as its source declares it.
- */
+/** One column of a paged or JSON listing, as its source declares it. */
 export type ListingDownloadColumn = Readonly<{
   /** The column's name in each page's CSV header, or each JSON record. */
   name: string;

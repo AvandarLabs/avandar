@@ -143,6 +143,8 @@ function _localFilterToRecord(
 
 /**
  * Defines per-visualization filter defaults and transforms filter state.
+ * Use it, for example, to initialize a chart subscription or parse a local
+ * filter's default value for its viewer state.
  */
 export const DataVizFilters = {
   /** Default subscription used by new visualization blocks. */

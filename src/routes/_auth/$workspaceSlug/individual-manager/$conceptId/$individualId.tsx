@@ -1,10 +1,6 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import {
-  createFileRoute,
-  ErrorComponentProps,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
 import { uuid } from "$/lib/uuid";
@@ -15,6 +11,7 @@ import { DetailPaneMessage } from "@/views/IndividualManagerApp/DetailPaneMessag
 import { SingleIndividualView } from "@/views/IndividualManagerApp/SingleIndividualView";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 
 /**
  * `comment` names a comment to scroll to and highlight, set by a copied

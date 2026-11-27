@@ -2,9 +2,7 @@ import { isNull } from "@utils/guards/isNull/isNull.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 
-/**
- * The result type of `excludeNullsIn`.
- */
+/** The result type of `excludeNullsIn`. */
 export type ExcludeNullsIn<
   T extends UnknownObject,
   K extends keyof T = keyof T,

@@ -1,15 +1,14 @@
-import {
-  assertIsDefined,
-  objectEntries,
-  objectKeys,
-  objectValuesMap,
-} from "@avandar/utils";
+import { assertIsDefined, objectKeys } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import { match } from "ts-pattern";
-import { EmptyObject } from "type-fest";
+import {
+  buildInsertSqlFromRows,
+  buildOrderByClauseFromColumns,
+  buildQuotedSqlIdentifier,
+  buildWhereClauseFromFilters,
+  serializeRowValues,
+} from "@clients/SqliteCrudClient/SqliteSqlHelpers.ts";
 import type { ILogger } from "@avandar/logger";
-import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
@@ -19,6 +18,7 @@ import type {
   SupabaseCrudClient,
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { EmptyObject } from "type-fest";
 
 /**
  * SQLite-backed CRUD client for the Electrobun desktop shell. Mirrors
@@ -83,7 +83,7 @@ export function createSqliteCrudClient<
   } = options;
 
   const pk = String(dbTablePrimaryKey);
-  const table = _ident(String(tableName));
+  const table = buildQuotedSqlIdentifier(String(tableName));
 
   const modelClient = createModelCrudClient({
     modelName,
@@ -103,14 +103,16 @@ export function createSqliteCrudClient<
           return undefined;
         }
         const { rows } = await sqliteTransport.query({
-          sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
+          sql: `select * from ${table} where ${buildQuotedSqlIdentifier(pk)} = ? limit 1`,
           params: [params.id as unknown],
         });
         return (rows[0] as M["DBRead"] | undefined) ?? undefined;
       },
 
       getCount: async (params) => {
-        const { where, params: bindings } = _buildWhereClause(params.where);
+        const { where, params: bindings } = buildWhereClauseFromFilters(
+          params.where,
+        );
         const { rows } = await sqliteTransport.query({
           sql: `select count(*) as _count from ${table}${where}`,
           params: bindings,
@@ -120,9 +122,11 @@ export function createSqliteCrudClient<
       },
 
       getPage: async (params) => {
-        const { where, params: bindings } = _buildWhereClause(params.where);
+        const { where, params: bindings } = buildWhereClauseFromFilters(
+          params.where,
+        );
         const offset = params.pageNum * params.pageSize;
-        const sql = `select * from ${table}${where}${_orderByClause(params.orderBy)} limit ? offset ?`;
+        const sql = `select * from ${table}${where}${buildOrderByClauseFromColumns(params.orderBy)} limit ? offset ?`;
         const { rows } = await sqliteTransport.query({
           sql,
           params: [...bindings, params.pageSize, offset],
@@ -131,9 +135,9 @@ export function createSqliteCrudClient<
       },
 
       insert: async (params) => {
-        const row = _serializeRowValues(params.data as Record<string, unknown>);
+        const row = serializeRowValues(params.data as Record<string, unknown>);
         const cols = objectKeys(row);
-        const sql = _buildInsertSql({
+        const sql = buildInsertSqlFromRows({
           table,
           cols,
           pk,
@@ -156,7 +160,7 @@ export function createSqliteCrudClient<
           return [];
         }
         const allRows = params.data.map((rowData) => {
-          return _serializeRowValues(rowData as Record<string, unknown>);
+          return serializeRowValues(rowData as Record<string, unknown>);
         });
         // Take column set from the first row; assume every row in a
         // bulkInsert has the same shape (matches Postgres + Supabase
@@ -175,7 +179,7 @@ export function createSqliteCrudClient<
             return placeholders;
           })
           .join(", ");
-        const sql = _buildInsertSql({
+        const sql = buildInsertSqlFromRows({
           table,
           cols,
           pk,
@@ -196,12 +200,12 @@ export function createSqliteCrudClient<
       },
 
       update: async (params) => {
-        const row = _serializeRowValues(params.data as Record<string, unknown>);
+        const row = serializeRowValues(params.data as Record<string, unknown>);
         const cols = objectKeys(row);
         if (cols.length === 0) {
           // No-op update; just read the current row back.
           const { rows } = await sqliteTransport.query({
-            sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
+            sql: `select * from ${table} where ${buildQuotedSqlIdentifier(pk)} = ? limit 1`,
             params: [params.id as unknown],
           });
           const back = rows[0];
@@ -210,10 +214,10 @@ export function createSqliteCrudClient<
         }
         const setClause = cols
           .map((col) => {
-            return `${_ident(col)} = ?`;
+            return `${buildQuotedSqlIdentifier(col)} = ?`;
           })
           .join(", ");
-        const sql = `update ${table} set ${setClause} where ${_ident(pk)} = ? returning *`;
+        const sql = `update ${table} set ${setClause} where ${buildQuotedSqlIdentifier(pk)} = ? returning *`;
         const { rows } = await sqliteTransport.query({
           sql,
           params: [
@@ -230,7 +234,7 @@ export function createSqliteCrudClient<
 
       delete: async (params) => {
         await sqliteTransport.run({
-          sql: `delete from ${table} where ${_ident(pk)} = ?`,
+          sql: `delete from ${table} where ${buildQuotedSqlIdentifier(pk)} = ?`,
           params: [params.id as unknown],
         });
       },
@@ -245,7 +249,7 @@ export function createSqliteCrudClient<
           })
           .join(", ");
         await sqliteTransport.run({
-          sql: `delete from ${table} where ${_ident(pk)} in (${placeholders})`,
+          sql: `delete from ${table} where ${buildQuotedSqlIdentifier(pk)} in (${placeholders})`,
           params: params.ids as unknown as unknown[],
         });
       },
@@ -259,168 +263,4 @@ export function createSqliteCrudClient<
     ExtendedQueriesClient,
     ExtendedMutationsClient
   >;
-}
-
-/**
- * Quote an identifier (table or column name) with double quotes so
- * reserved words and snake_case names round-trip correctly. Embedded
- * double quotes are doubled per SQL grammar; nothing in the codebase
- * uses identifiers containing them today, but quoting keeps the path
- * safe if a future migration introduces one.
- */
-function _ident(name: string): string {
-  return `"${name.replaceAll('"', '""')}"`;
-}
-
-/** Column names an `orderBy` entry may reference. */
-const ORDER_COLUMN = /^[a-z_][a-z0-9_]*$/;
-
-/**
- * Build an ` order by` clause from the caller's `orderBy`. Returns an empty
- * string when no ordering was requested, so unordered pages are unchanged.
- * Throws if a column name falls outside `ORDER_COLUMN`.
- */
-function _orderByClause(
-  orderBy:
-    | ReadonlyArray<{ column: string; direction: "asc" | "desc" }>
-    | undefined,
-): string {
-  if (!orderBy || orderBy.length === 0) {
-    return "";
-  }
-  const parts = orderBy.map((order) => {
-    if (!ORDER_COLUMN.test(order.column)) {
-      throw new Error(`Unsupported order column: ${order.column}`);
-    }
-    return `${_ident(order.column)} ${order.direction}`;
-  });
-  return ` order by ${parts.join(", ")}`;
-}
-
-/**
- * Build a parameterised WHERE clause from the model's
- * `FiltersByColumn` shape. Supports the same operators as the
- * Supabase client (`eq`, `in`, `is`) and emits placeholders rather than
- * interpolating values; the only thing that gets concatenated is the
- * caller-controlled column name.
- */
-function _buildWhereClause<DBRead extends Record<string, unknown>>(
-  filters: FiltersByColumn<DBRead> | undefined,
-): { where: string; params: unknown[] } {
-  if (!filters) {
-    return { where: "", params: [] };
-  }
-  const clauses: string[] = [];
-  const params: unknown[] = [];
-
-  objectKeys(filters).forEach((column) => {
-    const filter = filters[column];
-    if (!filter) {
-      return;
-    }
-    objectEntries(filter).forEach(([operator, value]) => {
-      const quotedColumn = _ident(String(column));
-      match(operator as FilterOperator)
-        .with("eq", () => {
-          clauses.push(`${quotedColumn} = ?`);
-          params.push(value as unknown);
-        })
-        .with("in", () => {
-          const values = (value as readonly unknown[]) ?? [];
-          if (values.length === 0) {
-            // An empty IN list in SQL is invalid; degrade to a
-            // contradiction so the surrounding query returns no rows.
-            clauses.push("1 = 0");
-            return;
-          }
-          const placeholders = values
-            .map(() => {
-              return "?";
-            })
-            .join(", ");
-          clauses.push(`${quotedColumn} in (${placeholders})`);
-          params.push(...values);
-        })
-        .with("is", () => {
-          clauses.push(`${quotedColumn} is null`);
-        })
-        .exhaustive();
-    });
-  });
-
-  return clauses.length === 0
-    ? { where: "", params: [] }
-    : { where: ` where ${clauses.join(" and ")}`, params };
-}
-
-/**
- * Stringify object/array values so bun:sqlite can store them in
- * TEXT-affinity (`jsonb`) columns. Returns primitives unchanged.
- * Symmetric parse-on-read is intentionally not done here; model
- * parsers handle DBRead → ModelRead transforms and can pick up the
- * raw JSON strings.
- */
-function _serializeRowValues(
-  row: Record<string, unknown>,
-): Record<string, unknown> {
-  return objectValuesMap(row, (value) => {
-    if (
-      value !== null &&
-      typeof value === "object" &&
-      !(value instanceof Date)
-    ) {
-      return JSON.stringify(value);
-    }
-    return value;
-  });
-}
-
-type BuildInsertSqlArgs = {
-  table: string;
-  cols: readonly string[];
-  pk: string;
-  valuesClause?: string;
-  upsert: boolean;
-  onConflict: { columnNames: string[]; ignoreDuplicates: boolean } | undefined;
-};
-
-/**
- * Compose an `insert ... values ... [on conflict ...] returning *`
- * statement. `valuesClause` is provided for the bulk path; the single
- * insert path leaves it undefined and uses one `(?, ?, …)` row.
- */
-function _buildInsertSql(args: Readonly<BuildInsertSqlArgs>): string {
-  const { table, cols, pk, valuesClause, upsert, onConflict } = args;
-  const colsClause = cols.map(_ident).join(", ");
-  const values =
-    valuesClause ??
-    "(" +
-      cols
-        .map(() => {
-          return "?";
-        })
-        .join(", ") +
-      ")";
-  let conflict = "";
-  if (upsert) {
-    assertIsDefined(onConflict, "`onConflict` must be defined when upserting");
-    const onCols = onConflict.columnNames.map(_ident).join(", ");
-    if (onConflict.ignoreDuplicates) {
-      conflict = ` on conflict (${onCols}) do nothing`;
-    } else {
-      const updates = cols
-        .filter((col) => {
-          return col !== pk && !onConflict.columnNames.includes(col);
-        })
-        .map((col) => {
-          return `${_ident(col)} = excluded.${_ident(col)}`;
-        })
-        .join(", ");
-      conflict =
-        updates.length === 0
-          ? ` on conflict (${onCols}) do nothing`
-          : ` on conflict (${onCols}) do update set ${updates}`;
-    }
-  }
-  return `insert into ${table} (${colsClause}) values ${values}${conflict} returning *`;
 }

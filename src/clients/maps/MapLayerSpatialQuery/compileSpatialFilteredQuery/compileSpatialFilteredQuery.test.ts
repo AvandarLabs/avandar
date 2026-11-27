@@ -1,6 +1,4 @@
-/**
- * Spatial filter compilation over every spatial compiler's output.
- */
+/** Spatial filter compilation over every spatial compiler's output. */
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";

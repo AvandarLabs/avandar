@@ -52,7 +52,8 @@ async function _generateFeaturebaseJWT(
 }
 
 /**
- * This is the route handler for all support endpoints.
+ * Defines support endpoints served by `MiniServer`, including the endpoint
+ * that returns a signed Featurebase identity JWT for the authenticated user.
  */
 export const SupportRoutes = defineRoutes<SupportAPI>("support", {
   "/featurebase-jwt": {

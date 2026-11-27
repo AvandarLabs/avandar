@@ -2,13 +2,12 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { isEmpty, isNotEmpty } from "@avandar/utils";
 import { requireLicense } from "../requireLicense";
-import { ProducerCli } from "../runProducerCommand/ProducerCli/ProducerCli.mjs";
 import { AdoptThemeArgs } from "./AdoptThemeArgs";
 import { CssCustomProperties } from "./CssCustomProperties";
 import {
-  makeThemeCssFromTokens,
   getEasingsFromPalette,
   makeKitTokensFromPalette,
+  makeThemeCssFromTokens,
   printReport,
   writeCurves,
 } from "./themeOutputHelpers/themeOutputHelpers";
@@ -135,5 +134,7 @@ function _writeThemeCss({
   isDryRun,
   css,
 }: Readonly<{ isDryRun: boolean; css: string }>): void {
-  if (!isDryRun) writeFileSync(resolve("src/theme.css"), css);
+  if (!isDryRun) {
+    writeFileSync(resolve("src/theme.css"), css);
+  }
 }

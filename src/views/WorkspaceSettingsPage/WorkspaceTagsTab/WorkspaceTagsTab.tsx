@@ -21,7 +21,9 @@ import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
 
 /**
- * CRUD for workspace user-group tags (names + colors).
+ * Renders controls for managing the current workspace's user-group names and
+ * colors.
+ * WorkspaceSettingsPage uses it to display user-group management in settings.
  */
 export function WorkspaceTagsTab(): JSX.Element {
   const { t } = useLingui();

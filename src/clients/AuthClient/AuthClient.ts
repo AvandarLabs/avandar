@@ -1,16 +1,16 @@
-import {
-  AuthChangeEvent,
-  Session,
-  Subscription,
-  User,
-  WeakPassword,
-} from "@supabase/supabase-js";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { isDesktop } from "$/platform/isDesktop";
 import { ServerApiSessionRefresher } from "$/ServerApiClient";
 import { PlatformRegistry } from "@/config/platform/PlatformRegistry/PlatformRegistry";
 import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
 import type { Session as PlatformSession } from "$/platform/types/AuthProvider.types";
+import type {
+  AuthChangeEvent,
+  Session,
+  Subscription,
+  User,
+  WeakPassword,
+} from "@supabase/supabase-js";
 
 /**
  * In the Electrobun desktop shell, the sign-in, sign-out, and session-restore
@@ -105,9 +105,7 @@ type AuthClient = {
    */
   isManuallySignedOut: () => boolean;
 
-  /**
-   * Resets the manual sign out flag.
-   */
+  /** Resets the manual sign out flag. */
   resetManualSignOut: () => void;
 
   /**

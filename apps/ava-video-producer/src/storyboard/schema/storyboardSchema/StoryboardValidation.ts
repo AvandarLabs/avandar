@@ -1,9 +1,9 @@
 import { prop, propEq } from "@avandar/utils";
-import { z } from "zod";
 import { StageTheme } from "../../../scenes/StageTheme/StageTheme";
 import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../../StoryFilm/SteppedColumnWipe/SteppedColumnWipe";
-import { shotSchema } from "../shotSchema";
 import { type TiltedWindowProps } from "./StoryboardValidation.types";
+import type { shotSchema } from "../shotSchema";
+import type { z } from "zod";
 /** Explains why a shot's transition object cannot render as authored. */
 function _checkShotTransition({
   shot,

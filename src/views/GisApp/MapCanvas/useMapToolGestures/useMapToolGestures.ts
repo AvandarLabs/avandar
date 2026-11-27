@@ -2,7 +2,6 @@ import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
 import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
 import { attachPlaceGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachPlaceGestures/attachPlaceGestures";
@@ -11,6 +10,7 @@ import {
   attachMeasureGestures,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { PlaceCoordinate } from "@/clients/places/places.types";
 import type {
   AoiGestureCallbacks,
@@ -225,7 +225,10 @@ type GestureResult = {
 };
 
 /**
- * Registers map-tool click, close, and Escape-to-Pan gestures.
+ * Connects the active map tool to map gestures and returns its preview
+ * vertices,
+ * invalid ring status, and last created annotation ID.
+ * Use it, for example, to support drawing and measuring on a map canvas.
  */
 export function useMapToolGestures({
   mapRef,

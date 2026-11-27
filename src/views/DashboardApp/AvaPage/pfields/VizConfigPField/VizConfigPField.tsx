@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { Workspace } from "$/models/Workspace/Workspace";
 import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useDataVizAuthoring } from "../useDataVizAuthoring/useDataVizAuthoring";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
 
 type Props = {

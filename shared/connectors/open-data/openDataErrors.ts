@@ -157,7 +157,7 @@ function _buildFailureMessage(failure: OpenDataAcquisitionFailure): string {
  * models a status to send back to a client and pulls in the Supabase and Resend
  * clients, neither of which belongs in an acquisition path.
  */
-export class OpenDataAcquisitionFailed extends Error {
+export class OpenDataAcquisitionFailedError extends Error {
   /** Which condition failed, and the context that condition carries. */
   readonly failure: OpenDataAcquisitionFailure;
 
@@ -167,7 +167,7 @@ export class OpenDataAcquisitionFailed extends Error {
    */
   constructor(failure: OpenDataAcquisitionFailure, cause?: unknown) {
     super(_buildFailureMessage(failure), { cause });
-    this.name = "OpenDataAcquisitionFailed";
+    this.name = "OpenDataAcquisitionFailedError";
     this.failure = failure;
   }
 
@@ -175,9 +175,9 @@ export class OpenDataAcquisitionFailed extends Error {
   static is(
     value: unknown,
     code?: OpenDataAcquisitionFailureCode,
-  ): value is OpenDataAcquisitionFailed {
+  ): value is OpenDataAcquisitionFailedError {
     return (
-      value instanceof OpenDataAcquisitionFailed &&
+      value instanceof OpenDataAcquisitionFailedError &&
       (code === undefined || value.failure.code === code)
     );
   }

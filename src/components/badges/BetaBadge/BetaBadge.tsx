@@ -1,6 +1,7 @@
 import { mantineVar, Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Badge, BadgeProps } from "@mantine/core";
+import { Badge } from "@mantine/core";
+import type { BadgeProps } from "@mantine/core";
 
 type Props = BadgeProps & {
   /**
@@ -10,7 +11,9 @@ type Props = BadgeProps & {
 };
 
 /**
- * Small “Beta” badge; optional tooltip explains the product beta state.
+ * Marks a product capability as beta, for example a catalog in beta.
+ * Returns a badge with a product-beta tooltip by default; set withTooltip
+ * to false to show the badge without it.
  */
 export function BetaBadge({
   style,

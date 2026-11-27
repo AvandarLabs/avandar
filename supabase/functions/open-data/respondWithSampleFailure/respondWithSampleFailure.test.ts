@@ -1,6 +1,6 @@
 import { respondWithSampleFailure } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 import { describe, expect, it, vi } from "vitest";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 
 const LISTING_ID = "5b89fc55-586d-485f-8526-3c7a9a1b0d90";
 
@@ -10,7 +10,7 @@ describe("respondWithSampleFailure", () => {
 
     const response = await respondWithSampleFailure({
       catalogListingId: LISTING_ID,
-      error: new OpenDataAcquisitionFailed({
+      error: new OpenDataAcquisitionFailedError({
         code: "resource-empty",
         ckanResourceId: "r1",
       }),
@@ -38,7 +38,7 @@ describe("respondWithSampleFailure", () => {
 
     const response = await respondWithSampleFailure({
       catalogListingId: LISTING_ID,
-      error: new OpenDataAcquisitionFailed({
+      error: new OpenDataAcquisitionFailedError({
         code: "ckan-unreachable",
         action: "package_show",
       }),

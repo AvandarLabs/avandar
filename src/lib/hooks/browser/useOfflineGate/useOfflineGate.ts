@@ -5,9 +5,7 @@ import { notifyError } from "@/utils/notifications/notify";
 type Gate = {
   /** True when offline: wire to a Button `disabled` prop or `OfflineGated`. */
   isBlocked: boolean;
-  /**
-   * Wrap an onClick handler so it short-circuits with a toast when offline.
-   */
+  /** Wrap an onClick handler so it short-circuits with a toast when offline. */
   guard: <T extends (...args: never[]) => unknown>(fn: T) => T;
 };
 

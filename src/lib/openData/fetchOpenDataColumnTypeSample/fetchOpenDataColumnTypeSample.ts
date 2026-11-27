@@ -63,13 +63,13 @@ const SAMPLE_REUSE_MS = 14 * 60 * 1000;
 const RETRYABLE_SAMPLE_STATUSES: ReadonlySet<number> = new Set([502, 503, 504]);
 
 /** A sample read the server answered, but not with the sample. */
-class ColumnTypeSampleRequestFailed extends Error {
+class ColumnTypeSampleRequestFailedError extends Error {
   readonly status: number;
 
   constructor(status: number, code: string | undefined) {
     const codeNote = code === undefined ? "" : ` (${code})`;
     super(`Column type sample fetch failed: ${status}${codeNote}`);
-    this.name = "ColumnTypeSampleRequestFailed";
+    this.name = "ColumnTypeSampleRequestFailedError";
     this.status = status;
   }
 }
@@ -132,7 +132,7 @@ function _sleep(delayMs: number): Promise<void> {
 
 function _isRetryableSampleFailure(error: unknown): boolean {
   return (
-    error instanceof ColumnTypeSampleRequestFailed &&
+    error instanceof ColumnTypeSampleRequestFailedError &&
     RETRYABLE_SAMPLE_STATUSES.has(error.status)
   );
 }
@@ -160,7 +160,7 @@ async function _readSampleOnce(
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
   if (!response.ok) {
-    throw new ColumnTypeSampleRequestFailed(
+    throw new ColumnTypeSampleRequestFailedError(
       response.status,
       await _readSampleFailureCode(response),
     );

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
-import { _render, _attributes } from "./UtteranceToModelDraftTestHelpers";
+import { _attributes, _render } from "./UtteranceToModelDraftTestHelpers";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 
 /**
  * Asserts only one phrase copy travels and role captions wait until all

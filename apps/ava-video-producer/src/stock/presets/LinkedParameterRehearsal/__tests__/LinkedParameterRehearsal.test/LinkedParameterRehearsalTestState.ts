@@ -5,11 +5,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
 import { LinkedParameterRehearsal } from "../../LinkedParameterRehearsal";
-import {
-  DEFAULT_INPUT,
-  fixtures,
-} from "../../LinkedParameterRehearsal.fixtures";
+import { DEFAULT_INPUT } from "../../LinkedParameterRehearsal.fixtures";
 import { inputSchema, type Input } from "../../LinkedParameterRehearsal.schema";
+import type { fixtures } from "../../LinkedParameterRehearsal.fixtures";
 
 function _assertRuleLineClearance({
   rule,

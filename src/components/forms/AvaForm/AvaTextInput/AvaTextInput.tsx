@@ -1,5 +1,5 @@
 import { isDefined, objectKeys, prop } from "@avandar/utils";
-import { TextInput, TextInputProps } from "@mantine/core";
+import { TextInput } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type {
   GenericFormSchemaRecord,
@@ -7,6 +7,7 @@ import type {
 } from "@/components/forms/AvaForm/AvaForm.types";
 import type { FormType } from "@avandar/ui/hooks";
 import type { ObjectPaths, PathValue, StringKeyOf } from "@avandar/utils";
+import type { TextInputProps } from "@mantine/core";
 import type { ChangeEvent } from "react";
 
 type SyncedField<FieldSchemaRecord extends GenericFormSchemaRecord> = {

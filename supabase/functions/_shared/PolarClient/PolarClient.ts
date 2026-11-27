@@ -1,8 +1,8 @@
 import { getPolarAccessToken } from "@sbfn/_shared/PolarClient/getPolarAccessToken.ts";
 import { getPolarServerType } from "@sbfn/_shared/PolarClient/getPolarServerType.ts";
 import { Polar } from "npm:@polar-sh/sdk@0.41.5";
-import { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
 import type { Checkout } from "npm:@polar-sh/sdk@0.41.5/models/components/checkout.js";
+import type { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
 import type { Product } from "npm:@polar-sh/sdk@0.41.5/models/components/product.js";
 import type { Subscription } from "npm:@polar-sh/sdk@0.41.5/models/components/subscription.js";
 
@@ -61,16 +61,12 @@ export type PolarClient = {
     newTotalSeats: number;
   }) => Promise<Subscription>;
 
-  /**
-   * Revokes (cancels immediately) a Polar subscription.
-   */
+  /** Revokes (cancels immediately) a Polar subscription. */
   revokeSubscription: (options: {
     subscriptionId: string;
   }) => Promise<Subscription>;
 
-  /**
-   * Get the Polar products, but with a simplified structure.
-   */
+  /** Get the Polar products, but with a simplified structure. */
   getProducts: () => Promise<Product[]>;
 
   /**
@@ -110,19 +106,13 @@ export type PolarClient = {
       workspaceId: string;
     };
 
-    /**
-     * The ID of the Polar product to checkout.
-     */
+    /** The ID of the Polar product to checkout. */
     productId: string;
 
-    /**
-     * The URL to use in the Back button in Polar's checkout page.
-     */
+    /** The URL to use in the Back button in Polar's checkout page. */
     returnURL: string;
 
-    /**
-     * The URL to redirect to after the checkout is completed.
-     */
+    /** The URL to redirect to after the checkout is completed. */
     successURL: string;
 
     /** The email of the user to auto-fill in the checkout form */
@@ -154,15 +144,11 @@ export type PolarClient = {
    */
   createCustomerSessions: (
     options: {
-      /**
-       * The URL to redirect to after the customer session is created.
-       */
+      /** The URL to redirect to after the customer session is created. */
       returnURL?: string;
     } & (
       | {
-          /**
-           * The Polar ID of the customer to create a session for
-           */
+          /** The Polar ID of the customer to create a session for */
           customerId: string;
           avandarUserId?: undefined;
         }

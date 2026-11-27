@@ -339,7 +339,7 @@ msgid "{removedCount, plural, one {# column no longer uses a dictionary.} other 
 "{# columns no longer use a dictionary.}}"
 msgstr "{removedCount, plural, one {# 個欄已不再使用字典。} other {# 個欄已不再使用字典。}}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Right span"
 msgstr "右側範圍"
 
@@ -453,7 +453,7 @@ msgid "An error occurred while loading the file"
 msgstr "載入檔案時發生錯誤"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
@@ -597,7 +597,7 @@ msgstr "以自然語言輸入您的問題或指示以生成 SQL 查詢"
 msgid "Could not update {pluginName}"
 msgstr "無法更新 {pluginName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H4"
 msgstr "H4"
 
@@ -710,7 +710,7 @@ msgid "Expand"
 msgstr "展開"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Callout"
 msgstr "標註框"
 
@@ -784,7 +784,7 @@ msgstr "沒有圖層可以使用此緩衝區進行篩選。"
 msgid "Views"
 msgstr "檢視"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Second point"
 msgstr "第二點"
 
@@ -821,7 +821,7 @@ msgid "The place is removed from its dataset, so it disappears from every map "
 "and chart that uses it."
 msgstr "此地點已從其資料集移除，因此會從所有使用它的地圖和圖表中消失。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar layout"
 msgstr "側邊欄版面配置"
 
@@ -900,7 +900,8 @@ msgstr "發生什麼情況"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "否"
@@ -1008,7 +1009,7 @@ msgid "Pan and select"
 msgstr "平移並選取"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List"
 msgstr "清單"
 
@@ -1109,7 +1110,7 @@ msgid "For more control over your subscription, you can manage your "
 "subscription in your"
 msgstr "要更好地控制您的訂閱，您可以在您的訂閱中進行管理"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Extra large"
 msgstr "特大"
 
@@ -1399,7 +1400,7 @@ msgstr "平均值"
 msgid "There was an error loading Google services."
 msgstr "載入 Google 服務時發生錯誤。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide published date"
 msgstr "隱藏發布日期"
 
@@ -1435,7 +1436,7 @@ msgstr "標準差"
 msgid "Get a count of how many values there are"
 msgstr "獲取值的數量"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Caption"
 msgstr "圖說"
 
@@ -1444,7 +1445,8 @@ msgid "Post the first update below. Type @ to mention a teammate or link a "
 "dashboard, dataset, or case."
 msgstr "在下方發布第一則更新。輸入 @ 可提及協作者，或連結儀表板、資料集或案件。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Collapse at"
 msgstr "收合於"
 
@@ -1496,6 +1498,8 @@ msgstr "其他…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "將計劃更改為 {newPlanName} ({newPlanSubType})"
 
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
 msgstr "內容"
@@ -1550,7 +1554,7 @@ msgstr "地圖"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
@@ -1608,7 +1612,11 @@ msgstr "僅附加作為參考"
 msgid "Role group updated"
 msgstr "角色組已更新"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Small"
 msgstr "小"
 
@@ -1722,7 +1730,7 @@ msgstr "目前尚無圖層。"
 msgid "Could not read these records."
 msgstr "無法讀取這些記錄。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Narrow"
 msgstr "窄"
 
@@ -2257,7 +2265,7 @@ msgstr "用於學習的資料集"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的問題包含可能會影響 AI 回答的語言。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Vertical padding"
 msgstr "垂直內距"
 
@@ -2347,7 +2355,7 @@ msgstr "在頁面上顯示副標題"
 msgid "Export preview"
 msgstr "匯出預覽"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide title"
 msgstr "隱藏標題"
 
@@ -2629,7 +2637,7 @@ msgstr "您的工作階段已過期。正在將您重新導向至登入頁面。
 msgid "This dataset can be stored in the cloud."
 msgstr "此資料集可儲存至雲端。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 12"
 msgstr "第 12 欄"
 
@@ -2922,7 +2930,7 @@ msgid "Creating a dictionary needs edit access to Data Sources. Ask a workspace 
 "admin for it."
 msgstr "建立字典需要具備 Data Sources 的編輯存取權限。請向工作區管理員申請。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 3"
 msgstr "第 3 欄"
 
@@ -2939,7 +2947,8 @@ msgstr "/月"
 msgid "Filters for this chart"
 msgstr "此圖表的篩選器"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Align"
 msgstr "對齊"
 
@@ -3056,7 +3065,7 @@ msgid "You chose not to send values to the AI provider, so suggestions are off "
 "for this dictionary. You can still map values yourself."
 msgstr "您選擇不將值傳送給 AI 提供者，因此此字典已關閉建議功能。您仍可自行對應值。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "副標題"
@@ -3189,7 +3198,11 @@ msgid "No entries yet. Add one for each kind of column this dictionary "
 "describes."
 msgstr "尚無項目。請為此字典描述的每種欄類型新增一個項目。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Medium"
 msgstr "中"
 
@@ -3277,7 +3290,9 @@ msgstr "請選擇一個檔案以導入"
 msgid "Role for everyone in the workspace"
 msgstr "工作區中的每個人都有角色"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Gap"
 msgstr "間距"
 
@@ -3657,7 +3672,7 @@ msgstr "檢測到偏見："
 msgid "The {pluginId} plugin ran into an error while drawing this chart."
 msgstr "{pluginId} 外掛在繪製此圖表時發生錯誤。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Body"
 msgstr "內文"
 
@@ -3702,7 +3717,7 @@ msgstr "FROM 子句不是純資料表參照。"
 msgid "Sign Out"
 msgstr "登出"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Section"
 msgstr "區段"
 
@@ -3760,7 +3775,7 @@ msgid "Unknown group"
 msgstr "未知群組"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Paragraph"
 msgstr "段落"
 
@@ -4006,7 +4021,7 @@ msgstr "隱藏 Y 軸"
 msgid "or"
 msgstr "或"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Items"
 msgstr "項目"
 
@@ -4175,7 +4190,7 @@ msgstr "平移、縮放並點選圖徵以閱讀內容。若要編輯圖層，請
 msgid "Could not create the places dataset."
 msgstr "無法建立地點資料集。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Info"
 msgstr "資訊"
 
@@ -4434,7 +4449,7 @@ msgstr "選擇一個欄位"
 msgid "{numColumns} columns"
 msgstr "{numColumns} 欄"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Normal"
 msgstr "一般"
 
@@ -4527,7 +4542,7 @@ msgid "No case types or datasets match"
 msgstr "沒有符合的個案類型或資料集"
 
 #: shared/copy/vizSettingGroupLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Grid"
 msgstr "網格"
 
@@ -4580,7 +4595,7 @@ msgstr "已隱藏"
 msgid "Dataset name is required"
 msgstr "數據集名稱為必填項"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Main"
 msgstr "主要"
 
@@ -4693,7 +4708,7 @@ msgstr "敏感度"
 msgid "E"
 msgstr "東"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 5"
 msgstr "第 5 欄"
 
@@ -4797,7 +4812,7 @@ msgstr "尚未設定屬性或資料集。"
 msgid "No longer being worked on."
 msgstr "已不再處理。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 8"
 msgstr "第 8 欄"
 
@@ -5248,7 +5263,8 @@ msgstr "連結至來源紀錄"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
@@ -5429,11 +5445,11 @@ msgstr "輸入值"
 msgid "Opens on"
 msgstr "開啟於"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 11"
 msgstr "第 11 欄"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 7"
 msgstr "第 7 欄"
 
@@ -5597,7 +5613,7 @@ msgstr "{0, plural, one {# 個欄} other {# 個欄}}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 msgid "Code"
 msgstr "程式碼"
 
@@ -5729,7 +5745,7 @@ msgstr "您的資料已摘要"
 msgid "No topics"
 msgstr "沒有主題"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Padding"
 msgstr "內距"
 
@@ -5750,7 +5766,7 @@ msgstr "圖層設定已儲存。恢復網路連線後重試，或重新載入頁
 msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
 msgstr "{plainTextLength} / {RICH_TEXT_MAX_TEXT_LENGTH} 個字元"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Theme"
 msgstr "主題"
 
@@ -5822,7 +5838,7 @@ msgstr "每月都會新增連接器。如果您需要某個資料庫或服務，
 msgid "Global Admin"
 msgstr "全域管理員"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Comma (,)"
 msgstr "逗號 (,)"
 
@@ -5897,7 +5913,7 @@ msgstr "{flaggedRowCount} / {0} 列需要檢閱。我們依位置將這些值與
 msgid "Y axis"
 msgstr "Y 軸"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 9"
 msgstr "第 9 欄"
 
@@ -6086,7 +6102,7 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 msgid "Recommended with this dataset"
 msgstr "推薦搭配此資料集"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Full"
 msgstr "完整"
 
@@ -6250,7 +6266,7 @@ msgstr "圖層 {0} 設為「位移」，但此選項僅適用於點。請在其�
 msgid "Failed to save to dashboard: {0}"
 msgstr "儲存到儀表板失敗：{0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "標題列"
@@ -6457,7 +6473,7 @@ msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置
 msgid "Preview:"
 msgstr "預覽："
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Background"
 msgstr "背景"
 
@@ -6717,7 +6733,7 @@ msgstr "返回 {datasetName} 中的原始值"
 msgid "The source file isn't in a format Avandar can read as a table."
 msgstr "來源檔案的格式不是 Avandar 可讀取為資料表的格式。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image"
 msgstr "圖片"
 
@@ -6797,7 +6813,7 @@ msgstr "它匯入的資料集"
 msgid "Next: map values"
 msgstr "下一步：對應值"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
 msgstr "數據"
@@ -6960,7 +6976,7 @@ msgstr "驗證失敗"
 msgid "Hex"
 msgstr "六邊形"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
@@ -6970,7 +6986,7 @@ msgstr "索引標籤"
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "某些已發佈的數據集無法加載。請稍後再試。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "First point"
 msgstr "第一個點"
 
@@ -7088,7 +7104,7 @@ msgstr "時間範圍結束：{endLabel}"
 msgid "Home"
 msgstr "首頁"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Pipe (|)"
 msgstr "管道符號 (|)"
 
@@ -7126,7 +7142,7 @@ msgstr "Avandar（預設）"
 msgid "Add your first dataset"
 msgstr "新增您的第一個資料集"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Wide"
 msgstr "寬"
 
@@ -7156,7 +7172,7 @@ msgstr "沒有資料集符合您的搜尋和篩選條件。請嘗試減少篩選
 msgid "is true"
 msgstr "為真"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "URL"
 msgstr "URL"
 
@@ -7694,7 +7710,7 @@ msgstr "{formattedNumResults}+ 個資料集"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
@@ -7935,7 +7951,7 @@ msgstr "{0} 刪除成功"
 msgid "Open dashboard"
 msgstr "打開儀表板"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H1"
 msgstr "H1"
 
@@ -8085,7 +8101,11 @@ msgstr "選擇一個或多個"
 msgid "Import {title}"
 msgstr "匯入 {title}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Large"
 msgstr "大"
 
@@ -8250,7 +8270,7 @@ msgstr "項目"
 msgid "Suggested from the column name and values"
 msgstr "根據欄位名稱和值建議"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Embed"
 msgstr "嵌入"
 
@@ -8356,7 +8376,7 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 msgstr "因缺少軸或系列，無法顯示 {chartName}。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
 msgid "Card"
 msgstr "卡片"
 
@@ -8523,7 +8543,8 @@ msgstr "清除有爭議狀態欄"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "是"
@@ -8729,7 +8750,7 @@ msgstr "沒有資料列"
 msgid "Shared drives"
 msgstr "共用雲端硬碟"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H3"
 msgstr "H3"
 
@@ -9061,7 +9082,9 @@ msgstr "{0, plural, one {# 個回應} other {# 個回應}}"
 msgid "Ask about your data..."
 msgstr "詢問您的數據..."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
@@ -9097,7 +9120,7 @@ msgstr "{publisher} · 版本 {version}"
 msgid "Nothing matches your filter"
 msgstr "沒有符合篩選條件的項目"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 4"
 msgstr "第 4 欄"
 
@@ -9113,7 +9136,7 @@ msgstr "選擇 {slotTitle} 的記錄"
 msgid "Received a non-string value for a select field"
 msgstr "接收到非字串值的選擇欄位"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Left span"
 msgstr "左側跨度"
 
@@ -9333,7 +9356,7 @@ msgstr "尚無成員或用戶組。請在工作區設置中邀請成員或創建
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
@@ -9371,7 +9394,7 @@ msgstr "此自訂 URL 已被保留。請嘗試在其中加入一個字詞。"
 msgid "Reference"
 msgstr "參照"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Unordered"
 msgstr "無序"
@@ -9571,7 +9594,7 @@ msgstr "草圖"
 msgid "What this column means, so teammates read it the same way"
 msgstr "此欄的意義，讓團隊成員以相同方式理解"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 1"
 msgstr "第 1 欄"
 
@@ -9639,7 +9662,9 @@ msgid "I couldn't build that chart. Its query kept failing."
 msgstr "無法建立該圖表。其查詢持續失敗。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Right"
 msgstr "右"
 
@@ -9763,7 +9788,7 @@ msgstr "來自這張圖表的列"
 msgid "member"
 msgstr "成員"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Typography"
 msgstr "字體排版"
 
@@ -9829,7 +9854,7 @@ msgstr "輸入值；每個值後按 Enter"
 msgid "You haven't added any series"
 msgstr "您尚未添加任何系列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide author"
 msgstr "隱藏作者"
 
@@ -9970,7 +9995,7 @@ msgstr "沒有資料集"
 msgid "US Letter"
 msgstr "US Letter"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Level"
 msgstr "層級"
 
@@ -10255,7 +10280,7 @@ msgstr "沒有儀表板符合 “{searchQuery}”。"
 msgid "Position"
 msgstr "位置"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List item"
 msgstr "清單項目"
 
@@ -10279,7 +10304,7 @@ msgstr "新增資料集"
 msgid "{0} columns · {1} rows"
 msgstr "{0} 欄 · {1} 行"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "申請資料集"
 
@@ -10305,7 +10330,7 @@ msgstr "要移除 {slotTitle} 的記錄嗎？"
 msgid "Confirm Password"
 msgstr "確認密碼"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Attribution"
 msgstr "署名"
@@ -10443,7 +10468,7 @@ msgstr "顯示名稱"
 msgid "Dataset is now synced online"
 msgstr "資料集現在已在線同步"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Height"
 msgstr "高度"
 
@@ -10468,7 +10493,7 @@ msgstr "無法載入圖徵清單。"
 msgid "The query changed after the columns were added."
 msgstr "新增欄位後，查詢內容已變更。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "在此輸入您的段落…"
 
@@ -10641,7 +10666,7 @@ msgstr "正在載入對照表"
 msgid "The latitude must be between -90 and 90."
 msgstr "緯度必須介於 -90 和 90 之間。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Neutral"
 msgstr "中性"
 
@@ -11234,7 +11259,7 @@ msgid "Your plan does not allow sharing more dashboards."
 msgstr "您的方案不允許分享更多儀表板。"
 
 #: src/utils/notifications/notify.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Warning"
 msgstr "警告"
 
@@ -11251,7 +11276,7 @@ msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {a
 "{app}。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDividerBlockConfig.tsx
 msgid "Divider"
 msgstr "分隔線"
 
@@ -11483,7 +11508,7 @@ msgstr "此資料集不是地點資料集，因此無法將地點新增至其中
 msgid "Custom URL is available"
 msgstr "自訂網址可用"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of rows"
 msgstr "行數"
 
@@ -12269,7 +12294,10 @@ msgstr "播放"
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "管理您在 {0} 的顯示方式及用於登入的帳戶。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Extra small"
 msgstr "特小"
 
@@ -12580,7 +12608,7 @@ msgstr "選擇規則（例如：最常見）"
 msgid "Database is unreachable"
 msgstr "無法連線至資料庫"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Add tabular data to render a simple table."
 msgstr "新增表格資料以呈現簡單表格。"
 
@@ -12678,7 +12706,7 @@ msgstr "刪除字典"
 msgid "Visualizations"
 msgstr "視覺化"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Alt text"
 msgstr "替代文字"
 
@@ -12782,7 +12810,7 @@ msgstr "Avandar 會將您的問題轉換為查詢，以顯示答案。"
 msgid "Status"
 msgstr "狀態"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Tone"
 msgstr "語氣"
 
@@ -12837,7 +12865,7 @@ msgstr "計費入口網站。"
 msgid "Dates"
 msgstr "日期"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 2"
 msgstr "第 2 欄"
 
@@ -12931,7 +12959,9 @@ msgid "Bring in your first dataset"
 msgstr "匯入您的第一個資料集"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Left"
 msgstr "靠左"
 
@@ -13124,7 +13154,7 @@ msgstr "此資料集將僅限離線使用"
 msgid "Add at least one X / Y / Size series"
 msgstr "至少添加一個 X / Y / 大小系列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar"
 msgstr "側邊欄"
 
@@ -13136,7 +13166,7 @@ msgstr "{pluginName}：此指令無法使用"
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "此資料集已同步至線上。點擊以使其僅限離線使用。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Published Date"
 msgstr "發布日期"
 
@@ -13239,11 +13269,11 @@ msgstr "連線時發生未預期的錯誤。"
 msgid "Add field"
 msgstr "新增欄位"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide subtitle"
 msgstr "隱藏副標題"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Author"
 msgstr "作者"
 
@@ -13264,7 +13294,7 @@ msgstr "新增篩選器"
 msgid "Loading plugins"
 msgstr "正在載入插件"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Schema version"
 msgstr "結構描述版本"
 
@@ -13362,7 +13392,7 @@ msgstr "調整抽屜大小"
 msgid "Entry"
 msgstr "項目"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Horizontal padding"
 msgstr "水平內距"
 
@@ -13387,7 +13417,7 @@ msgstr "此來源需要登入才能下載此資料集。"
 msgid "Dataset ready"
 msgstr "數據集已準備好"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H2"
 msgstr "H2"
 
@@ -13399,7 +13429,7 @@ msgstr "在合併後的資料集中"
 msgid "Entry no longer available"
 msgstr "項目已無法使用"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Add a pull quote..."
 msgstr "新增引文…"
 
@@ -13497,7 +13527,8 @@ msgstr "選取資料集以查看其欄位、來源，以及最近一次變更的
 msgid "Source column"
 msgstr "來源欄位"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of columns"
 msgstr "欄位數量"
 
@@ -13563,7 +13594,8 @@ msgstr "沒有指派給此使用者的記錄"
 msgid "Update & republish"
 msgstr "更新並重新發布"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Center"
 msgstr "置中"
 
@@ -13634,7 +13666,7 @@ msgstr "這些邊界在目前的查詢中沒有可回報的值。"
 msgid "1 field"
 msgstr "1 個欄位"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -13654,7 +13686,7 @@ msgid "Click Offline under the message box to use them. Chat also uses them on "
 "its own when you lose your connection."
 msgstr "按一下訊息框下方的「離線」即可使用這些模型。失去連線時，聊天也會自動使用這些模型。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image URL"
 msgstr "圖片 URL"
 
@@ -13681,7 +13713,7 @@ msgstr "字典未儲存。請檢查醒目標示的欄位，然後重試。"
 msgid "Regenerate with the error"
 msgstr "使用錯誤重新生成"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
 msgstr "新增背景資訊、方法說明或關鍵重點。"
 
@@ -13717,7 +13749,7 @@ msgstr "請檢查您的連線，然後再次點擊按鈕以重試。"
 msgid "This layer's features cannot be listed."
 msgstr "無法列出此圖層的圖徵。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 6"
 msgstr "第 6 欄"
 
@@ -13974,7 +14006,7 @@ msgstr "此清單已排序，最低層級在前。如果順序不正確，儲存
 msgid "Only what's queried (recommended)"
 msgstr "僅查詢的內容（推薦）"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Untitled"
 msgstr "未命名"
 
@@ -14231,7 +14263,7 @@ msgstr "請保持這個分頁開啟，直到完成。"
 msgid "Remove column {columnName}"
 msgstr "移除欄 {columnName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
@@ -14263,7 +14295,7 @@ msgstr "沒有指派給您的項目。"
 msgid "Invalid value column selected"
 msgstr "選擇的值欄位無效"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/DashboardConfigHelpers.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 列 / 第 {colNum} 欄"
 
@@ -14395,7 +14427,9 @@ msgstr "長條圖間距"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
@@ -14433,7 +14467,7 @@ msgstr "HAVING 使用複雜引數上的彙總函式 {funcName}；映射將述詞
 msgid "Save Dataset"
 msgstr "儲存資料集"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar position"
 msgstr "側邊欄位置"
 
@@ -14489,7 +14523,7 @@ msgstr "尚未繪製"
 msgid "Selected document: {0}"
 msgstr "選定的文件：{0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Subtle"
 msgstr "細微"
 
@@ -15169,7 +15203,7 @@ msgstr "用於登錄您的帳戶。"
 msgid "Could not zoom to this cluster."
 msgstr "無法縮放至此叢集。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "新增圖片 URL 以呈現圖片。"
 
@@ -15230,11 +15264,11 @@ msgstr "與您共享"
 msgid "Run a query to configure a chart."
 msgstr "執行查詢以設定圖表。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
 msgstr "新增 URL 以嵌入視覺化內容或外部內容。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar span"
 msgstr "側邊欄跨度"
 
@@ -15242,7 +15276,7 @@ msgstr "側邊欄跨度"
 msgid "matches pattern (legacy)"
 msgstr "符合模式（舊版）"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Max width"
 msgstr "最大寬度"
 
@@ -15361,7 +15395,7 @@ msgstr "刪除地點"
 msgid "Bottom left"
 msgstr "左下"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Page title"
 msgstr "頁面標題"
 
@@ -15377,7 +15411,7 @@ msgstr "一些"
 msgid "Arrow"
 msgstr "箭頭"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 10"
 msgstr "第 10 欄"
 
@@ -15400,13 +15434,13 @@ msgid "Values, comma-separated"
 msgstr "值，以逗號分隔"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Heading"
 msgstr "標題"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Quote"
 msgstr "引用"
 

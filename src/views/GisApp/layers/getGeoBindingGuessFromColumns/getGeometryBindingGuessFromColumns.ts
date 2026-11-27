@@ -3,9 +3,7 @@ import { classifyGeometryValue } from "@/views/GisApp/layers/getGeoBindingGuessF
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ClassifiedGeometryValue } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/classifyGeometryValue";
 
-/**
- * A column plus a few of its cells, enough to tell geometry from text.
- */
+/** A column plus a few of its cells, enough to tell geometry from text. */
 export type GeometryBindingCandidateColumn = {
   name: string;
   sampleValues: readonly unknown[];

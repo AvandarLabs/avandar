@@ -47,9 +47,7 @@ export type GoogleSheetsDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the GoogleSheetsDataset model.
- */
+/** CRUD type definitions for the GoogleSheetsDataset model. */
 export type GoogleSheetsDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__google_sheets";

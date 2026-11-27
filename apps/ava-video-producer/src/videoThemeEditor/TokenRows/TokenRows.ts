@@ -7,13 +7,13 @@ import { getDocumentPathFromTokenPath } from "../getDocumentPathFromTokenPath/ge
 import { type ThemeDraft, ThemeDrafts } from "../ThemeDrafts/ThemeDrafts";
 import { getTokenOverrideStateFromContext as _getOverrideState } from "./getTokenOverrideStateFromContext";
 import {
-  type TokenTier,
   type RowContext,
+  type RowIssueDescription,
   type TokenRow,
-  type TokenRowsOptions,
   type TokenRowFilter,
   type TokenRowGroup,
-  type RowIssueDescription,
+  type TokenRowsOptions,
+  type TokenTier,
 } from "./TokenRows.types";
 import type {
   TokenDefinition,

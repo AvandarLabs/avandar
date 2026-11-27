@@ -13,9 +13,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { ReactElement, ReactNode } from "react";
 
-/**
- * Layer, dataset, and QueryClient fixtures for `useMapLayersData` tests.
- */
+/** Layer, dataset, and QueryClient fixtures for `useMapLayersData` tests. */
 
 /** Map overlay with no AOI or time range applied. */
 export const EMPTY_MAP_OVERLAY: MapOverlay = {

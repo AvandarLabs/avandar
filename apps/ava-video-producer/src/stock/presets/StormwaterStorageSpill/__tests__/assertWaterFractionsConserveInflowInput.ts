@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
 import { assertWaterFractionsConserveInflowSpillCrest as _assertWaterFractionsConserveInflowSpillCrest } from "./assertWaterFractionsConserveInflowSpillCrest";
 import { _render } from "./StormwaterStorageSpillTestHelpers";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
 
 /**
  * Asserts water fractions conserve inflow without positive minima and spill

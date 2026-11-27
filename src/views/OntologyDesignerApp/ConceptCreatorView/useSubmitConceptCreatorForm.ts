@@ -1,9 +1,10 @@
-import { useMutation, UseMutationResultTuple } from "@avandar/query-hooks";
+import { useMutation } from "@avandar/query-hooks";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { insertConceptFromFormValues } from "@/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
 export function useSubmitConceptCreatorForm(): UseMutationResultTuple<
   void,

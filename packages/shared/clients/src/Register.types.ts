@@ -42,9 +42,7 @@ export type RegisteredSupabaseDatabaseTableNames =
     ? keyof T
     : string;
 
-/**
- * Resolves a table's `Row` type from the registered database.
- */
+/** Resolves a table's `Row` type from the registered database. */
 export type RegisteredSupabaseTableRow<
   TableName extends RegisteredSupabaseDatabaseTableNames,
 > = RegisteredSupabaseDatabase extends {
@@ -55,10 +53,7 @@ export type RegisteredSupabaseTableRow<
   ? R
   : never;
 
-/**
- * Resolves a table's `Insert` type from the registered
- * database.
- */
+/** Resolves a table's `Insert` type from the registered database. */
 export type RegisteredSupabaseTableInsert<
   TableName extends RegisteredSupabaseDatabaseTableNames,
 > = RegisteredSupabaseDatabase extends {
@@ -69,10 +64,7 @@ export type RegisteredSupabaseTableInsert<
   ? I
   : never;
 
-/**
- * Resolves a table's `Update` type from the registered
- * database.
- */
+/** Resolves a table's `Update` type from the registered database. */
 export type RegisteredSupabaseTableUpdate<
   TableName extends RegisteredSupabaseDatabaseTableNames,
 > = RegisteredSupabaseDatabase extends {

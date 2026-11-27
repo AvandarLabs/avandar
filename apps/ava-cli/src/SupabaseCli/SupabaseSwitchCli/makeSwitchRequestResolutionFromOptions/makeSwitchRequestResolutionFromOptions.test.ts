@@ -1,6 +1,4 @@
-/**
- * One switch per branch: create, reuse, or confirm before reusing.
- */
+/** One switch per branch: create, reuse, or confirm before reusing. */
 import { makeSwitchRequestResolutionFromOptions } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/makeSwitchRequestResolutionFromOptions/makeSwitchRequestResolutionFromOptions";
 import { describe, expect, it } from "vitest";
 

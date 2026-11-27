@@ -339,7 +339,7 @@ msgid "{removedCount, plural, one {# column no longer uses a dictionary.} other 
 "{# columns no longer use a dictionary.}}"
 msgstr "{removedCount, plural, one {# 列不再使用字典。} other {# 列不再使用字典。}}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Right span"
 msgstr "右跨度"
 
@@ -453,7 +453,7 @@ msgid "An error occurred while loading the file"
 msgstr "加载文件时发生错误"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
@@ -597,7 +597,7 @@ msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
 msgid "Could not update {pluginName}"
 msgstr "无法更新 {pluginName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H4"
 msgstr "H4"
 
@@ -710,7 +710,7 @@ msgid "Expand"
 msgstr "展开"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Callout"
 msgstr "提示框"
 
@@ -784,7 +784,7 @@ msgstr "没有图层可以使用此缓冲区进行筛选。"
 msgid "Views"
 msgstr "视图"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Second point"
 msgstr "第二点"
 
@@ -821,7 +821,7 @@ msgid "The place is removed from its dataset, so it disappears from every map "
 "and chart that uses it."
 msgstr "该地点已从其数据集中移除，因此使用该数据集的所有地图和图表中都不会再显示它。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar layout"
 msgstr "侧边栏布局"
 
@@ -900,7 +900,8 @@ msgstr "发生了什么"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "否"
@@ -1008,7 +1009,7 @@ msgid "Pan and select"
 msgstr "平移并选择"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List"
 msgstr "列表"
 
@@ -1109,7 +1110,7 @@ msgid "For more control over your subscription, you can manage your "
 "subscription in your"
 msgstr "要更好地控制您的订阅，您可以在您的订阅中进行管理"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Extra large"
 msgstr "超大"
 
@@ -1399,7 +1400,7 @@ msgstr "平均值"
 msgid "There was an error loading Google services."
 msgstr "加载 Google 服务时出错。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide published date"
 msgstr "隐藏发布日期"
 
@@ -1435,7 +1436,7 @@ msgstr "标准差"
 msgid "Get a count of how many values there are"
 msgstr "获取值的数量"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Caption"
 msgstr "标题说明"
 
@@ -1444,7 +1445,8 @@ msgid "Post the first update below. Type @ to mention a teammate or link a "
 "dashboard, dataset, or case."
 msgstr "在下方发布第一条动态。输入 @ 可提及同事，或链接仪表板、数据集或案例。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Collapse at"
 msgstr "折叠于"
 
@@ -1496,6 +1498,8 @@ msgstr "其他…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "正在更改计划为 {newPlanName} ({newPlanSubType})"
 
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
 msgstr "内容"
@@ -1550,7 +1554,7 @@ msgstr "地图"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
@@ -1608,7 +1612,11 @@ msgstr "仅作为参考附加"
 msgid "Role group updated"
 msgstr "角色组已更新"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Small"
 msgstr "小"
 
@@ -1722,7 +1730,7 @@ msgstr "尚无图层。"
 msgid "Could not read these records."
 msgstr "无法读取这些记录。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Narrow"
 msgstr "窄"
 
@@ -2257,7 +2265,7 @@ msgstr "用于学习的数据集"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的问题包含可能会影响 AI 回答的语言。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Vertical padding"
 msgstr "垂直内边距"
 
@@ -2347,7 +2355,7 @@ msgstr "在页面上显示副标题"
 msgid "Export preview"
 msgstr "导出预览"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide title"
 msgstr "隐藏标题"
 
@@ -2629,7 +2637,7 @@ msgstr "您的会话已过期。正在将您重定向到登录页面。"
 msgid "This dataset can be stored in the cloud."
 msgstr "此数据集可以存储在云端。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 12"
 msgstr "第 12 列"
 
@@ -2922,7 +2930,7 @@ msgid "Creating a dictionary needs edit access to Data Sources. Ask a workspace 
 "admin for it."
 msgstr "创建字典需要对数据源拥有编辑权限。请向工作区管理员申请。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 3"
 msgstr "第 3 列"
 
@@ -2939,7 +2947,8 @@ msgstr "/月"
 msgid "Filters for this chart"
 msgstr "此图表的过滤器"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Align"
 msgstr "对齐"
 
@@ -3056,7 +3065,7 @@ msgid "You chose not to send values to the AI provider, so suggestions are off "
 "for this dictionary. You can still map values yourself."
 msgstr "您选择不将值发送给 AI 提供商，因此此字典已关闭建议功能。您仍然可以手动映射值。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "副标题"
@@ -3189,7 +3198,11 @@ msgid "No entries yet. Add one for each kind of column this dictionary "
 "describes."
 msgstr "还没有条目。请为此字典描述的每种列类型添加一个条目。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Medium"
 msgstr "中"
 
@@ -3277,7 +3290,9 @@ msgstr "请选择一个文件进行导入"
 msgid "Role for everyone in the workspace"
 msgstr "工作区中的每个人的角色"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Gap"
 msgstr "间距"
 
@@ -3657,7 +3672,7 @@ msgstr "检测到偏见："
 msgid "The {pluginId} plugin ran into an error while drawing this chart."
 msgstr "{pluginId} 插件在绘制此图表时出错。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Body"
 msgstr "正文"
 
@@ -3702,7 +3717,7 @@ msgstr "FROM 子句不是简单表引用。"
 msgid "Sign Out"
 msgstr "注销"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Section"
 msgstr "分区"
 
@@ -3760,7 +3775,7 @@ msgid "Unknown group"
 msgstr "未知组"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Paragraph"
 msgstr "段落"
 
@@ -4006,7 +4021,7 @@ msgstr "隐藏 Y 轴"
 msgid "or"
 msgstr "或"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Items"
 msgstr "项目"
 
@@ -4175,7 +4190,7 @@ msgstr "平移、缩放并点击要素以查看详情。要编辑图层，请在
 msgid "Could not create the places dataset."
 msgstr "无法创建地点数据集。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Info"
 msgstr "信息"
 
@@ -4434,7 +4449,7 @@ msgstr "选择一列"
 msgid "{numColumns} columns"
 msgstr "{numColumns} 列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Normal"
 msgstr "普通"
 
@@ -4527,7 +4542,7 @@ msgid "No case types or datasets match"
 msgstr "没有匹配的案例类型或数据集"
 
 #: shared/copy/vizSettingGroupLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Grid"
 msgstr "网格"
 
@@ -4580,7 +4595,7 @@ msgstr "已隐藏"
 msgid "Dataset name is required"
 msgstr "数据集名称是必需的"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Main"
 msgstr "主要"
 
@@ -4693,7 +4708,7 @@ msgstr "敏感性"
 msgid "E"
 msgstr "E"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 5"
 msgstr "第 5 列"
 
@@ -4797,7 +4812,7 @@ msgstr "未配置属性或数据集。"
 msgid "No longer being worked on."
 msgstr "已不再处理。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 8"
 msgstr "第 8 列"
 
@@ -5248,7 +5263,8 @@ msgstr "链接到源记录"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
@@ -5429,11 +5445,11 @@ msgstr "输入值"
 msgid "Opens on"
 msgstr "打开于"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 11"
 msgstr "第 11 列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 7"
 msgstr "第 7 列"
 
@@ -5597,7 +5613,7 @@ msgstr "{0, plural, one {# 列} other {# 列}}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 msgid "Code"
 msgstr "代码"
 
@@ -5729,7 +5745,7 @@ msgstr "您的数据已汇总"
 msgid "No topics"
 msgstr "无主题"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Padding"
 msgstr "内边距"
 
@@ -5750,7 +5766,7 @@ msgstr "图层配置已保存。恢复网络连接后重试，或重新加载页
 msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
 msgstr "{plainTextLength}/{RICH_TEXT_MAX_TEXT_LENGTH} 个字符"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Theme"
 msgstr "主题"
 
@@ -5822,7 +5838,7 @@ msgstr "我们每月都会添加新的连接器。如果您需要连接某个数
 msgid "Global Admin"
 msgstr "全局管理员"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Comma (,)"
 msgstr "逗号 (,)"
 
@@ -5898,7 +5914,7 @@ msgstr "{flaggedRowCount} / {0} "
 msgid "Y axis"
 msgstr "Y 轴"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 9"
 msgstr "第 9 列"
 
@@ -6087,7 +6103,7 @@ msgstr "向仪表板添加过滤器块，以启用此可视化的全局过滤。
 msgid "Recommended with this dataset"
 msgstr "与此数据集搭配推荐"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Full"
 msgstr "完整"
 
@@ -6251,7 +6267,7 @@ msgstr "图层 {0} 已设置为“偏移”，但该选项仅适用于点。请�
 msgid "Failed to save to dashboard: {0}"
 msgstr "保存到仪表板失败：{0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "表头行"
@@ -6458,7 +6474,7 @@ msgstr "为您的工作区成员创建组。数据集和仪表板可以配置为
 msgid "Preview:"
 msgstr "预览："
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Background"
 msgstr "背景"
 
@@ -6718,7 +6734,7 @@ msgstr "恢复为 {datasetName} 中的原始值"
 msgid "The source file isn't in a format Avandar can read as a table."
 msgstr "源文件的格式不是 Avandar 可读取的表格格式。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image"
 msgstr "图像"
 
@@ -6798,7 +6814,7 @@ msgstr "它导入的数据集"
 msgid "Next: map values"
 msgstr "下一步：映射值"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
 msgstr "数据"
@@ -6961,7 +6977,7 @@ msgstr "身份验证失败"
 msgid "Hex"
 msgstr "六边形"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
@@ -6971,7 +6987,7 @@ msgstr "选项卡"
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "某些已发布的数据集无法加载。请稍后再试。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "First point"
 msgstr "第一个点"
 
@@ -7089,7 +7105,7 @@ msgstr "时间范围结束：{endLabel}"
 msgid "Home"
 msgstr "主页"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Pipe (|)"
 msgstr "管道符 (|)"
 
@@ -7127,7 +7143,7 @@ msgstr "Avandar（默认）"
 msgid "Add your first dataset"
 msgstr "添加你的第一个数据集"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Wide"
 msgstr "宽"
 
@@ -7157,7 +7173,7 @@ msgstr "没有数据集符合你的搜索和筛选条件。请减少筛选条件
 msgid "is true"
 msgstr "为真"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "URL"
 msgstr "URL"
 
@@ -7695,7 +7711,7 @@ msgstr "{formattedNumResults}+ 个数据集"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
@@ -7936,7 +7952,7 @@ msgstr "{0} 删除成功"
 msgid "Open dashboard"
 msgstr "打开仪表板"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H1"
 msgstr "H1"
 
@@ -8086,7 +8102,11 @@ msgstr "选择一个或多个"
 msgid "Import {title}"
 msgstr "导入 {title}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Large"
 msgstr "大"
 
@@ -8251,7 +8271,7 @@ msgstr "条目"
 msgid "Suggested from the column name and values"
 msgstr "根据列名和值建议"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Embed"
 msgstr "嵌入"
 
@@ -8357,7 +8377,7 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 msgstr "由于缺少轴或系列，无法显示 {chartName}。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
 msgid "Card"
 msgstr "卡片"
 
@@ -8524,7 +8544,8 @@ msgstr "清除有争议状态列"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "是"
@@ -8730,7 +8751,7 @@ msgstr "无行"
 msgid "Shared drives"
 msgstr "共享云端硬盘"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H3"
 msgstr "H3"
 
@@ -9062,7 +9083,9 @@ msgstr "{0, plural, one {# 个反应} other {# 个反应}}"
 msgid "Ask about your data..."
 msgstr "询问有关您的数据..."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
@@ -9098,7 +9121,7 @@ msgstr "{publisher} · 版本 {version}"
 msgid "Nothing matches your filter"
 msgstr "没有内容符合你的筛选条件"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 4"
 msgstr "第 4 列"
 
@@ -9114,7 +9137,7 @@ msgstr "选择 {slotTitle} 的记录"
 msgid "Received a non-string value for a select field"
 msgstr "接收到非字符串值的选择字段"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Left span"
 msgstr "左侧跨度"
 
@@ -9334,7 +9357,7 @@ msgstr "尚无成员或用户组。请在工作区设置中邀请成员或创建
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
@@ -9372,7 +9395,7 @@ msgstr "此自定义 URL 已被占用。请尝试在其中添加一个词。"
 msgid "Reference"
 msgstr "参考"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Unordered"
 msgstr "无序"
@@ -9572,7 +9595,7 @@ msgstr "草图"
 msgid "What this column means, so teammates read it the same way"
 msgstr "此列的含义，确保团队成员以相同方式理解"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 1"
 msgstr "第 1 列"
 
@@ -9640,7 +9663,9 @@ msgid "I couldn't build that chart. Its query kept failing."
 msgstr "无法构建该图表。其查询持续失败。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Right"
 msgstr "右"
 
@@ -9764,7 +9789,7 @@ msgstr "来自此图表的行"
 msgid "member"
 msgstr "成员"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Typography"
 msgstr "排版"
 
@@ -9830,7 +9855,7 @@ msgstr "输入值；每个值后按 Enter"
 msgid "You haven't added any series"
 msgstr "您尚未添加任何系列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide author"
 msgstr "隐藏作者"
 
@@ -9971,7 +9996,7 @@ msgstr "没有数据集"
 msgid "US Letter"
 msgstr "US Letter"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Level"
 msgstr "级别"
 
@@ -10256,7 +10281,7 @@ msgstr "没有仪表板匹配 “{searchQuery}”。"
 msgid "Position"
 msgstr "位置"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List item"
 msgstr "列表项"
 
@@ -10280,7 +10305,7 @@ msgstr "添加数据集"
 msgid "{0} columns · {1} rows"
 msgstr "{0} 列 · {1} 行"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "请求数据集"
 
@@ -10306,7 +10331,7 @@ msgstr "要移除 {slotTitle} 的记录吗？"
 msgid "Confirm Password"
 msgstr "确认密码"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Attribution"
 msgstr "归属"
@@ -10444,7 +10469,7 @@ msgstr "显示名称"
 msgid "Dataset is now synced online"
 msgstr "数据集现已在线同步"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Height"
 msgstr "高度"
 
@@ -10469,7 +10494,7 @@ msgstr "无法加载要素列表。"
 msgid "The query changed after the columns were added."
 msgstr "添加列后，查询已发生变化。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "在此处输入段落内容..."
 
@@ -10642,7 +10667,7 @@ msgstr "正在加载交叉表"
 msgid "The latitude must be between -90 and 90."
 msgstr "纬度必须介于 -90 和 90 之间。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Neutral"
 msgstr "中性"
 
@@ -11235,7 +11260,7 @@ msgid "Your plan does not allow sharing more dashboards."
 msgstr "您的套餐不允许再分享更多仪表板。"
 
 #: src/utils/notifications/notify.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Warning"
 msgstr "警告"
 
@@ -11251,7 +11276,7 @@ msgid "When on, members of this group only get access if they already have "
 msgstr "开启时，只有在工作区中已拥有 {app} 访问权限的组成员才能访问。关闭时，组中的每个成员都可以在此访问，即使他们通常无法打开 {app}。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDividerBlockConfig.tsx
 msgid "Divider"
 msgstr "分隔线"
 
@@ -11483,7 +11508,7 @@ msgstr "此数据集不是地点数据集，因此无法向其中添加地点。
 msgid "Custom URL is available"
 msgstr "自定义 URL 可用"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of rows"
 msgstr "行数"
 
@@ -12269,7 +12294,10 @@ msgstr "播放"
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "管理您在 {0} 中的显示方式以及您用于登录的帐户。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Extra small"
 msgstr "超小"
 
@@ -12581,7 +12609,7 @@ msgstr "选择规则（例如，最频繁）"
 msgid "Database is unreachable"
 msgstr "无法访问数据库"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Add tabular data to render a simple table."
 msgstr "添加表格数据以呈现简单表格。"
 
@@ -12679,7 +12707,7 @@ msgstr "删除字典"
 msgid "Visualizations"
 msgstr "可视化"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Alt text"
 msgstr "替代文本"
 
@@ -12783,7 +12811,7 @@ msgstr "Avandar 会将您的问题转换为查询，以显示答案。"
 msgid "Status"
 msgstr "状态"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Tone"
 msgstr "语气"
 
@@ -12838,7 +12866,7 @@ msgstr "账单门户。"
 msgid "Dates"
 msgstr "日期"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 2"
 msgstr "第 2 列"
 
@@ -12932,7 +12960,9 @@ msgid "Bring in your first dataset"
 msgstr "导入您的第一个数据集"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Left"
 msgstr "左对齐"
 
@@ -13125,7 +13155,7 @@ msgstr "此数据集将仅离线使用"
 msgid "Add at least one X / Y / Size series"
 msgstr "添加至少一个 X / Y / 尺寸系列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar"
 msgstr "侧边栏"
 
@@ -13137,7 +13167,7 @@ msgstr "{pluginName}：此命令不可用"
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "此数据集已在线同步。点击以仅离线使用。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Published Date"
 msgstr "发布日期"
 
@@ -13240,11 +13270,11 @@ msgstr "连接时发生意外错误。"
 msgid "Add field"
 msgstr "添加字段"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide subtitle"
 msgstr "隐藏副标题"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Author"
 msgstr "作者"
 
@@ -13265,7 +13295,7 @@ msgstr "添加过滤器"
 msgid "Loading plugins"
 msgstr "正在加载插件"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Schema version"
 msgstr "架构版本"
 
@@ -13363,7 +13393,7 @@ msgstr "调整抽屉大小"
 msgid "Entry"
 msgstr "条目"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Horizontal padding"
 msgstr "水平内边距"
 
@@ -13388,7 +13418,7 @@ msgstr "该来源需要登录才能下载此数据集。"
 msgid "Dataset ready"
 msgstr "数据集已准备好"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H2"
 msgstr "H2"
 
@@ -13400,7 +13430,7 @@ msgstr "在合并后的数据集中"
 msgid "Entry no longer available"
 msgstr "条目不再可用"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Add a pull quote..."
 msgstr "添加引述…"
 
@@ -13498,7 +13528,8 @@ msgstr "选择数据集以查看其列、来源和最近更新时间。"
 msgid "Source column"
 msgstr "源列"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of columns"
 msgstr "列数"
 
@@ -13564,7 +13595,8 @@ msgstr "没有分配给此人的记录"
 msgid "Update & republish"
 msgstr "更新并重新发布"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Center"
 msgstr "居中"
 
@@ -13635,7 +13667,7 @@ msgstr "对于当前查询，这些边界没有可报告的值。"
 msgid "1 field"
 msgstr "1 个字段"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -13655,7 +13687,7 @@ msgid "Click Offline under the message box to use them. Chat also uses them on "
 "its own when you lose your connection."
 msgstr "点击消息框下方的“离线”即可使用这些模型。断开连接时，聊天也会自动使用它们。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image URL"
 msgstr "图片 URL"
 
@@ -13682,7 +13714,7 @@ msgstr "字典未保存。请检查突出显示的字段，然后重试。"
 msgid "Regenerate with the error"
 msgstr "使用错误重新生成"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
 msgstr "添加上下文、方法或关键要点。"
 
@@ -13718,7 +13750,7 @@ msgstr "请检查您的连接，然后再次点击按钮重试。"
 msgid "This layer's features cannot be listed."
 msgstr "无法列出此图层的要素。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 6"
 msgstr "第 6 列"
 
@@ -13975,7 +14007,7 @@ msgstr "此列表已排序，最低级别在前。如果顺序不正确，请保
 msgid "Only what's queried (recommended)"
 msgstr "仅查询的内容（推荐）"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Untitled"
 msgstr "无标题"
 
@@ -14232,7 +14264,7 @@ msgstr "请保持此标签页打开，直到完成。"
 msgid "Remove column {columnName}"
 msgstr "移除列 {columnName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
@@ -14264,7 +14296,7 @@ msgstr "没有分配给你的内容。"
 msgid "Invalid value column selected"
 msgstr "选择的值列无效"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/DashboardConfigHelpers.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 行 / 第 {colNum} 列"
 
@@ -14396,7 +14428,9 @@ msgstr "柱间距"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
@@ -14434,7 +14468,7 @@ msgstr "HAVING 使用了复杂参数上的聚合函数 {funcName}；映射将该
 msgid "Save Dataset"
 msgstr "保存数据集"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar position"
 msgstr "侧边栏位置"
 
@@ -14490,7 +14524,7 @@ msgstr "尚未绘制"
 msgid "Selected document: {0}"
 msgstr "选定文档：{0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Subtle"
 msgstr "细微"
 
@@ -15170,7 +15204,7 @@ msgstr "用于登录您的账户。"
 msgid "Could not zoom to this cluster."
 msgstr "无法缩放至此集群。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "添加图片 URL 以渲染图像。"
 
@@ -15231,11 +15265,11 @@ msgstr "与您共享"
 msgid "Run a query to configure a chart."
 msgstr "运行查询以配置图表。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
 msgstr "添加 URL 以嵌入可视化内容或外部内容。"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar span"
 msgstr "侧边栏跨度"
 
@@ -15243,7 +15277,7 @@ msgstr "侧边栏跨度"
 msgid "matches pattern (legacy)"
 msgstr "匹配模式（旧版）"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Max width"
 msgstr "最大宽度"
 
@@ -15362,7 +15396,7 @@ msgstr "删除地点"
 msgid "Bottom left"
 msgstr "左下方"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Page title"
 msgstr "页面标题"
 
@@ -15378,7 +15412,7 @@ msgstr "一些"
 msgid "Arrow"
 msgstr "箭头"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 10"
 msgstr "第 10 列"
 
@@ -15401,13 +15435,13 @@ msgid "Values, comma-separated"
 msgstr "值，逗号分隔"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Heading"
 msgstr "标题"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Quote"
 msgstr "引用"
 

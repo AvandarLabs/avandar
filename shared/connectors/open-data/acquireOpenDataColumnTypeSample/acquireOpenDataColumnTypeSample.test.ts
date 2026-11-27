@@ -4,7 +4,7 @@ import {
   COLUMN_TYPE_SAMPLE_MAX_BYTES,
   COLUMN_TYPE_SAMPLE_MAX_ROWS,
 } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import type { ReadByteRange } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
@@ -171,7 +171,9 @@ async function _readFailureCode(
       return error;
     },
   );
-  return OpenDataAcquisitionFailed.is(caught) ? caught.failure.code : undefined;
+  return OpenDataAcquisitionFailedError.is(caught)
+    ? caught.failure.code
+    : undefined;
 }
 
 describe("acquireOpenDataColumnTypeSample", () => {
@@ -218,7 +220,7 @@ describe("acquireOpenDataColumnTypeSample", () => {
       }),
     ).rejects.toSatisfy((caught: unknown) => {
       return (
-        OpenDataAcquisitionFailed.is(caught) &&
+        OpenDataAcquisitionFailedError.is(caught) &&
         caught.failure.code === "resource-format-unsupported"
       );
     });
@@ -379,7 +381,7 @@ describe("acquireOpenDataColumnTypeSample", () => {
       }),
     ).rejects.toSatisfy((caught: unknown) => {
       return (
-        OpenDataAcquisitionFailed.is(caught) &&
+        OpenDataAcquisitionFailedError.is(caught) &&
         caught.failure.code === "access-shape-invalid"
       );
     });

@@ -1,11 +1,11 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { program } from "commander";
 import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
-import { Database } from "$/types/database.types";
+import type { Database } from "$/types/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";

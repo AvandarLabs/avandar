@@ -1,6 +1,6 @@
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
-import { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
 import { assertPhysicalWaterDestinationItsOverflowSide as _assertPhysicalWaterDestinationItsOverflowSide } from "./assertPhysicalWaterDestinationItsOverflowSide";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
+import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
 
 /**
  * Asserts each physical water destination and its caption share a visible

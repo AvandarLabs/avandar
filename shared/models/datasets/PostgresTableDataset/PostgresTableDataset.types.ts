@@ -46,9 +46,7 @@ export type PostgresTableDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the PostgresTableDataset model.
- */
+/** CRUD type definitions for the PostgresTableDataset model. */
 export type PostgresTableDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__postgres_table";

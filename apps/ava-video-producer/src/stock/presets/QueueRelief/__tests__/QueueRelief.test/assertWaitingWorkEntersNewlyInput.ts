@@ -1,10 +1,10 @@
-import { QueueReliefTestState } from "./QueueReliefTestState";
-
-const { render, items: _items } = QueueReliefTestState;
 import assert from "node:assert/strict";
 import { prop } from "@avandar/utils";
-import { fixtures } from "../../QueueRelief.fixtures";
 import { assertWaitingWorkEntersNewlyInputCompleted as _assertWaitingWorkEntersNewlyInputCompleted } from "./assertWaitingWorkEntersNewlyInputCompleted";
+import { QueueReliefTestState } from "./QueueReliefTestState";
+import type { fixtures } from "../../QueueRelief.fixtures";
+
+const { render, items: _items } = QueueReliefTestState;
 
 /** Asserts the independently authored rendered test contract. */
 export function assertWaitingWorkEntersNewlyInput(

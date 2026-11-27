@@ -3,6 +3,10 @@
   "plugins": ["eslint", "import", "react", "jsx-a11y", "typescript"],
   "jsPlugins": [
     {
+      "name": "avandar",
+      "specifier": "@avandar/lint-typescript/oxlint"
+    },
+    {
       "name": "eslint-js",
       "specifier": "oxlint-plugin-eslint"
     },
@@ -41,6 +45,7 @@
     }
   },
   "ignorePatterns": [
+    "**/*.gen.*",
     "**/dist/**",
     ".agents/**",
     ".claude",
@@ -67,6 +72,16 @@
     "src/i18n/locales/*/messages.ts"
   ],
   "rules": {
+    "avandar/top-level-function-declarations": "error",
+    "avandar/nested-arrow-functions": "error",
+    "avandar/private-helper-prefix": "error",
+    "avandar/component-props-name": "error",
+    "avandar/module-context-witness": "error",
+    "avandar/error-class-suffix": "error",
+    "avandar/jsx-conditional-ternary": "error",
+    "avandar/property-helper-callbacks": "error",
+    "avandar/straight-line-object-construction": "error",
+    "avandar/optional-array-candidates": "error",
     "@tanstack/router/create-route-property-order": "warn",
     "@tanstack/router/route-param-names": "error",
     "@tanstack/query/exhaustive-deps": "error",
@@ -100,8 +115,16 @@
   },
   "overrides": [
     {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "avandar/export-key-jsdoc": "error"
+      }
+    },
+    {
       "files": ["**/*.{js,jsx,ts,tsx}"],
       "rules": {
+        "avandar/function-body-line-comments": "error",
+        "avandar/single-line-short-jsdoc": "error",
         "constructor-super": "off",
         "for-direction": "error",
         "getter-return": "off",
@@ -214,9 +237,16 @@
           }
         ],
         "no-shadow": "error",
-        "curly": "off",
+        "curly": ["error", "all"],
         "prefer-template": "off",
-        "typescript/consistent-type-imports": "off",
+        "typescript/consistent-type-imports": [
+          "error",
+          {
+            "prefer": "type-imports",
+            "fixStyle": "separate-type-imports",
+            "disallowTypeAnnotations": false
+          }
+        ],
         "import/extensions": [
           "error",
           "ignorePackages",
@@ -250,7 +280,9 @@
           {
             "default": "array-simple"
           }
-        ]
+        ],
+        "typescript/consistent-type-exports": "error",
+        "typescript/no-unnecessary-type-assertion": "off"
       },
       "env": {
         "browser": true,
@@ -449,6 +481,15 @@
       }
     },
     {
+      "files": [
+        "packages/lint/typescript/src/oxlint/**/*.js",
+        "packages/lint/css/src/stylelint/**/*.js"
+      ],
+      "rules": {
+        "import/extensions": ["error", "ignorePackages", { "js": "always" }]
+      }
+    },
+    {
       "files": ["apps/ava-video-producer/**/*.{js,jsx,mjs,ts,tsx}"],
       "rules": {
         "video-producer/max-lines-per-function": "error",
@@ -469,5 +510,8 @@
         "plugin-restrictions/no-restricted-paths": "error"
       }
     }
-  ]
+  ],
+  "options": {
+    "typeAware": true
+  }
 }

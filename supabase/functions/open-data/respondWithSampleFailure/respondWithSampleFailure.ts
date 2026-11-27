@@ -1,7 +1,7 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { failureToInvalidDatasetReason } from "$/connectors/open-data/failureToInvalidDatasetReason/failureToInvalidDatasetReason.ts";
-import type { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import type { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 /** Marks a listing's dataset as one that cannot be loaded. */
@@ -24,7 +24,7 @@ export type MarkListingInvalid = (args: {
  */
 export async function respondWithSampleFailure(args: {
   catalogListingId: string;
-  error: OpenDataAcquisitionFailed;
+  error: OpenDataAcquisitionFailedError;
   markInvalid: MarkListingInvalid;
 }): Promise<Response> {
   const { failure } = args.error;

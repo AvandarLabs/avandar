@@ -14,35 +14,6 @@ For every **Find candidates** block below, scope the grep to the files
 under review (pass them as arguments instead of recursing the whole
 repo) so the output stays small and tied to the diff.
 
-- In Deno-reachable code, imports **that name a file** must include the
-  file extension (e.g. `.ts`). Repos that use Deno usually pin a few
-  specific directories as Deno-reachable. The repo-local
-  `docs/code-reviews/extra-checklist.md` should enumerate the exact
-  directories that count as Deno-reachable for that repo; check there
-  before flagging. If the repo-local checklist does not define
-  Deno-reachable paths, skip this rule.
-
-  This applies to relative imports and to directory-style aliases (an
-  alias mapped with a trailing slash, such as `@utils/` -> `src/`, where
-  the rest of the specifier is a path). It does **not** apply to bare
-  package specifiers such as `@avandar/utils` or `@avandar/utils/sql`.
-  Those name a package entry point, not a file: Node resolves them
-  through `exports`, and Deno resolves them through an exact import-map
-  entry. Adding an extension to one is wrong and will fail to resolve.
-
-  **Find candidates** (replace `<deno-dir>` with each Deno-reachable
-  directory from the repo-local checklist):
-
-  ```bash
-  grep -rEn 'from "(\.|\.\.)/[^"]+"' <deno-dir> --include="*.ts" \
-    | grep -Ev '\.(ts|tsx|js|jsx|json|css)"$'
-  ```
-
-  Misses imports under non-relative path aliases (`@something/foo`) that
-  resolve to Deno-reachable code, so still scan those imports by eye.
-  When you do, first decide whether the specifier is a package name or a
-  file path; only flag the latter.
-
 - Use JSDoc for public classes and methods.
 
 - Prefer functional and declarative programming.
@@ -82,31 +53,6 @@ repo) so the output stays small and tied to the diff.
   ```bash
   awk 'length>80 && /^\s*(\/\/|\*|\/\*)/ {print FILENAME":"NR": "$0}' \
     path/to/file.ts ...
-  ```
-
-- If a docstring fits on one line within 80 characters, keep it single-line.
-  This is a formatting rule only: never cut a docstring's content to make it
-  fit on one line.
-
-- Never use single-line `if` statements: always keep braces.
-
-  **Find candidates** (heuristic; non-exhaustive):
-
-  ```bash
-  grep -rEn '^\s*if *\(.*\)[^{]*[a-zA-Z]' --include="*.ts" --include="*.tsx" . \
-    | grep -v '{$'
-  ```
-
-  Flags lines like `if (cond) doThing();` and `if (cond) return foo;`.
-  Multi-line `if (...)\n  doThing();` patterns are missed; still scan by
-  eye for those.
-
-- Prefer string interpolation over string concatenation.
-
-  **Find candidates** (string literal concatenated with `+`):
-
-  ```bash
-  grep -rEn '"[^"]*" *\+|\+ *"[^"]*"' --include="*.ts" --include="*.tsx" .
   ```
 
 - Use PascalCase for React components, classes, singleton instances, and module
@@ -202,8 +148,6 @@ repo) so the output stays small and tied to the diff.
 
   Each hit is a candidate, not a finding. Open it and apply the 5-line test and
   the exceptions before flagging.
-
-- Non-exported top-level helper functions should be prefixed with `_`.
 
 - Declare local helper functions above the exported function that uses them,
   so a file reads helpers first and its public entry point last. A reader
@@ -411,16 +355,6 @@ repo) so the output stays small and tied to the diff.
   Confirm a hit really returns only copy: a function returning a structured
   object that happens to contain a label is a conversion, not a copy function.
 
-- React component prop types should always be named `Props`.
-
-  **Find candidates** (prop type aliases whose name is not literally
-  `Props`):
-
-  ```bash
-  grep -rEn '^(export )?type [A-Z][a-zA-Z]*Props\b' --include="*.tsx" . \
-    | grep -Ev '\btype Props\b'
-  ```
-
 - Prefer default parameter values over nullish guard logic.
 
 - Use RO-RO for multiple parameters and multiple return values.
@@ -431,35 +365,6 @@ repo) so the output stays small and tied to the diff.
   `config` is more accurate.
 
 - Keep small object parameter types inline. Only extract them when reused.
-
-- Top-level functions should use the `function` keyword.
-
-  **Find candidates** (top-level arrow-function consts; heuristic):
-
-  ```bash
-  grep -rEn '^(export )?const [a-z][a-zA-Z0-9_]* *(:[^=]*)?= *(async )?\(' \
-    --include="*.ts" --include="*.tsx" .
-  ```
-
-  Many hits will be true single-expression utilities or factory results;
-  flag only ones that are real top-level function declarations.
-
-- Nested functions and object methods should use arrow functions.
-
-- Type imports and type exports should always use the `type` keyword.
-
-  **Find candidates** (imports/exports of clearly type-only names, by
-  convention `T`, `I`, or names ending in `Props` / `Type` / `Id` /
-  `Config`, without the `type` keyword; heuristic):
-
-  ```bash
-  grep -rEn '^import \{[^}]*\b([A-Z][a-zA-Z]*Props|[A-Z][a-zA-Z]*Type|[A-Z][a-zA-Z]*Id|[A-Z][a-zA-Z]*Config)\b' \
-    --include="*.ts" --include="*.tsx" . \
-    | grep -v '^[^:]*:import type '
-  ```
-
-  Heuristic only; still scan import lists manually for type-only names
-  this regex doesn't anticipate.
 
 - Do not add barrel files, except in repo-approved directories documented
   by the repo-local checklist.
@@ -488,8 +393,8 @@ repo) so the output stays small and tied to the diff.
   docstrings too.
 
 - Function docstrings should explain the function's purpose and output, not
-  its interior implementation details. Use `//` comments inside the function
-  body for how the function works. Exception: mention complex or unconventional
+  its interior implementation details. Exception: mention complex or
+  unconventional
   architectural/design decisions in the docstring only when developers using
   the function need that context.
 

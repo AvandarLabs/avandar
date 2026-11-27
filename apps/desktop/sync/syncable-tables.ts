@@ -228,9 +228,7 @@ export const EXCLUDED_TABLES = [
  */
 export type SyncableTable = (typeof SYNCABLE_TABLES)[number];
 
-/**
- * Narrowed literal union of every table deliberately excluded from sync.
- */
+/** Narrowed literal union of every table deliberately excluded from sync. */
 export type ExcludedTable = (typeof EXCLUDED_TABLES)[number];
 
 /**

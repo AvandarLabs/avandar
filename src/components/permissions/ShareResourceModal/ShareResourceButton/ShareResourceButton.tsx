@@ -16,7 +16,8 @@ type Props = {
 };
 
 /**
- * Opens the share modal when the user has admin on the resource.
+ * Renders a button that opens sharing controls for a resource when enabled.
+ * Use it, for example, to offer sharing from a dataset or map view.
  */
 export function ShareResourceButton({
   resourceName,

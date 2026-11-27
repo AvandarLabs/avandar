@@ -1,6 +1,6 @@
-import { WindowMotion } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import { type WindowPose } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion.types";
 import { DemoTheme } from "../DemoTheme";
+import type { WindowMotion } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import type { DemoReadout } from "../HelperDemoFrame/HelperDemoFrame";
 /** The pose readouts every window preview shows. */
 function _getPoseReadouts(pose: WindowPose) {

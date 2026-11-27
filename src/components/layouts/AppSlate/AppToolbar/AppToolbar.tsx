@@ -1,6 +1,5 @@
 import { mantineColorVar } from "@avandar/ui";
 import { Group, Title } from "@mantine/core";
-import { ReactNode } from "react";
 import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -8,6 +7,7 @@ import { NavbarSidebarToggle } from "@/components/layouts/AppSlate/AppToolbar/Na
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator/OfflineIndicator";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
+import type { ReactNode } from "react";
 
 type Props = {
   children?: ReactNode;

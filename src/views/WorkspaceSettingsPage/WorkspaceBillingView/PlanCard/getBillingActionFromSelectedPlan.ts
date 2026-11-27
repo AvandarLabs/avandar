@@ -9,7 +9,10 @@ export type BillingAction =
   | { type: "billing_error" };
 
 /**
- * Resolves which billing action the plan card should take for a selection.
+ * Selects a billing action for a plan and the current subscription.
+ * For example, use it when a plan card handles a plan selection.
+ * Returns an action for native free creation, checkout, plan change, or an
+ * error.
  */
 export function getBillingActionFromSelectedPlan(options: {
   currentSubscription: SubscriptionRead | undefined;

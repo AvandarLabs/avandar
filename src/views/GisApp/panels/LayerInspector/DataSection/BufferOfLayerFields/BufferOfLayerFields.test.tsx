@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-/**
- * Buffer inspector fields: read-only source, clamped distance, dissolve.
- */
+/** Buffer inspector fields: read-only source, clamped distance, dissolve. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";

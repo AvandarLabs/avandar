@@ -6,7 +6,7 @@ const { render: _render, booking: _booking } =
 import assert from "node:assert/strict";
 import { propEq } from "@avandar/utils";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import {
+import type {
   DEFAULT_INPUT,
   fixtures,
   changedInput,

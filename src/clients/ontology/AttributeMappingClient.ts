@@ -1,12 +1,12 @@
 import { makeBucketRecord, objectKeys, prop } from "@avandar/utils";
 import { match } from "ts-pattern";
-import {
+import { DatasetColumnMappingClient } from "@/clients/ontology/DatasetColumnMappingClient";
+import { ManualEntryMappingClient } from "@/clients/ontology/ManualEntryMappingClient";
+import type {
   AttributeMapping,
   AttributeMappingRegistry,
   AttributeMappingType,
 } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import { DatasetColumnMappingClient } from "@/clients/ontology/DatasetColumnMappingClient";
-import { ManualEntryMappingClient } from "@/clients/ontology/ManualEntryMappingClient";
 
 export const AttributeMappingClient = {
   bulkInsert: async (params: {

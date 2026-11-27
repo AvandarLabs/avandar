@@ -2,7 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 
 /**
- * Standard offline tooltip copy for gated controls and links.
+ * Renders the standard offline-unavailable tooltip message.
+ * Use it, for example, to explain an offline-gated control.
  */
 export function OfflineUnavailableTooltipLabel(): JSX.Element {
   return (

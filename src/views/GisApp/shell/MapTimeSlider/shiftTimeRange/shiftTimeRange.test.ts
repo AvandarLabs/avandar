@@ -1,6 +1,4 @@
-/**
- * Play-step translation of a map clock window.
- */
+/** Play-step translation of a map clock window. */
 import { describe, expect, it } from "vitest";
 import { shiftTimeRange } from "./shiftTimeRange";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";

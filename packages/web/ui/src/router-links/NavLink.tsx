@@ -1,22 +1,18 @@
 import { noop } from "@avandar/utils";
 import {
   DEFAULT_THEME,
-  MantineColor,
   NavLink as MantineNavLink,
-  NavLinkProps as MantineNavLinkProps,
   useMantineTheme,
 } from "@mantine/core";
 import { useHover, useMergedRef } from "@mantine/hooks";
 import { createLink } from "@tanstack/react-router";
-import {
-  AnchorHTMLAttributes,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import type {
+  MantineColor,
+  NavLinkProps as MantineNavLinkProps,
+} from "@mantine/core";
 import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
+import type { AnchorHTMLAttributes } from "react";
 
 const DEFAULT_PRIMARY_SHADE =
   typeof DEFAULT_THEME.primaryShade === "object"
@@ -41,9 +37,7 @@ const MantineNavLinkComponent = forwardRef<
 
 const MantineRouterNavLink = createLink(MantineNavLinkComponent);
 
-/**
- * This is a Mantine NavLink that works with our router.
- */
+/** This is a Mantine NavLink that works with our router. */
 // oxlint-disable-next-line react-js/function-component-definition -- typed API
 export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
   const [isClicked, setIsClicked] = useState(false);

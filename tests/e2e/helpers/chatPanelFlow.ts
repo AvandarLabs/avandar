@@ -19,7 +19,9 @@ export async function openChatPanelIfClosed(page: Page): Promise<void> {
 }
 
 /**
- * Locates the chat composer input on Data Explorer or dashboard pages.
+ * Returns a locator for the chat composer input on Data Explorer or dashboard
+ * pages.
+ * Use it, for example, when an E2E flow needs to interact with the composer.
  */
 export function getChatComposerInput(page: Page): Locator {
   return page.getByPlaceholder(
@@ -28,14 +30,17 @@ export function getChatComposerInput(page: Page): Locator {
 }
 
 /**
- * Locates the New chat control in the chat panel header.
+ * Returns a locator for the New chat button in the chat panel.
+ * Use it, for example, when an E2E flow needs to start a new chat.
  */
 export function getNewChatButton(page: Page): Locator {
   return getChatPanel(page).getByRole("button", { name: /new chat/i });
 }
 
 /**
- * Locates the AppShell chat Aside (Ask Avandar panel).
+ * Returns a locator for the Ask Avandar complementary panel.
+ * Use it, for example, when an E2E flow needs to find a control within the
+ * panel.
  */
 export function getChatPanel(page: Page): Locator {
   return page.getByRole("complementary").filter({ hasText: "Ask Avandar" });

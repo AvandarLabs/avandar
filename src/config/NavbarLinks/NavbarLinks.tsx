@@ -20,9 +20,7 @@ export type NavbarLink = {
   link: AppLink;
   icon: ReactNode;
 
-  /**
-   * Whether or not this link should be shown
-   */
+  /** Whether or not this link should be shown */
   isEnabled?: (options: {
     user: User.T;
     workspace: Workspace.WithSubscription;

@@ -1,7 +1,11 @@
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /**
- * Marks a workspace subscription row as canceled for billing edge-case e2e.
+ * Marks a workspace's subscriptions as canceled for billing end-to-end tests.
+ * Use it, for example, to set up a canceled subscription before testing billing
+ * recovery.
+ * Resolves when the update completes and throws if the workspace lookup or
+ * update fails.
  */
 export async function seedCanceledSubscriptionForWorkspace(options: {
   supabaseAdminClient: AvaSupabaseDBClient;

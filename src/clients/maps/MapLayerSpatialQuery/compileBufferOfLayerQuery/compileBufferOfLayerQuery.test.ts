@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Buffer-of-layer compilation for compileMapLayerSpatialQuery.
- */
+/** Buffer-of-layer compilation for compileMapLayerSpatialQuery. */
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";

@@ -23,9 +23,7 @@ export const DuckDbDataTypeUtils = {
     ].includes(duckDbDataType);
   },
 
-  /**
-   * Converts a DuckDB data type to an Avandar data type.
-   */
+  /** Converts a DuckDB data type to an Avandar data type. */
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
   // `fromDuckDbDataType`
   toAvaDataType: (duckDbDataType: DuckDbDataType): AvaDataTypeT => {

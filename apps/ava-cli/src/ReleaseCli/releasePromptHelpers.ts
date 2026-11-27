@@ -59,7 +59,9 @@ export async function promptForVersion(options: {
 }
 
 /**
- * Asks a yes/no question. Returns the answer; `--yes` never reaches here.
+ * Asks an interactive yes/no question and returns whether the user confirms.
+ * Use it, for example, when a release needs approval after a CI warning.
+ * Callers bypass this prompt for `--yes`.
  */
 export async function promptToConfirm(message: string): Promise<boolean> {
   _assertInteractive("A confirmation");

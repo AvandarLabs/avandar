@@ -1,7 +1,7 @@
 import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
+import type { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import type { Input } from "./ScheduleBuffer.schema";
 import type { ReactNode } from "react";
 

@@ -1,4 +1,4 @@
-import { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

@@ -75,7 +75,8 @@ function useTextSelectPointer(
 }
 
 /**
- * Select-mode chrome for a text annotation: drag to move, handle to resize.
+ * Renders a text annotation with controls for moving and resizing it.
+ * Use it, for example, when a selected map annotation needs editing controls.
  */
 export function AnnotationTextSelectFrame({
   map,

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { makeDestinationKeysClearCompleteSegmentsFromX as _makeDestinationKeysClearCompleteSegmentsFromX } from "./makeDestinationKeysClearCompleteSegmentsFromX";
-import { _render } from "./StormwaterStorageSpillTestHelpers";
+import type { makeDestinationKeysClearCompleteSegmentsFromX as _makeDestinationKeysClearCompleteSegmentsFromX } from "./makeDestinationKeysClearCompleteSegmentsFromX";
+import type { _render } from "./StormwaterStorageSpillTestHelpers";
 
 /** Asserts destination keys clear the complete visible overflow crest. */
 export function assertDestinationKeysClearCompleteMarkup({

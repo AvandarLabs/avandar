@@ -3,7 +3,9 @@ import { useState } from "react";
 type PdfPoint = { x: number; y: number };
 
 /**
- * Draft state for two-point y-axis calibration on one region.
+ * Manages a region's calibration draft, returning its selected points and
+ * actions.
+ * Use it, for example, when collecting two y-axis points for PDF calibration.
  */
 export function usePdfAxisCalibration(): {
   regionId: string | null;

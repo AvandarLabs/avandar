@@ -4,7 +4,7 @@ import {
   makePrincipalKeyFromPublicSession,
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
+import { RelationCacheWriteFailedError } from "$/models/relations/RelationCachePort/RelationCacheWriteFailedError";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
@@ -398,7 +398,7 @@ function _describePrincipalShape(principal: PrincipalKey): string {
  * live-entry rule this port needs is a side effect of the existing schema,
  * not logic this function has to enforce itself. On a quota-exceeded
  * failure, evicts to make room and retries once; if the retry also fails,
- * throws `RelationCacheWriteFailed`.
+ * throws `RelationCacheWriteFailedError`.
  */
 async function _write(write: RelationCacheWrite): Promise<void> {
   if (write.identity.relation.kind !== "dataset") {
@@ -433,7 +433,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
     try {
       await _putRow(row);
     } catch {
-      throw new RelationCacheWriteFailed(firstError);
+      throw new RelationCacheWriteFailedError(firstError);
     }
   }
 }
@@ -510,7 +510,7 @@ export const LocalPublicDatasetRelationCache: RelationCachePort = {
    * Stores one downloaded snapshot. Throws if the relation is not a
    * `"dataset"` or the principal is not a public-session principal. On a
    * quota-exceeded failure, evicts to make room and retries once; if the
-   * retry also fails, throws `RelationCacheWriteFailed`.
+   * retry also fails, throws `RelationCacheWriteFailedError`.
    */
   write: _write,
 

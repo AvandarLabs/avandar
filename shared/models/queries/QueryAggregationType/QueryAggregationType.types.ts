@@ -20,9 +20,7 @@ export const QUERY_AGGREGATION_TYPES = [
   "none",
 ] as const;
 
-/**
- * These are the aggregations we allow in Avandar for the Data Explorer app.
- */
+/** These are the aggregations we allow in Avandar for the Data Explorer app. */
 export type QueryAggregationTypeT = (typeof QUERY_AGGREGATION_TYPES)[number];
 
 /**

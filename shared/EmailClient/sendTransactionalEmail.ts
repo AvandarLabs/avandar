@@ -1,8 +1,8 @@
 import { render } from "@react-email/render";
-import { ReactNode } from "react";
-import { CreateEmailResponseSuccess } from "resend";
 import { ResendClient } from "$/EmailClient/ResendClient.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
+import type { ReactNode } from "react";
+import type { CreateEmailResponseSuccess } from "resend";
 
 export type SendTransactionalEmailOptions = {
   to: string | string[];

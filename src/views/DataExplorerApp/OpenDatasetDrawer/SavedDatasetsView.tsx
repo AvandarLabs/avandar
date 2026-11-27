@@ -35,7 +35,8 @@ type Props = {
 };
 
 /**
- * Returns the localized label for a given dataset source type.
+ * Returns localized labels keyed by dataset source type.
+ * Use it, for example, to label source types in a saved-dataset picker.
  */
 function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
   const { t } = useLingui();

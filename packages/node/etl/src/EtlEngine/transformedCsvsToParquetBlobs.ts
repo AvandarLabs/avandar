@@ -4,17 +4,13 @@ import { resolve } from "node:path";
 import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
-/**
- * Column metadata for CSV → Parquet conversion (DuckDB cast names).
- */
+/** Column metadata for CSV → Parquet conversion (DuckDB cast names). */
 export type TransformedColumnDescription = Readonly<{
   name: string;
   type: DuckDbSniffableDataType;
 }>;
 
-/**
- * One transformed table: `<name>.csv` under the transform output directory.
- */
+/** One transformed table: `<name>.csv` under the transform output directory. */
 export type TransformedDataDescriptionForParquet = Readonly<{
   name: string;
   columns: readonly TransformedColumnDescription[];

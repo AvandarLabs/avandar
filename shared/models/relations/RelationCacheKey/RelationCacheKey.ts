@@ -190,7 +190,8 @@ export async function makePreparedRelationCacheKeyFromKey(
 }
 
 /**
- * Sorts and deduplicates a finite column set. `"all"` is unchanged.
+ * Returns sorted, unique column names, or "all" unchanged.
+ * Use it, for example, when combining finite column sets for cache coverage.
  */
 export function normalizeColumns(
   columns: readonly string[] | "all",

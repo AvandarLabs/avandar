@@ -1,6 +1,4 @@
-/**
- * Alt-pan and tool cursor: drag-pan is off unless Select or Alt is active.
- */
+/** Alt-pan and tool cursor: drag-pan is off unless Select or Alt is active. */
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { fireEvent, render } from "@/test-utils";

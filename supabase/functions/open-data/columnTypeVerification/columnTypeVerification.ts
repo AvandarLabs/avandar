@@ -123,7 +123,7 @@ export const markListingInvalid: MarkListingInvalid = async ({
  * text as a browser reads it, so the browser can hand it back to be copied
  * (`readVouchedCompleteSample`).
  *
- * @throws `OpenDataAcquisitionFailed` when the sample cannot be read.
+ * @throws `OpenDataAcquisitionFailedError` when the sample cannot be read.
  */
 export async function respondWithColumnTypeSample(
   entry: Readonly<DataCatalogListing.T>,

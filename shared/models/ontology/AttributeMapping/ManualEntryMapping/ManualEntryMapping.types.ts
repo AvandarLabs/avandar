@@ -6,9 +6,7 @@ import type { SetOptional, Simplify } from "type-fest";
 
 export type ManualEntryMappingId = UUID<"ManualEntryMapping">;
 
-/**
- * CRUD type definition for the manual entry attribute mapping
- */
+/** CRUD type definition for the manual entry attribute mapping */
 type ManualEntryMappingRead = {
   /** Unique identifier for this mapping */
   id: ManualEntryMappingId;
@@ -52,9 +50,7 @@ export type ManualEntryMappingModel = SupabaseCrudModelSpec<
   }
 >;
 
-/**
- * Helper type for a specific variant of the ManualEntryMapping model
- */
+/** Helper type for a specific variant of the ManualEntryMapping model */
 export type ManualEntryMapping<
   K extends keyof ManualEntryMappingModel = "Read",
 > = Simplify<ManualEntryMappingModel[K]>;

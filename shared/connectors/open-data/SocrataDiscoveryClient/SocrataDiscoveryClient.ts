@@ -114,8 +114,8 @@ function _buildSearchParams(
  *
  * Stateless, mirroring `CkanClient` and `SocrataClient`'s shape. Unlike
  * `SocrataClient`, this client does not convert failures into a structured
- * `OpenDataAcquisitionFailed` error: `openDataErrors.ts` has no failure code
- * for the Discovery API, and none is introduced here. An HTTP or
+ * `OpenDataAcquisitionFailedError`: `openDataErrors.ts` has no failure code for
+ * the Discovery API, and none is introduced here. An HTTP or
  * schema-validation failure propagates as a raw exception.
  */
 export function createSocrataDiscoveryClient(

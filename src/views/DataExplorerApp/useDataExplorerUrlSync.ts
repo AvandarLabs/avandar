@@ -84,9 +84,7 @@ export function useDataExplorerUrlSync({
   const needsColumns =
     (urlState.colNames?.length ?? 0) > 0 && Boolean(urlState.dsId);
 
-  /**
-   * When the URL has `sql`, it wins: do not restore `ds` / cols from URL.
-   */
+  /** When the URL has `sql`, it wins: do not restore `ds` / cols from URL. */
   const restoreStructuredFromUrl = !urlState.rawSql;
 
   const isDatasetSource = useMemo(() => {
