@@ -199,6 +199,38 @@ lexical and file-metric rules remain in the universal companion.
 | CSS convention | Stylelint or `@avandar/lint-css/stylelint` | Stylelint parses CSS and supports fixable plugins |
 | SQL convention | `@avandar/lint-sql` | SQL requires its own parser and repository context |
 
+### Shared native Oxlint preset
+
+`@avandar/lint` is the single source of the Avandar ruleset for every
+repository that installs it. Catalog entries owned by native Oxlint rules
+(for example avlint-ts-001 `curly`) are enforced by a preset the package ships, not by
+a repository's own `.oxlintrc.json`. Until the preset exists, those rules are
+enabled only in this repository's root `.oxlintrc.json`, and the coverage
+command proves them from that file.
+
+The preset migration moves every native Oxlint rule configuration that is not
+specific to this repository out of the root `.oxlintrc.json` and into the
+package:
+
+- The package exports an Oxlint config fragment that a repository extends. It
+  enables the native rules, their options, and the `avandar/*` custom plugin
+  rules in one place. Repositories do not copy rule lists.
+- Native rules are configured, never reimplemented. No custom rule is built for
+  behavior Oxlint already provides.
+- Repo-specific configuration stays in the repository root. Examples:
+  Deno-based shared path handling, `plugin-restrictions/no-restricted-paths`
+  zones, per-app overrides, and `ignorePatterns` for local generated files.
+- A repository may tighten or disable a preset rule only through its own
+  config. A disabled preset rule drops that rule's coverage to `fallback`,
+  exactly like any other disabled rule.
+- Coverage proofs run against the effective config (preset plus repository
+  overrides), so a repository that installs the package without the preset
+  receives `fallback` for native-owned rules instead of a false `covered`.
+
+Allocation: the preset package and the move of non-repo-specific native rules
+land before the Phase 4 guided diagnostics ship, so Phases 4 through 6 add
+their rules to the preset rather than to a repository config.
+
 ## Safe-fix inventory: deterministic safe fixes
 
 Each rule is eligible for the ordinary safe-fix path only inside its proven
