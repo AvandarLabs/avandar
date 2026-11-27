@@ -1,7 +1,7 @@
 # Phase 1E brainstorm: "Try again" and parity in the agent
 
 Status: brainstorm, 2026-11-19. Written without a live design session:
-every open question is resolved here from the roadmap, the decision log,
+every open question is resolved here from the decision log,
 and the code, and each resolution is listed under
 [Assumptions](#assumptions) for Pablo to confirm or overturn before the
 spec is written. This is not the spec and not the plan. Part of
@@ -273,7 +273,7 @@ left out for a saved card (the field is optional).
 13. `dashboard.block_added_via_chat` for the editor path and confirmed
     cards only, with the payload shape unchanged and no block count for a
     saved card.
-14. No Playwright spec in 1E: the roadmap puts the browser test in 1F.
+14. No Playwright spec in 1E: the browser test is planned for 1F.
     The chat runtime's integration tests cover the flow here.
 15. The baseline for the Try again eval is today's chat on Claude Haiku
     5.5 (D31) with `retryContext`.
@@ -284,7 +284,7 @@ left out for a saved card (the field is optional).
 |---|---|
 | The model reads the line as chat and replies "Sure, trying again" with no tool call. | The Try again eval grades it. Fallback: A3. |
 | The kept first attempt misleads a later follow-up ("make it a chart" builds on the first attempt). | A follow-up question in the eval. Fallback: A2. |
-| Each extra Try again adds an attempt to the transcript. | The attempts are cached prefix, a few hundred tokens each. Context pruning is roadmap 2.5. |
+| Each extra Try again adds an attempt to the transcript. | The attempts are cached prefix, a few hundred tokens each. Context pruning is tracked in Avandar's Linear roadmap. |
 | Starting over after an earlier answer's Try again uses a new vault, so the thread's placeholders read `[earlier value]` and cards resolved earlier are not reported again. | The same as after a reload or a session switch today (D39). |
 | Two different threads match by accident. | The key covers every message's role and text. A thread repeats exactly only when assistant-ui reruns it. |
 | A change slips into the text of turns that are not a Try again and shifts the 45 unnoticed. | A test that `buildAgentTurnText` without `isRetry` is byte-identical for every existing case, plus the existing Pi harness turn tests. |
@@ -379,7 +379,7 @@ whitespace, or the same text, and no card).
 | Today's chat with `retryContext`, three runs | `phase-1e:today-retry` | The baseline, recorded first. |
 | Agent v6 with the line, three runs | `phase-1e:agent-retry` | Right on the second attempt at least as often as the baseline, a repeat no more often, nothing invented, and T06's follow-up passing. A single miss is rerun before calling it a regression. |
 
-The set costs well under a dollar per run. The roadmap's bar for 1E (unit
+The set costs well under a dollar per run. The bar for 1E (unit
 tests now, the browser test in 1F) stays. This set is what lets A1 ship
 without a new prompt version, and it decides whether a fallback is needed.
 
@@ -390,5 +390,4 @@ without a new prompt version, and it decides whether a fallback is needed.
 - The exact wording of the Try again line, after the eval.
 - Which existing questions the T set is built from.
 - The doc changes that ship with 1E: a decision entry for its design, the
-  1E rows in roadmap.md and phase-1.md, and the "What keeps the agent off"
-  table.
+  1E row in phase-1.md.

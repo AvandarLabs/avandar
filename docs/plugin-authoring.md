@@ -1029,6 +1029,66 @@ geoBoundaries gbHumanitarian release, built from Mozambique INE and UN OCHA
 ROSEA data, under CC BY 3.0 IGO. Its descriptions say so, and its README says
 the shapes were simplified.
 
+## Notes for host contributors
+
+These are facts about the plugin host that a plugin author never touches but
+a contributor changing the host will not guess.
+
+### Derived columns
+
+- **The SQL analyzer does not stop file reads in a derived column.**
+  `DuckDbSqlAnalyzer` only inspects functions after `FROM` or `JOIN`. The
+  deny-list in `assertSingleSqlExpression` and DuckDB's binder ("table
+  function used as a scalar function") are what stop `read_csv(...)`. A
+  deny-list is never complete, so keep the executed binder tests in
+  `makeDerivedColumnsSqlFromColumns/__tests__/` when touching this.
+- **The wrapped SQL gets fresh column IDs unless the bindings are re-keyed.**
+  `applyDerivedColumnsSql` re-keys the column bindings to the wrapped SQL, and
+  `useQueryResultColumnBindings` prefers a seed registry whose key matches.
+  Undo restores the original bindings the same way. Removing either half
+  makes the user's chart go blank after a command runs.
+
+### Data slots
+
+- **A binding is the permission grant, but the database does not prove the
+  source is readable.** A binding stores a case type or dataset id and an
+  attribute map, and `querySlot` checks the current user's access when it
+  reads. A source deleted later leaves both ids null, which the check
+  constraint allows on purpose (`on delete set null` needs it).
+  `getDataSlotBindingStatus` then reports the binding as `broken` with a
+  `source_missing` problem.
+- **`bound_by` is stamped by a trigger.**
+  `tr__plugin_data_slot_bindings__stamp_bound_by` overwrites it from
+  `auth.uid()`, because the RPC argument could be spoofed. The set-null
+  cascade does not restamp it.
+- **A binding needs a source when it is written.**
+  `tr__plugin_data_slot_bindings__check_source` requires the id named by
+  `source_type` to be non-null on insert and when the type changes. The
+  `on delete set null` cascade is exempt through `pg_trigger_depth() > 1`, so
+  any future writer of that table from inside a trigger is exempt too.
+- **A plugin's `querySlot` errors are deliberately vague.** The plugin sees
+  `CommandFailed` with a fixed message, so it cannot learn why a source was
+  unreadable.
+
+### Testing and tooling
+
+- **Plugin files, tests included, cannot import the repo's `tests/` helpers**
+  such as `withDuckDb`. An executed test in a plugin opens its own
+  `DuckDBInstance` and closes it in `finally`. A function with both a unit
+  test and an executed test keeps both in `<function>/__tests__/`.
+- **`pnpm check:plugin-bundle` prints no byte count on success.** To measure
+  headroom, set `HOST_BUDGET_BYTES` to 0 for one run and read the failure line.
+- **The root vitest config excludes `packages/**`.** Run vitest inside the
+  package directory.
+- **E2E runs with reduced motion**, so animation-timing bugs need a manual
+  check with `page.emulateMedia({ reducedMotion: "no-preference" })`.
+- **pgTAP fixtures must clear `request.jwt.claims` after `reset role`.**
+  `set_config` survives the role reset and stamps later fixture rows with the
+  earlier user.
+- **With more than two matching commands,** all of a plugin's commands collapse
+  into one "Plugins" menu, so E2E specs pick results that keep the commands
+  they need as buttons.
+
 ## Rules to keep in mind
 
 - **Permissions are declared, not enforced.** A manifest lists the permissions

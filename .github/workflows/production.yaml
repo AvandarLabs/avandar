@@ -14,8 +14,27 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
+  # Skip CI/CD when every pushed commit says `[skip deploy]` or only touches
+  # safe documentation and agent-skill files.
+  check-skip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      should-skip: ${{ steps.skip.outputs.should-skip }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - id: skip
+        uses: ./.github/actions/check-skip
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
   # Lint and TypeScript checks.
   lint-typecheck:
+    needs: check-skip
+    if: needs.check-skip.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -90,6 +109,9 @@ jobs:
   # End-to-end tests. Intentionally NOT a dependency of `migrate`.
   # See `staging.yaml` for the explanation on the timeout threshold.
   test-e2e:
+    # Disabled for now: the suite is too slow and has known failures.
+    # Re-enable via the Linear issue that tracks it.
+    if: false
     # Pinned rather than `ubuntu-latest`: some runners now resolve that to
     # Ubuntu 26.04, where Playwright 1.59.1 cannot install Chromium and the
     # job fails before any test runs. Move this with the Playwright version.

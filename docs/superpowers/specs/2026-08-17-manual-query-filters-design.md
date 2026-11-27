@@ -4,7 +4,7 @@
 **Author:** pablo@avandarlabs.com (designed with Claude)
 **Date:** 2026-08-17
 **Findings this responds to:**
-`docs/superpowers/2026-08-17-manual-query-filters-review.md` (F1 to F16, U1 to
+the retired manual query filters review (F1 to F16, U1 to
 U19, M1 to M14)
 **Related code:**
 `src/views/DataExplorerApp/QueryForm/QueryFiltersField/`,
@@ -655,6 +655,6 @@ Nothing below blocks this delivery.
 
 Update this spec when the operator catalog changes, when the value encoding
 changes, or when a decision in section 3 is revisited. The findings document
-(`docs/superpowers/2026-08-17-manual-query-filters-review.md`) is the evidence
+(the retired manual query filters review) is the evidence
 base and should not be edited; add new findings there only with fresh
 reproduction.

@@ -10,7 +10,7 @@
 
 **Design:** `docs/superpowers/specs/2026-11-08-individual-assignment-design.md`
 
-**Already done on this branch:** the roadmap text. P5c.3, P5c.6, P5c.8, and the demo rehearsal item in `docs/production-plan-world-humanitarian-day.md`, and the assignment bullet in `docs/measles-demo/measles-outbreak-response.md`. Do not edit those again unless the design changes.
+**Already done on this branch:** the roadmap text. P5c.3, P5c.6, P5c.8, and the demo rehearsal item in Avandar's Linear roadmap, and the assignment bullet in `docs/measles-demo/measles-outbreak-response.md`. Do not edit those again unless the design changes.
 
 ---
 

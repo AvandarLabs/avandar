@@ -8,7 +8,7 @@
 
 **Tech Stack:** Postgres 15 (Supabase declarative schema, pgTAP), TypeScript, React, Mantine, Lingui, Vitest.
 
-**Background reading:** `docs/superpowers/2026-11-16-plugins-1d-handoff.md` ("Still open" lists the items this plan closes), `docs/rules/sql.md`, `docs/rules/testing.md`, `docs/rules/i18n.md`.
+**Background reading:** the retired plugins 1d handoff ("Still open" lists the items this plan closes), `docs/rules/sql.md`, `docs/rules/testing.md`, `docs/rules/i18n.md`.
 
 **Merge target:** `demo/measles`, only with Pablo's explicit approval. A push to `demo/**` deploys. Do not push. The branch has no upstream on purpose.
 
@@ -28,7 +28,7 @@
 | 6. Dead exports, doc paths | `packages/shared/plugin-manifest/src/PluginManifest/PluginDataSlotSchema.ts`, `src/lib/pluginDataSlots/isDataTypeAcceptedBySlotAttribute/isDataTypeAcceptedBySlotAttribute.ts`, four docs |
 | 7. Maplibre test | `src/routes/_auth/$workspaceSlug/dashboards/edit/-$dashboardId.test.tsx` |
 | 8. Translations | `src/i18n/locales/*/messages.po` and `messages.ts` |
-| 9. Verify and hand off | `docs/superpowers/2026-11-16-plugins-1d-handoff.md` |
+| 9. Verify and hand off | the retired plugins 1d handoff |
 
 ---
 
@@ -642,7 +642,7 @@ Closes handoff follow-ups 8 and 9.
 - [ ] **Step 2:** Replace the old path in the four docs:
 
   ```bash
-  for f in docs/measles-demo/data-dictionaries-5-crosswalks-plan.md docs/measles-demo/pr-feature-log.md docs/superpowers/2026-11-09-plugins-1b-handoff.md docs/superpowers/plans/2026-11-09-plugins-1b-part-b-derived-columns.md; do
+  for f in docs/measles-demo/data-dictionaries-5-crosswalks-plan.md docs/measles-demo/pr-feature-log.md the retired plugins 1b handoff docs/superpowers/plans/2026-11-09-plugins-1b-part-b-derived-columns.md; do
     sed -i '' 's#src/lib/plugins/derivedColumns/assertSingleSqlExpression#src/lib/sql/assertSingleSqlExpression#g' "$f"
   done
   grep -rn "derivedColumns/assertSingleSqlExpression" docs
@@ -718,5 +718,5 @@ Closes Pablo's open review of the LLM translations from `cf4b98de8`.
   - `pnpm verify:packages`
   - `pnpm desktop:sqlite:check-migrations`
 - [ ] **Step 2: E2E**, one spec at a time: `pnpm test:e2e plugins-mozambique-install.spec.ts`, then `plugins-epidemiology-case-slot.spec.ts`. Check `docker ps -q | wc -l` first.
-- [ ] **Step 3: Handoff.** In `docs/superpowers/2026-11-16-plugins-1d-handoff.md`, move follow-ups 1 to 4 (first half), 6 to 10 and 12 from "Still open" to "Closed after the handoff was first written", each with its commit. Add one line under "Where things stand": the leftovers are on `fix/plugins-leftovers`, not merged, and they add a migration.
+- [ ] **Step 3: Handoff.** In the retired plugins 1d handoff, move follow-ups 1 to 4 (first half), 6 to 10 and 12 from "Still open" to "Closed after the handoff was first written", each with its commit. Add one line under "Where things stand": the leftovers are on `fix/plugins-leftovers`, not merged, and they add a migration.
 - [ ] **Step 4: Commit.** `docs(plugins): record the closed 1d follow-ups`

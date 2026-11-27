@@ -5,7 +5,7 @@
 **Branch:** `feat/statuses`
 **Roadmap:** P5b.1 (status sets) and P5c.4 (status workflow, without
 history) and P5c.6 (list filtering by status) in
-`docs/production-plan-world-humanitarian-day.md`
+Avandar's Linear roadmap
 **Parents:** `docs/ontology-architecture.md` (sections 6, 13, 16),
 `docs/permissions-architecture.md`, `docs/design/app-view-layout.md`
 
@@ -673,7 +673,7 @@ be seeded directly.
 1. **Status change history.** Belongs in a broader history feature that
    records who changed what and when, across status, assignment, and edits
    (roadmap P5c.4's history half and P5c.5). Add it to
-   `docs/production-plan-world-humanitarian-day.md` and to Linear.
+   Avandar's Linear roadmap and to Linear.
 2. Move the create-case-type form to `AppView`.
 3. Give `getPage` a stable order, so a filtered, paged records list
    cannot repeat or skip rows.
@@ -688,5 +688,5 @@ be seeded directly.
   status sets", and the new reserved attribute name.
 - `docs/permissions-architecture.md`: the app list in Vocabulary, and the
   case-type and record rules in Common scenarios.
-- `docs/production-plan-world-humanitarian-day.md`: mark P5b.1 and P5c.6
+- Avandar's Linear roadmap: mark P5b.1 and P5c.6
   done, P5c.4 done except history, and add the history follow-up.

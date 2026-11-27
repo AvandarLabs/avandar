@@ -233,7 +233,7 @@ export function runInitPluginCli(options: {
 }
 
 /** CLI for scaffolding a new bundled plugin. */
-export const InitPluginCli = Acclimate.createCLI("init")
+export const InitPluginCli = Acclimate.createCli("init")
   .description(
     `${INIT_PLUGIN_HELP.purpose} Example: ava plugin init case-tools.`,
   )

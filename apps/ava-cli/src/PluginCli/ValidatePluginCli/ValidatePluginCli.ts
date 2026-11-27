@@ -238,7 +238,7 @@ export function runValidatePluginCli(options: {
 }
 
 /** CLI for validating bundled plugins. */
-export const ValidatePluginCli = Acclimate.createCLI("validate")
+export const ValidatePluginCli = Acclimate.createCli("validate")
   .description(
     `${VALIDATE_PLUGIN_HELP.purpose} Example: ava plugin validate epidemiology.`,
   )

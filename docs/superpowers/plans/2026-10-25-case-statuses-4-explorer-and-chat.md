@@ -86,7 +86,7 @@
 | `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx`, `CaseTypeDraftCard.module.css`, `CaseTypeDraftAttributeRow.tsx`, `CaseTypeDraftManualEntrySection.tsx`, `CaseTypeDraftBlock.test.tsx` | Modify | Wire the section, flag "status" |
 | `tests/e2e/helpers/CaseTypeSeedHelpers.ts` | Create | Seed and delete a case type |
 | `tests/e2e/case-statuses-data-explorer.spec.ts` | Create | E2E spec 4 |
-| `docs/ontology-architecture.md`, `docs/production-plan-world-humanitarian-day.md` | Modify | §14 docs |
+| `docs/ontology-architecture.md` | Modify | §14 docs |
 
 ---
 
@@ -4395,7 +4395,6 @@ git commit -m "test(case-statuses): group a case type by status in the Data Expl
 
 **Files:**
 - Modify: `docs/ontology-architecture.md`
-- Modify: `docs/production-plan-world-humanitarian-day.md`
 
 Plan 2 also edited `docs/ontology-architecture.md` (the `individuals` row, section 13's status placement, section 16, the reserved name). Apply the edits below to the file as it stands; where plan 2 already reworded a sentence quoted here, add this plan's content to its wording instead of replacing it.
 
@@ -4553,7 +4552,7 @@ and add a row after "Records UI":
 
 - [ ] **Step 7: Roadmap**
 
-In `docs/production-plan-world-humanitarian-day.md`:
+In Avandar's Linear roadmap:
 
 Replace
 
@@ -4650,13 +4649,13 @@ After the P5c.8 bullet, add:
 
 - [ ] **Step 8: Check the docs for em dashes**
 
-Run: `grep -n "$(printf '\342\200\224')" docs/ontology-architecture.md docs/production-plan-world-humanitarian-day.md`
+Run: `grep -n "$(printf '\342\200\224')" docs/ontology-architecture.md`
 Expected: no line this plan added. (The production plan's title line already contains one; leave it.)
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git add docs/ontology-architecture.md docs/production-plan-world-humanitarian-day.md
+git add docs/ontology-architecture.md
 git commit -m "docs(case-statuses): document the status column and chat statuses, and update the roadmap" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 

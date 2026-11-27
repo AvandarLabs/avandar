@@ -5174,17 +5174,17 @@ git commit -m "test(e2e): add a chart to a named dashboard through the agent"
 ### Task 25: Docs
 
 **Files:**
-- Modify: `docs/ai-agent/roadmap.md`, `docs/ai-agent/specs/phase-1.md`, `docs/ai-agent/README.md`
+- Modify: `docs/ai-agent/specs/phase-1.md`, `docs/ai-agent/README.md`
 - Modify: `docs/ai-agent/specs/phase-1d.md` (status line)
 - Modify: `docs/measles-demo/pr-feature-log.md`
 
-- [ ] **Step 1: Roadmap and specs**
+- [ ] **Step 1: Specs**
 
-In `roadmap.md`, change the 1D row to "Done (<date>)" with what was met (the D runs, the P, M, and 45 runs, the offline runs, the browser spec), and the eval label `phase-1d` linking to `eval.md#phase-1d`. Note that prompt v6 is fixed once pushed to the demo. In "What keeps the agent off", change the dashboard row's "Agent today" to say the agent adds blocks from any page, and its "Planned" to "Done in 1D". In `specs/phase-1.md`, set the 1D row's status. In `specs/phase-1d.md`, change the status line to "Built on <date>." In `README.md`, keep the decision range at D01 to D44.
+In `specs/phase-1.md`, set the 1D row's status. In `specs/phase-1d.md`, change the status line to "Built on <date>." In `README.md`, keep the decision range at D01 to D44.
 
 - [ ] **Step 2: Feature log F139**
 
-In `docs/measles-demo/pr-feature-log.md`, add **F139: Dashboard blocks from any page, online and offline**, in the shape of F128: a summary paragraph; every commit on this branch since `demo/measles` (`git log --reverse --format='%h %s' demo/measles..HEAD`) with the files each touches (`git show --stat --format= <sha>`); the shared-files rows for files other features also own (`createChatModelAdapter.ts`, `useAvandarChatRuntime.ts`, `dataAgentTools.ts`, `buildDataAgentSystemPrompt.ts`, `buildAgentContextBlocks.ts`, `PiHarness.ts`, `eval.md`, `roadmap.md`, `decisions.md`, the three e2e specs) added to the "AI agent context and the chat panel" table; and an Open decisions item: prompt v6 joins item 3's list of served versions.
+In `docs/measles-demo/pr-feature-log.md`, add **F139: Dashboard blocks from any page, online and offline**, in the shape of F128: a summary paragraph; every commit on this branch since `demo/measles` (`git log --reverse --format='%h %s' demo/measles..HEAD`) with the files each touches (`git show --stat --format= <sha>`); the shared-files rows for files other features also own (`createChatModelAdapter.ts`, `useAvandarChatRuntime.ts`, `dataAgentTools.ts`, `buildDataAgentSystemPrompt.ts`, `buildAgentContextBlocks.ts`, `PiHarness.ts`, `eval.md`, `decisions.md`, the three e2e specs) added to the "AI agent context and the chat panel" table; and an Open decisions item: prompt v6 joins item 3's list of served versions.
 
 - [ ] **Step 3: Final checks**
 
@@ -5216,4 +5216,4 @@ git commit -m "docs(ai-agent): mark Phase 1D built and log it as F129"
 | Errors table | 6, 7, 14, 18 |
 | Eval: harness support, runs, bars | 12, 23 (baseline already committed) |
 | Browser spec; v3 mocks moved to v6 | 22, 24 |
-| Done when: roadmap, D44, F139, tsc, i18n | 25 |
+| Done when: D44, F139, tsc, i18n | 25 |

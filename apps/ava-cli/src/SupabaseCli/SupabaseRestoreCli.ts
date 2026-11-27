@@ -6,7 +6,7 @@ import { Acclimate } from "@avandar/acclimate";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
 /** CLI for undoing this branch's local or remote Supabase switch. */
-export const SupabaseRestoreCli = Acclimate.createCLI("restore")
+export const SupabaseRestoreCli = Acclimate.createCli("restore")
   .description(
     "Undo this branch's `ava supabase switch`: put every development env file back as it was, and delete the branch's own local project and its data if it had one.",
   )

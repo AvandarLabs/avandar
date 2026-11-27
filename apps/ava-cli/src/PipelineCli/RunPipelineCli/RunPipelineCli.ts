@@ -159,7 +159,7 @@ export async function runPipelineCommand(options: {
   }
 }
 
-export const RunPipelineCli = Acclimate.createCLI("run")
+export const RunPipelineCli = Acclimate.createCli("run")
   .description(
     "Run a pipeline on the pipeline-server, or use --local to run the " +
       "pipeline module via vite-node without starting the server.",

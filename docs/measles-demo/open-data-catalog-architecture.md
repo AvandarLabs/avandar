@@ -589,7 +589,7 @@ relation's object before writing the row that points at it.
   a reusable, exported predicate.
 
 **Explicitly deferred, not designed here, tracked in Linear and in
-`production-plan-world-humanitarian-day.md`:**
+Avandar's Linear roadmap:**
 
 1. Query-time pushdown (tier 3, section 2). Needs the capability-driven
    planner this repo does not have yet, for any source type.
@@ -657,7 +657,7 @@ relation's object before writing the row that points at it.
    whole, so GHO is modelled as a drive with one listing per indicator
    instead. What it would need is in
    [`gho-pipeline-spec.md`](gho-pipeline-spec.md) section 9, and it is
-   tracked as P6.13 in `production-plan-world-humanitarian-day.md`.
+   tracked as P6.13 in Avandar's Linear roadmap.
 
 ## 8. Testing references to add
 

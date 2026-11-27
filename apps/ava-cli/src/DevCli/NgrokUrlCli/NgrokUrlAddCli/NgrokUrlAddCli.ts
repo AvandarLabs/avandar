@@ -32,7 +32,7 @@ export async function runNgrokUrlAdd(options: { url: string }): Promise<void> {
 }
 
 /** Add a dev ngrok URL to the registry. */
-export const NgrokUrlAddCli = Acclimate.createCLI("add")
+export const NgrokUrlAddCli = Acclimate.createCli("add")
   .description("Add a dev ngrok URL to the registry.")
   .addPositionalArg({
     name: "url",

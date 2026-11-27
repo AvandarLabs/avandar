@@ -4,7 +4,7 @@ import { NgrokUrlRemoveCli } from "@ava-cli/DevCli/NgrokUrlCli/NgrokUrlRemoveCli
 import { Acclimate } from "@avandar/acclimate";
 
 /** Manage registered dev ngrok URLs for the dev-fanout-server. */
-export const NgrokCli = Acclimate.createCLI("ngrok")
+export const NgrokCli = Acclimate.createCli("ngrok")
   .description("Manage registered dev ngrok URLs for the dev-fanout-server.")
   .addCommand("add", NgrokUrlAddCli)
   .addCommand("list", NgrokUrlListCli)

@@ -3,7 +3,7 @@
 **Status:** Draft for implementation
 **Author:** pablo@avandarlabs.com (brainstormed with Claude)
 **Date:** 2026-08-12
-**Related:** `docs/production-plan-world-humanitarian-day.md` (P7), `docs/permissions-architecture.md`, `src/components/GISApp/`, `src/clients/qetl/WorkspaceQETLClient.ts`
+**Related:** Avandar's Linear roadmap (P7), `docs/permissions-architecture.md`, `src/components/GISApp/`, `src/clients/qetl/WorkspaceQETLClient.ts`
 
 ---
 

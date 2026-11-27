@@ -39,7 +39,7 @@ export const SUPABASE_COMMAND_HELP_SPECS: CommandHelpSpec[] = [
 ];
 
 /** A CLI for managing Avandar's Supabase database. */
-export const SupabaseCli = Acclimate.createCLI("supabase")
+export const SupabaseCli = Acclimate.createCli("supabase")
   .description(
     "Manage Supabase in Avandar. All commands default to the local database.",
   )

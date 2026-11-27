@@ -814,7 +814,7 @@ wide. Both fail toward correctness.
 > written without `AS`, a typed literal's keyword (`TIMESTAMP '...'`), and
 > unqualified columns in a multi-dataset statement each produce a projection
 > that DuckDB rejects with a binder error on a cold cache. The fix is tracked as
-> P0.9 in `docs/production-plan-world-humanitarian-day.md` (Track 0, P0. QETL
+> P0.9 in Avandar's Linear roadmap (Track 0, P0. QETL
 > Engine): restore "fail wide" by returning `"all"` whenever attribution is
 > ambiguous. The failure shapes are listed in `docs/qetl-architecture.md` under
 > known gaps.

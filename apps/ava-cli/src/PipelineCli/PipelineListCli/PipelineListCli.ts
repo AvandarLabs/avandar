@@ -71,6 +71,6 @@ export async function runPipelineList(
   }
 }
 
-export const PipelineListCli = Acclimate.createCLI("list")
+export const PipelineListCli = Acclimate.createCli("list")
   .description("List all available pipelines.")
   .action(runPipelineList);

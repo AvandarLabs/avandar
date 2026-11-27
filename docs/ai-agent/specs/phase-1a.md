@@ -37,7 +37,7 @@ Out (later sub-projects or phases):
   (1F). Until 1F the agent still runs only behind `DataAgentFeature`; with
   the switch on, it now runs on every page.
 - Offline mode outside the Data Explorer. Other pages keep the old offline
-  pipeline; widening offline mode is roadmap 4.2.
+  pipeline; widening offline mode is tracked in Avandar's Linear roadmap.
 
 ## Approach
 
@@ -316,8 +316,7 @@ Red/green TDD with Vitest, plus one browser spec:
   `pnpm type-check:deno`), and lint pass.
 - The eval bar above is met and archived.
 - The browser spec passes on its own.
-- `roadmap.md` marks 1A done and `decisions.md` records the new decisions
-  (D37, D38).
+- `decisions.md` records the new decisions (D37, D38).
 
 ## Known follow-ups
 

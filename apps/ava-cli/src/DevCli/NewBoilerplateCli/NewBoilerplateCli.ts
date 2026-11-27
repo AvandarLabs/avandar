@@ -8,7 +8,7 @@ import { Acclimate } from "@avandar/acclimate";
  * A CLI for creating new code boilerplates, such as new TypeScript models
  * or new Supabase table schemas.
  */
-export const NewBoilerplateCli = Acclimate.createCLI("new")
+export const NewBoilerplateCli = Acclimate.createCli("new")
   .addCommand("model", NewAvaModelCli)
   .addCommand("package", NewPackageCli)
   .addCommand("table", NewSupabaseTableCli)

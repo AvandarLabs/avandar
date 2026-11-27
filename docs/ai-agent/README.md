@@ -9,7 +9,6 @@ before it merges to `demo/measles`, and later `develop`.
 |---|---|
 | [architecture.md](architecture.md) | The target design: agent loop in the browser, metered proxy, tools, privacy boundary, model policy, cost model, and the path to the full agent. |
 | [decisions.md](decisions.md) | Every decision made (D01 to D45), with alternatives and costs. |
-| [roadmap.md](roadmap.md) | The approved plan to the full Avandar agent (D33), offline work, and what must happen before `develop`. |
 | [eval.md](eval.md) | The eval: results, model sweeps (online and offline), the method in detail (data checksums, graders, metrics, versions), and the command behind every number. |
 | [eval-runs/](eval-runs/README.md) | Every eval run with all of its answers, for checking any number. |
 | [spike-findings.md](spike-findings.md) | Bundle size, Deno, prompt caching, the chat UI integration, and the browser run. |
@@ -60,4 +59,4 @@ in about 6,600, which leaves room for multi-step agent work and a free tier.
 
 None. D04 (server-held prompts) and D31 (Haiku 5.5) are done; D18
 (metering and the free-tier cap) is deferred and tracked in
-[roadmap.md](roadmap.md).
+the "Launch agent metering and plan budgets" project in Linear.

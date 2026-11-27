@@ -368,7 +368,7 @@ highlighted.
 - `case-activity-architecture.md`: replace the "Extension points for object
   references and embeds" section with a description of what was built and a
   pointer to `gadgets.md`.
-- `docs/production-plan-world-humanitarian-day.md`: note gadget references
+- Avandar's Linear roadmap: note gadget references
   under P5c, and list the follow-ups in section 12.
 - `docs/measles-demo/pr-feature-log.md`: log this as its own feature.
 

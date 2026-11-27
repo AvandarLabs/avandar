@@ -1495,7 +1495,7 @@ Composer tests (extend `RichTextComposer.test.tsx`, mocking `@/clients/gadgets/s
 **Files:**
 - Modify: `src/i18n/locales/*/messages.po|ts` (generated)
 - Create: `docs/measles-demo/gadgets.md`
-- Modify: `docs/measles-demo/case-activity-architecture.md`, `docs/production-plan-world-humanitarian-day.md`, `docs/measles-demo/pr-feature-log.md`
+- Modify: `docs/measles-demo/case-activity-architecture.md`, `docs/measles-demo/pr-feature-log.md`
 
 - [ ] **Step 1:** `pnpm i18n:extract && pnpm i18n:compile`; commit `src/i18n/locales` as `chore(comments): extract gadget messages`.
 - [ ] **Step 2:** Write `docs/measles-demo/gadgets.md` with the content of spec section 9 (gadget table with table, id, open route, facts; never-gadgets with reasons; not-yet-gadgets; how to add a type), plus a short "How it works" paragraph naming `rpc_gadgets__search`, `GADGET_REGISTRY`, the two nodes, and `comment_gadget_refs`.

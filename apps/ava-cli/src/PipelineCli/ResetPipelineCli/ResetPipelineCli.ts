@@ -351,7 +351,7 @@ export async function resetPipelineCommand(options: {
   }
 }
 
-export const ResetPipelineCli = Acclimate.createCLI("reset")
+export const ResetPipelineCli = Acclimate.createCli("reset")
   .description(
     "Delete the data catalog listings a pipeline wrote, so it can be run " +
       "again from scratch. Asks before deleting anything. Uses the database " +

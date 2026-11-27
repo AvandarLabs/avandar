@@ -50,7 +50,7 @@ None of these changes a decision. Each one follows the code where the spec did n
 | 1a. Delete rpcs | Create `supabase/schemas/00.enum.datasets__delete_status.sql`, `supabase/schemas/50.rpc_datasets__get_delete_target.sql`, `supabase/schemas/50.rpc_datasets__delete.sql`, `supabase/tests/database/datasets/rpc_datasets__delete.test.sql`. Generated: `supabase/migrations/<timestamp>_add_dataset_delete_rpcs.sql`, `apps/desktop/migrations/<timestamp>_add_dataset_delete_rpcs.gen.sql`, `shared/types/database.types.ts` |
 | 1b. `fullDelete` | `src/clients/datasets/DatasetClient/createDatasetMutations.ts` (+ `.test.ts`), `DatasetDeleteError.ts`, `src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts` (+ `.test.ts`), `src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.test.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.test.tsx`, `docs/superpowers/specs/2026-11-16-plugins-uninstall-content-design.md` |
 | 2. IPC routing | `shared/platform/ipc/client.ts` (+ `.test.ts`), `apps/desktop/main/ipc/desktopIpcBridgeScript/desktopIpcBridgeScript.ts`, create `.../desktopIpcBridgeScript/desktopIpcBridgeScript.test.ts`, `apps/desktop/main/ipc/createIpcServer/createIpcServer.test.ts`, the uninstall spec |
-| 3. Switch rule | `CLAUDE.md`, `docs/superpowers/2026-11-09-plugins-1b-handoff.md`, `2026-11-10-plugins-1c-handoff.md`, `2026-11-16-plugins-1d-handoff.md` |
+| 3. Switch rule | `CLAUDE.md`, the retired plugins 1b handoff, the retired plugins 1c handoff, the retired plugins 1d handoff |
 | 4. Plugin errors | `plugins/epidemiology/src/derivedColumns/useAddColumns.ts`, `AddColumnsFooter.tsx`, create `derivedColumns/getAddColumnsErrorKeyFromCode/getAddColumnsErrorKeyFromCode.ts` (+ `.test.ts`), `incidence/IncidenceModal/IncidenceForm.tsx`, `useIncidenceForm.ts`, `IncidenceModal.test.tsx`, `rollingAverage/RollingAverageModal/RollingAverageForm.tsx`, `useRollingAverageForm.ts`, `RollingAverageModal.test.tsx`, `plugins/epidemiology/locales/en.json`, `docs/plugin-authoring.md` |
 | 5a. Unlimited SQL | `src/clients/queries/runStructuredQuery/runStructuredQuery.types.ts`, `runStructuredQueryWithMetadata.ts`, `runStructuredQuery.test.ts`, `src/views/DataExplorerApp/useDataQuery/useDataQuery.ts` (+ `.test.tsx`) |
 | 5b. Limit outside the wrap | `src/lib/plugins/DataExplorerBridge.types.ts`, `src/lib/plugins/derivedColumns/makeDerivedColumnsSqlFromColumns/makeDerivedColumnsSqlFromColumns.ts` (+ both tests in `__tests__/`), `src/lib/plugins/derivedColumns/addColumnsForInvocation/addColumnsForInvocation.ts` (+ `.test.ts`), `src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts` (+ `.test.tsx`), `src/views/DataExplorerApp/DataExplorerApp.tsx`, `src/views/DataExplorerApp/__tests__/pluginDerivedColumns.integration.test.tsx`, `docs/plugin-authoring.md` |
@@ -60,7 +60,7 @@ None of these changes a decision. Each one follows the code where the spec did n
 | 9. Test gaps and Undo | `plugins/epidemiology/src/incidence/IncidenceModal/IncidenceModal.test.tsx`, `RollingAverageModal.test.tsx`, `src/lib/plugins/PluginMenuSlot/PluginMenuSlot.test.tsx`, `src/views/DataExplorerApp/__tests__/pluginDerivedColumns.integration.test.tsx`, `src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx` (+ `.test.tsx`) |
 | 10. Manifest and prompt | Move `packages/shared/plugin-manifest/src/node/emitPluginAiTools.ts`, `emitPluginAiTools.main.ts`, `__tests__/emitPluginAiTools.integration.test.ts` into `src/node/emitPluginAiTools/`. Modify `src/node/index.ts`, `src/runtime.ts`, `README.md`, `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` |
 | 11. Catalogs | `src/i18n/locales/*/messages.po` and `messages.ts` |
-| 12. Verify, handoffs | `docs/superpowers/2026-11-09-plugins-1b-handoff.md`, `2026-11-10-plugins-1c-handoff.md` |
+| 12. Verify, handoffs | the retired plugins 1b handoff, the retired plugins 1c handoff |
 
 Task order: 0, then 1a before 1b. Task 4 before Task 8 (both edit `useRollingAverageForm.ts`). Task 5b before Task 9 (both edit the integration test). Task 11 after every task that adds a string (1b, 9). The rest are independent.
 
@@ -1591,7 +1591,7 @@ Facts (verified): the only callers of `IpcBridge.once` are `callIpc` and the loo
 
 **Files:**
 - Modify: `CLAUDE.md:152-186`, `CLAUDE.md:238-241`
-- Modify: `docs/superpowers/2026-11-09-plugins-1b-handoff.md:80-82`, `docs/superpowers/2026-11-10-plugins-1c-handoff.md:107-109`, `docs/superpowers/2026-11-16-plugins-1d-handoff.md:167-169`
+- Modify: the retired plugins 1b handoff, the retired plugins 1c handoff, the retired plugins 1d handoff
 
 - [ ] **Step 1: Rewrite the section.** In `CLAUDE.md`, replace everything from "Every worktree uses the shared `avandar` stack by default, and most branches should" (line 152) through "advice is expected. Do not switch just to follow it." (line 186) with:
 
@@ -1653,7 +1653,7 @@ Facts (verified): the only callers of `IpcBridge.once` are `callIpc` and the loo
 
   The rest of that bullet ("With no project id, the command kebab-cases...") stays.
 
-- [ ] **Step 3: Point the handoffs at the rule.** Add this bullet as the first item of each Environment section: `docs/superpowers/2026-11-09-plugins-1b-handoff.md` ("## Environment state"), `2026-11-10-plugins-1c-handoff.md` ("## Environment"), and `2026-11-16-plugins-1d-handoff.md` ("## Environment"):
+- [ ] **Step 3: Point the handoffs at the rule.** Add this bullet as the first item of each Environment section: the retired plugins 1b handoff ("## Environment state"), the retired plugins 1c handoff ("## Environment"), and the retired plugins 1d handoff ("## Environment"):
 
   ```md
   - **Switch rule:** every `demo/measles` branch switches its local stack before any database work. See "Switch every demo/measles branch before it touches the database" in `CLAUDE.md`.
@@ -1664,7 +1664,7 @@ Facts (verified): the only callers of `IpcBridge.once` are `callIpc` and the loo
 - [ ] **Step 5: Commit.**
 
   ```bash
-  git add CLAUDE.md docs/superpowers/2026-11-09-plugins-1b-handoff.md docs/superpowers/2026-11-10-plugins-1c-handoff.md docs/superpowers/2026-11-16-plugins-1d-handoff.md
+  git add CLAUDE.md the retired plugins 1b handoff the retired plugins 1c handoff the retired plugins 1d handoff
   git commit -m "docs: switch every demo/measles branch before database work
 
   The shared avandar stack follows develop and lacks demo/measles'
@@ -3775,7 +3775,7 @@ Closes 1c follow-ups 4, 5, and 6. **Unit:** mechanical (moves and one-line edits
 
   Expected: all pass. The uninstall spec now deletes through the new rpcs, and the incidence spec adds columns and clicks Undo.
 
-- [ ] **Step 4: Record the closed follow-ups.** Get the commits: `git log --format='%h %s' demo/measles..HEAD`. In `docs/superpowers/2026-11-09-plugins-1b-handoff.md`, directly under "## Open follow-ups", add:
+- [ ] **Step 4: Record the closed follow-ups.** Get the commits: `git log --format='%h %s' demo/measles..HEAD`. In the retired plugins 1b handoff, directly under "## Open follow-ups", add:
 
   ```md
   ### Closed by `fix/plugins-cleanup`
@@ -3791,7 +3791,7 @@ Closes 1c follow-ups 4, 5, and 6. **Unit:** mechanical (moves and one-line edits
   | 7. The Undo button's accessible name | `<Task 9 Step 7 sha>` and `<Task 11 sha>` |
   ```
 
-  In `docs/superpowers/2026-11-10-plugins-1c-handoff.md`, directly under "## Open follow-ups from 1c", add:
+  In the retired plugins 1c handoff, directly under "## Open follow-ups from 1c", add:
 
   ```md
   ### Closed by `fix/plugins-cleanup`
@@ -3806,14 +3806,14 @@ Closes 1c follow-ups 4, 5, and 6. **Unit:** mechanical (moves and one-line edits
   | 7. The imperative loop in `runFitRegression.ts` | `<Task 8 Step 6 sha>` |
   ```
 
-  Replace each `<... sha>` with the short hash from the log. In the 1c handoff, also change "The 1b follow-ups in `docs/superpowers/2026-11-09-plugins-1b-handoff.md` are untouched." to "The 1b follow-ups 1 to 7 are closed. See that handoff."
+  Replace each `<... sha>` with the short hash from the log. In the 1c handoff, also change "The 1b follow-ups in the retired plugins 1b handoff are untouched." to "The 1b follow-ups 1 to 7 are closed. See that handoff."
 
-- [ ] **Step 5: Check the docs for em dashes.** `grep -n "—" docs/superpowers/2026-11-09-plugins-1b-handoff.md docs/superpowers/2026-11-10-plugins-1c-handoff.md` prints nothing.
+- [ ] **Step 5: Check the docs for em dashes.** `grep -n "—" the retired plugins 1b handoff the retired plugins 1c handoff prints nothing.
 
 - [ ] **Step 6: Commit.**
 
   ```bash
-  git add docs/superpowers/2026-11-09-plugins-1b-handoff.md docs/superpowers/2026-11-10-plugins-1c-handoff.md
+  git add the retired plugins 1b handoff the retired plugins 1c handoff
   git commit -m "docs(plugins): record the closed 1b and 1c follow-ups
 
   Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"

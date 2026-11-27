@@ -69,7 +69,7 @@ export async function runCustomerRemove(options: {
 }
 
 /** Remove a customer (and associated subscriptions) by email. */
-export const CustomerRemoveCli = Acclimate.createCLI("remove")
+export const CustomerRemoveCli = Acclimate.createCli("remove")
   .description("Remove a Polar customer and associated subscriptions by email.")
   .addOption({
     name: "--email",

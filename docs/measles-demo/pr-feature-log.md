@@ -20,8 +20,8 @@ backlog, not a porting list: every feature reaches `develop` with the
 `demo/measles` promotion, and each one gets a public retroactive review,
 explained in [docs/reviews/README.md](../reviews/README.md).
 
-Bug fixes ready to port to `develop`, and the PR and Linear status of
-each, are tracked in [bug-log.md](bug-log.md).
+Bug fixes that were ready to port to `develop`, and their PR and
+status, are tracked in Avandar's Linear roadmap.
 
 Out of scope: the Postgres connector. It came in through
 `1d8678750 Merge branch 'feat/postgres-connector'`, again through
@@ -160,7 +160,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F85 | Agent query results as gadget cards in the chat | not started | F21, F79 | |
 | F86 | Page-agnostic agent: the current page in every turn, results in the chat | not started | F21, F78, F84, F85 | |
 | F87 | Column-aware placeholders keep personal values in page SQL on the device | not started | F86 | |
-| F88 | Agent docs: architecture, decisions, eval, roadmap, and the page-agnostic agent specs | not started | F87, F89 to F91 | |
+| F88 | Agent docs: architecture, decisions, eval, and the page-agnostic agent specs | not started | F87, F89 to F91 | |
 | F89 | Mentioned and attached gadgets reach the agent: ref tokens, `<attached>` and `<mentioned>` blocks, prompt v3 | not started | F81 to F85, F86 and F87, F21, F22 | |
 | F90 | Chat composer with `@` mentions of gadgets, and mention chips in sent messages | not started | F89, F21 | |
 | F91 | Chat context tray and "Add context" picker, kept per chat | not started | F89, F90, F21 (with its `ee2206125` addendum) | |
@@ -463,7 +463,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68, F131 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. F131: the rail width reads `--ava-app-view-rail-width`, so the Apply view can widen it (`dd1bc5bec`). |
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
-| `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
+| Avandar's Linear roadmap | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
 | `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134, F136, F137 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. F136: regenerate for its migration, route, and messages. F137: messages only (`abdafb519`). |
 
 ### Joined cases (F69 to F76)
@@ -601,7 +601,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/{confirmAgentDashboardCard.{ts,test.ts},AgentDashboardBlockPart.tsx}` | F139, F140 | F139 creates them. F140: Confirm logs `dashboard.block_added_via_chat` once the block is queued or saved, and the part passes `editor.editorData` (`e2cac534d`). |
 | `src/lib/agent/schemaAnswer/isSchemaAnswerTurn.test.ts` | F95, F140 | F95 creates it. F140: a retried column question stays one, and the Try again line alone is not one (`6a1cc904a`). |
 | `scripts/ai-eval/covid/covidSchemaQuestions.{ts,test.ts}` | F95, F140 | F95 creates them. F140: `_saysNotStackable` accepts "do not line up" and its contractions (`f4da653cb`, `09e31504e`), "not directly" and "renaming is needed", and rejects "nothing to rename" and "no need to rename" (`d8ef5c4f9`). `71040955f` then rejects four wrong replies the earlier checks accepted ("No column renaming is needed", extra columns that "don't line up", "not directly" mid-sentence, and "you don't need to rename anything"). So the changes both loosen and tighten the check. "nothing needs to be renamed" still passes. |
-| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md,architecture.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139, F140 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. F140: D45, the 1E rows in `roadmap.md` and `phase-1.md`, section 8 of `architecture.md`, and the Phase 1E section and T questions in `eval.md`. |
+| `docs/ai-agent/{README.md,decisions.md,eval.md,architecture.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139, F140 | F128: D43, and the 1C row in `phase-1.md`. F89: D40 to D42, the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D row in `phase-1.md`, and the Phase 1D eval section. F140: D45, the 1E row in `phase-1.md`, section 8 of `architecture.md`, and the Phase 1E section and T questions in `eval.md`. |
 
 ### Plugins (F96 to F112)
 
@@ -1363,10 +1363,10 @@ Rows for its Commits table:
 
 | SHA | Subject | Take |
 |---|---|---|
-| `eee3e5b14` | docs(measles-demo): add case management roadmap for contact tracing | All of it: `docs/measles-demo/case-management-roadmap.md` (new). Its statements are dated 2026-11-09, before assignment (F66) shipped: it still says nothing writes `assigned_to`, so refresh that row when porting. |
+| `eee3e5b14` | docs(measles-demo): add case management roadmap for contact tracing | All of it: a case management roadmap file (new, since removed in favor of Avandar's Linear roadmap). |
 | `f177ec60b` | docs(cases): plan assigning a record to one member | MIXED: only the `docs/measles-demo/measles-outbreak-response.md` hunk (the assignment gap note). The rest is F66. |
 
-Files addition: `docs/measles-demo/case-management-roadmap.md`.
+Files addition: none (the roadmap file this commit added has since been removed).
 
 Add to F9's Commits table:
 
@@ -1742,7 +1742,7 @@ with its `@avandar/clients` patch changeset.
 `docs/measles-demo/case-comments-plan.md` are new on this branch, so port
 them to `docs/` (and the spec and plan to `docs/superpowers/`) in the PR,
 fixing the links in `AGENTS.md`, `docs/ontology-architecture.md`,
-`docs/production-plan-world-humanitarian-day.md`, and the two schema
+Avandar's Linear roadmap, and the two schema
 comments that point at the architecture doc. The one-line note in
 `docs/measles-demo/measles-outbreak-response.md` is branch-only: don't port it.
 
@@ -1783,7 +1783,7 @@ Add to **Commits to read**:
 
 | SHA | Subject | Take |
 |---|---|---|
-| `35e1acd07` | docs(measles-demo): move the case comments docs here and log them as feature F17 | MIXED: the moves of `case-comments-design.md` and `case-comments-plan.md` into `docs/measles-demo/`, the `case-activity-architecture.md` link, and the link fixes in `AGENTS.md`, `docs/ontology-architecture.md`, `docs/production-plan-world-humanitarian-day.md`, `00.enum.activity_events__kind.sql`, and `22.activity_events.sql` are what F18's **Docs** paragraph already asks for (port them to `docs/`, fixing those links). The `measles-outbreak-response.md` line and `pr-feature-log.md` are branch-only. |
+| `35e1acd07` | docs(measles-demo): move the case comments docs here and log them as feature F17 | MIXED: the moves of `case-comments-design.md` and `case-comments-plan.md` into `docs/measles-demo/`, the `case-activity-architecture.md` link, and the link fixes in `AGENTS.md`, `docs/ontology-architecture.md`, Avandar's Linear roadmap, `00.enum.activity_events__kind.sql`, and `22.activity_events.sql` are what F18's **Docs** paragraph already asks for (port them to `docs/`, fixing those links). The `measles-outbreak-response.md` line and `pr-feature-log.md` are branch-only. |
 
 ---
 
@@ -2001,7 +2001,7 @@ hunks in the case feed (`CaseActivityComposer.tsx`,
 them with F18's docs, and port the "Gadget references" section of
 `case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the
 gadget references bullet under P5c.2 in
-`docs/production-plan-world-humanitarian-day.md`.
+Avandar's Linear roadmap.
 
 **Schema:** one migration, `20261107004932_gadget_references.sql` (and its
 desktop mirror `apps/desktop/migrations/20261107004932_gadget_references.gen.sql`).
@@ -2069,7 +2069,7 @@ listed.
 
 | SHA | Subject | Take |
 |---|---|---|
-| `428060a69` | docs(measles-demo): document gadgets and log gadget references | MIXED: `docs/measles-demo/gadgets.md` (new), the "Gadget references" section of `docs/measles-demo/case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the gadget references bullet in `docs/production-plan-world-humanitarian-day.md` go here (see Docs). The `docs/measles-demo/pr-feature-log.md` hunk is branch-only: never port. |
+| `428060a69` | docs(measles-demo): document gadgets and log gadget references | MIXED: `docs/measles-demo/gadgets.md` (new), the "Gadget references" section of `docs/measles-demo/case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the gadget references bullet in Avandar's Linear roadmap go here (see Docs). The `docs/measles-demo/pr-feature-log.md` hunk is branch-only: never port. |
 | `43982e31d` | test(comments): cover linking and embedding gadgets in a case comment | All of it: `tests/e2e/case-gadgets.spec.ts` and `tests/e2e/helpers/seedDashboardWithTile.ts` (both new). |
 | `c212f382d` | docs(measles-demo): note multi-word @ queries as a gadget follow-up | All of it (`gadgets.md`). |
 | `371c85b45` | test(dashboards): stub the preview route search and cover the linked tile id | All of it. |
@@ -2458,7 +2458,7 @@ cramping them.
 |---|---|---|
 | `d8a72da58` | feat(data-catalog): preview an ODC listing's first 200 rows and open it full screen | All of it. Regenerate the `.po` catalogs. |
 | `6b815b3d3` | fix(data-catalog): preview an API-backed CSV listing from the start of its file | All of it. |
-| `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the `production-plan-world-humanitarian-day.md` P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
+| `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the Avandar's Linear roadmap P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
 
 **Files:** `src/clients/DuckDbClient/previewParquetBlob/`, the
 `previewParquetBlob` method in `DuckDbClient.ts`,
@@ -2590,7 +2590,7 @@ in `.github/workflows/demo.yaml`, `src/lib/openData/requestOpenDataParquetCopy/`
 and its call in `DataCatalogView.tsx`, the four new catalog messages,
 `docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
-bullets in `production-plan-world-humanitarian-day.md`.
+bullets in Avandar's Linear roadmap.
 
 **Schema:** `00.enum.data_catalog_listings__parquet_cache_status.sql`, the
 `parquet_cache_*` columns and constraints in `11.data_catalog_listings.sql`,
@@ -2825,7 +2825,7 @@ to a workspace and joined to country names, without a hardcoded connector.
 
 | SHA | Subject | Take |
 |---|---|---|
-| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The `production-plan-world-humanitarian-day.md` and `open-data-catalog-architecture.md` hunks go with F9. |
+| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The Avandar's Linear roadmap and `open-data-catalog-architecture.md` hunks go with F9. |
 | `f42fe266e` | docs(open-data): record the GHO spec's decisions | All of it. |
 | `905503037` | feat(open-data): store listing companions and freshness probes | All of it. |
 | `6dde864dd` | feat(catalog): recommend listings to add together, and say when a listing has no data | All of it. |
@@ -4668,7 +4668,7 @@ upsert function and listings that carry columns), and F8 (the
 - `src/lib/openData/`: `verifyOpenDataColumnTypes/`, `createColumnTypeVerificationCoordinator/`, `ColumnTypeVerifications.ts` (new)
 - `src/views/DataManagerApp/DataImportView/DataCatalogView/`: `useVerifyColumnTypesOnDwell/`, `readCatalogColumnsForAdding/`, `DataCatalogListingColumns/` (new), `DataCatalogView.tsx`, `DataCatalogListingDetail/DataCatalogListingDetail.tsx`
 - `shared/models/data-catalog-listings/DataCatalogListing/{DataCatalogListing.types.ts,DataCatalogListingParsers.ts}` (`dateColumnTypeLastVerified`) and the same fixtures as F51
-- `docs/production-plan-world-humanitarian-day.md`: the P6.6 and P6.7 bullets
+- Avandar's Linear roadmap: the P6.6 and P6.7 bullets
 - `src/i18n/locales/*/messages.{po,ts}`: regenerate
 
 **Schema:** regenerate `20261022194116_verify_catalog_listing_column_types.sql`
@@ -5372,7 +5372,7 @@ Take F61's hunks of the QETL and query column files from
 - Integration: `tests/integration/queries/{StructuredQueryTestFixtures.ts,structuredQueryConcepts.executed.test.ts}`.
 - E2E: `tests/e2e/case-statuses-data-explorer.spec.ts`, `tests/e2e/helpers/CaseTypeSeedHelpers.ts` (new).
 - Docs: F61's hunks of `docs/ontology-architecture.md` and
-  `docs/production-plan-world-humanitarian-day.md`, and plan 4.
+  Avandar's Linear roadmap, and plan 4.
 
 **Schema:** none.
 
@@ -5651,7 +5651,7 @@ page).
 
 | SHA | Subject | Take |
 |---|---|---|
-| `f177ec60b` | docs(cases): plan assigning a record to one member | MIXED: the spec, the plan, and the `docs/production-plan-world-humanitarian-day.md` hunk. The `docs/measles-demo/measles-outbreak-response.md` hunk is F9. |
+| `f177ec60b` | docs(cases): plan assigning a record to one member | MIXED: the spec, the plan, and the Avandar's Linear roadmap hunk. The `docs/measles-demo/measles-outbreak-response.md` hunk is F9. |
 | `9ddbcd1f1` | feat(cases): guard who a record can be assigned to | All of it. Regenerate the migration. |
 | `4ac9b2821` | feat(cases): filter a case type's records by assignee | All of it, including deleting `makeRecordsWhereFromStatusFilter/`. |
 | `145f99853` | feat(cases): refresh assignee lists after a record is assigned | All of it. |
@@ -5680,7 +5680,7 @@ page).
   `src/components/layouts/RootLayout/{makeMainNavbarLinksFromPermissions.ts,WorkspaceLayout/WorkspaceLayout.test.ts}`.
 - Cache: F66's hunks of `invalidateCaseStatusQueries/invalidateCaseStatusQueries.{ts,test.ts}`.
 - Docs: the spec and plan, F66's hunks of `docs/ontology-architecture.md` and
-  `docs/production-plan-world-humanitarian-day.md`.
+  Avandar's Linear roadmap.
 
 **Schema:** one migration, `20261109032546_individuals_assignment.sql` (the
 `individuals__check_assignment_change` trigger and
@@ -7620,7 +7620,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonne
 
 ---
 
-## F88: Agent docs: architecture, decisions, eval, roadmap, and the page-agnostic agent specs
+## F88: Agent docs: architecture, decisions, eval, and the page-agnostic agent specs
 
 Status: not started. Built on `feat/pi-agent` and `feat/agent-default`,
 merged into `demo/measles` in `64bc1c78d`, `b32bf6834`, `2329454f0`, and
@@ -7635,7 +7635,7 @@ and the cost model. `decisions.md` logs every decision (D01 to D42; D41 and
 D42 are F89 to F91's) with alternatives and costs. `eval.md` holds
 the results, the online and offline model sweeps, the method in full (data
 checksums, graders, metrics, versions), and the command behind every
-number. `roadmap.md` is the approved plan to one Avandar agent (D33),
+number. Avandar's Linear roadmap holds the approved plan to one Avandar agent (D33),
 including what must happen before the agent reaches paying users (metering
 and plan budgets). `spike-findings.md` covers bundle size, Deno, prompt
 caching, and the browser run. `specs/phase-1.md`, `specs/phase-1a.md`, and
@@ -7644,7 +7644,7 @@ placeholders, and `plans/phase-1a.md` is its implementation plan.
 **Value:** The reasoning and the evidence behind F77 to F87 stay with the
 code.
 
-**PR title:** `docs(ai-agent): document the agent's architecture, decisions, eval, and roadmap`
+**PR title:** `docs(ai-agent): document the agent's architecture, decisions, and eval`
 
 **Depends on:** F87 and F89 to F91 (their docs commits edit the same
 files; one docs PR for both is simplest).
@@ -7671,7 +7671,7 @@ files; one docs PR for both is simplest).
 | `c99cc385b` | docs(ai-agent): record the alias and case id fixes | All of it. |
 
 **Files:**
-- `docs/ai-agent/{README.md,architecture.md,decisions.md,eval.md,roadmap.md,spike-findings.md}`.
+- `docs/ai-agent/{README.md,architecture.md,decisions.md,eval.md,spike-findings.md}`.
 - `docs/ai-agent/specs/{phase-1.md,phase-1a.md,phase-1a-redaction.md}` and
   `docs/ai-agent/plans/phase-1a.md` (see Open questions).
 - F89 to F91's `specs/phase-1b.md` and `plans/phase-1b.md`, if this
@@ -7748,10 +7748,10 @@ eval), F21 (the `Gadget` model and `isGadgetRef`), and F22
 
 | SHA | Subject | Take |
 |---|---|---|
-| `966cb0dab` | docs(ai-agent): hand off the agent work after Phase 1A | MIXED: `docs/ai-agent/roadmap.md` and `docs/ai-agent/specs/phase-1a.md` (1A's live checks) go here. `HANDOFF.md` is branch-only. |
-| `d7f6ed19f` | docs(ai-agent): record the push and widen 1E to parity | MIXED: `decisions.md` (D40), `roadmap.md`, and `specs/phase-1.md` go here. `HANDOFF.md` is branch-only. |
+| `966cb0dab` | docs(ai-agent): hand off the agent work after Phase 1A | MIXED: `docs/ai-agent/specs/phase-1a.md` (1A's live checks) goes here. `HANDOFF.md` is branch-only. |
+| `d7f6ed19f` | docs(ai-agent): record the push and widen 1E to parity | MIXED: `decisions.md` (D40) and `specs/phase-1.md` go here. `HANDOFF.md` is branch-only. |
 | `61e3e0c55` | docs(ai-agent): spec Phase 1B, attachable context | All of it. |
-| `83b016c7d` | docs(ai-agent): plan Phase 1B and retire the handoff | MIXED: `plans/phase-1b.md` (new) and `roadmap.md` ("What keeps the agent off") go here. Deleting `HANDOFF.md` and its `README.md` row is branch-only. |
+| `83b016c7d` | docs(ai-agent): plan Phase 1B and retire the handoff | MIXED: `plans/phase-1b.md` (new) goes here. Deleting `HANDOFF.md` and its `README.md` row is branch-only. |
 | `a29760351` | refactor(ai-agent): share block text helpers across agent blocks | All of it: `agentBlockText.ts` (new) and the `buildAgentPageContextBlock.ts` refactor. |
 | `508ff35f7` | feat(ai-agent): write chat mentions as ref tokens | All of it. |
 | `0648bf6b8` | feat(ai-agent): describe a mentioned gadget's metadata | All of it. |
@@ -7784,7 +7784,7 @@ eval), F21 (the `Gadget` model and `isGadgetRef`), and F22
 | `009cc73c8` | docs(ai-agent): record the third mention privacy review round | All of it. |
 | `ba4c249a0` | docs(ai-agent): record the Phase 1B eval | MIXED: only the Phase 1B section of `docs/ai-agent/eval.md`. The six `eval-runs/2026-11-09T11-*` folders and their `eval-runs/README.md` rows stay branch-only. |
 | `4d21a6583` | fix(ai-agent): let dashboard charts with no SQL skip the chart budget | All of it. |
-| `1f3bc348d` | docs(ai-agent): mark Phase 1B built | MIXED: `docs/ai-agent/{decisions,roadmap}.md` and `specs/phase-1b.md` go here. The `docs/measles-demo/gadgets.md` hunk goes to F91. |
+| `1f3bc348d` | docs(ai-agent): mark Phase 1B built | MIXED: `docs/ai-agent/decisions.md` and `specs/phase-1b.md` go here. The `docs/measles-demo/gadgets.md` hunk goes to F91. |
 | `14b498708` | fix(ai-agent): load mentions on demand and count the asked question | All of it. |
 | `5c088efc5` | docs(ai-agent): align the Phase 1B docs with the build | All of it. |
 
@@ -7815,7 +7815,7 @@ eval), F21 (the `Gadget` model and `isGadgetRef`), and F22
 - E2E: `tests/e2e/agent-chat-result.spec.ts` (the v3 route).
 - Docs: `docs/ai-agent/specs/phase-1b.md` (new),
   `docs/ai-agent/plans/phase-1b.md` (new), and F89's hunks in
-  `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`,
+  `docs/ai-agent/{README.md,decisions.md,eval.md}`,
   `specs/phase-1.md`, and `specs/phase-1a.md`. Drop the `README.md` row for
   `HANDOFF.md`: the file was deleted in `43e0df775` but the row survived.
 
@@ -10383,7 +10383,7 @@ Then confirm PR #321's e2e jobs run on `ubuntu-24.04`.
 Status: not started. Built on `feat/agent-sessions`, merged into
 `demo/measles` on 2026-11-11 (`git log --merges --grep agent-sessions
 demo/measles` finds the merge). `develop` has none of it and no PR is open.
-This is Phase 1C of the agent roadmap (decision D43).
+This is Phase 1C of the agent plan (decision D43).
 
 **Purpose:** The chat panel keeps several chats per workspace and user.
 Up to three open chats show as tabs, the rest in an overflow list, and a
@@ -10449,7 +10449,7 @@ and the Case Manager home).
 | `21778456f` | test(chat): cover session tabs and the archive in the browser | All of it. |
 | `8b9f5970b` | test(chat): assert session navigation reaches data explorer | All of it. |
 | `ab02f9641` | fix(chat): clear session typecheck errors | MIXED: the four `ChatPanel` files go here. The `src/views/GisApp/GisAppLayerPanel.test.tsx` return type is F119's, and `demo/measles` already had the same fix. |
-| `c40ebd3b3` | docs(ai-agent): mark multiple chat sessions built | The roadmap's 1C row. Regenerate the catalogs. |
+| `c40ebd3b3` | docs(ai-agent): mark multiple chat sessions built | Regenerate the catalogs. |
 | `5d49c7760` | fix(chat): keep the selected chat when a background tab closes | All of it. |
 | `ddd22a0b7` | fix(chat): mount chat sessions on pages outside a workspace | All of it. |
 | `8bc905e0d` | fix(chat): detect the workspace route by its slug param | All of it. |
@@ -10498,13 +10498,13 @@ and the Case Manager home).
 - E2E: `tests/e2e/agent-chat-sessions.spec.ts` (new), and the Dock hunk of
   `tests/e2e/case-list-field.spec.ts`.
 - Docs: `docs/ai-agent/specs/phase-1c.md` (new), D43 in `decisions.md`, the
-  1C rows in `roadmap.md` and `specs/phase-1.md`.
+  the 1C row in `specs/phase-1.md`.
 - `src/i18n/locales/*/messages.{po,ts}`: regenerate with
   `pnpm i18n:extract && pnpm i18n:compile`, never copy.
 
 **Schema:** none. Sessions, threads, trays, and the archive are in
-localStorage. Chat history in the database is future work F4 in
-`docs/ai-agent/roadmap.md`, not this log's F4.
+localStorage. Chat history in the database is future work tracked in
+Avandar's Linear roadmap (AVA-298), not this log's F4.
 
 **Known gaps** (triaged at the branch review and left on purpose): the
 archive dropdown is still `role="menu"` with no menu items, and the tab
@@ -11948,7 +11948,7 @@ stylelint on changed files, and vitest over `src/views/DataManagerApp`,
 
 Status: not started. Built on `feat/agent-dashboards`, rebased onto
 `demo/measles` at `bfc73f1ef` on 2026-11-18, and not merged into it. This is
-Phase 1D of the agent roadmap (decision D44).
+Phase 1D of the agent plan (decision D44).
 
 **Purpose:** The agent adds one block to a dashboard from any page, with the
 `add_dashboard_block` tool and today's ten block kinds. The target is the
@@ -12024,7 +12024,7 @@ already has, and `1a9a157d5`, whose formatting `demo/measles` already has):
 
 | SHA | Subject | Take |
 |---|---|---|
-| `6bd24f3ef` | docs(ai-agent): add the Phase 1D spec and D44 | All of it. Its `README.md`, `roadmap.md`, and `specs/phase-1.md` hunks are one line each, in the shared rows below. |
+| `6bd24f3ef` | docs(ai-agent): add the Phase 1D spec and D44 | All of it. Its `README.md` and `specs/phase-1.md` hunks are one line each, in the shared rows below. |
 | `51d5145f9` | test(ai-eval): add the dashboard questions and today's chat baseline | All of it. Its `eval-runs/` files are the `phase-1d_today-dashboards` runs. |
 | `38d7683f3` | docs(ai-agent): revise the Phase 1D spec after a review against the code | All of it. |
 | `7ff571d3b` | docs(ai-agent): add the Phase 1D plan | All of it. The plan is open decision 11. |
@@ -12105,7 +12105,7 @@ already has, and `1a9a157d5`, whose formatting `demo/measles` already has):
 - E2E: `tests/e2e/agent-dashboard-block.spec.ts` (new), and the v6 route hunks of the three agent specs (shared rows below).
 - Plugin manifest: `packages/shared/plugin-manifest/src/PluginManifest/{makeComparableAiToolName.ts,PluginManifestSchema.test.ts}` (`add_dashboard_block` reserved).
 - Docs: `docs/ai-agent/specs/phase-1d.md` and `docs/ai-agent/plans/phase-1d.md` (new), D44 in `decisions.md`,
-  the 1D rows in `roadmap.md` and `specs/phase-1.md`, the Phase 1D section of `eval.md`,
+  the 1D row in `specs/phase-1.md`, the Phase 1D section of `eval.md`,
   and the `phase-1d` run folders under `docs/ai-agent/eval-runs/`.
 - `src/i18n/locales/*/messages.{po,ts}`: regenerate with `pnpm i18n:extract && pnpm i18n:compile`, never copy.
 
@@ -12141,7 +12141,7 @@ The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
 
 Status: not started. Built on `jpsyx/agent-parity-1e`, based on
 `demo/measles`, and not merged into it. This is Phase 1E of the agent
-roadmap (decision D45, with D40).
+plan (decision D45, with D40).
 
 **Purpose:** The agent loses nothing today's chat does on three counts.
 Try again on the agent's latest answer reruns it with the first attempt
@@ -12159,7 +12159,7 @@ chat: the bias check, then the audit row, before the card shows, with
 `dashboard.block_added_via_chat` for every block that reaches a dashboard
 through the open editor or a confirmed card. No prompt change: v6 stays.
 
-**Value:** Turning the agent on (roadmap 1F) keeps Try
+**Value:** Turning the agent on (Phase 1F) keeps Try
 again useful, keeps the clarification audit log and bias check complete,
 and keeps the chat analytics comparable with today's.
 
@@ -12264,7 +12264,7 @@ blocks F139's `add_dashboard_block` and confirm card add).
   `harnesses/baseline/{BaselineHarness,DenoChatTurnRunner,baselinePageContext}.ts`, `baselinePageContext.test.ts`,
   `harnesses/pi/PiHarness.{ts,test.ts}`, and `covid/covidSchemaQuestions.{ts,test.ts}`.
 - Docs: `docs/ai-agent/specs/{phase-1e.md,phase-1e-brainstorm.md}` and `docs/ai-agent/plans/phase-1e.md` (new), D45 in `decisions.md`,
-  the 1E rows in `roadmap.md` and `specs/phase-1.md`, section 8 of `architecture.md`, the Phase 1E section and the T questions in `eval.md`,
+  the 1E row in `specs/phase-1.md`, section 8 of `architecture.md`, the Phase 1E section and the T questions in `eval.md`,
   and the `phase-1e` run folders under `docs/ai-agent/eval-runs/`.
 - No user-facing string: `pnpm i18n:check` shows no catalog change.
 
@@ -12317,19 +12317,21 @@ on a release line:
   `develop`'s, and the deploy job is kept on the local branch
   `feat/ci-deploy-jobs`. Edge function secrets stay set by hand on each
   Supabase project.
-- The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
-  move the open data catalog and its Parquet objects between projects.
+- The catalog move scripts, under `scripts/catalog-move/` (`3769ba532`),
+  moved the open data catalog and its Parquet objects between projects.
+  They were deleted once the cutover was done. Their last version is at tag
+  `v0.15.0`.
 
 **Value:** Releases keep the alpha line's safety checks without a second
 release line. A later change can give the staging and production deploys
 its deploy job.
 
-**Design:** `docs/measles-demo/production-cutover-plan.md` (its "Deploys",
-"`ava release` without the alpha line", and "The catalog" sections). The
-alpha line's own plan, runbook, and Stage 0 plan are kept as history and
-are superseded. Its migration audit, `alpha-migration-audit.md`, is to be
-refreshed for production and staging and renamed
-`production-migration-audit.md`.
+**Design:** the production cutover plan (its "Deploys", "`ava release`
+without the alpha line", and "The catalog" sections). That plan, the
+cutover runbook, and the alpha line's own plan, runbook, migration audit,
+and Stage 0 plan were deleted once the cutover was done. Their last
+versions are at tag `v0.15.0`: for example,
+`git show v0.15.0:docs/measles-demo/production-cutover-plan.md`.
 
 **PR title:** none of its own. It reaches `develop` with the `demo/measles`
 promotion (the production cutover plan, its "Stages" section).
@@ -12390,8 +12392,6 @@ set aside for follow-up work (M1).
 **Verification:**
 ```sh
 pnpm --filter @avandar/ava-cli test
-pnpm vitest run scripts/catalog-move
-shellcheck -x scripts/catalog-move/*.sh
 ```
 
 ---

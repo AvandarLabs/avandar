@@ -275,11 +275,11 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Why.** Cost could not be measured before. The refactor changes no
   behavior; the chat function's 121 tests pass.
 
-## D18. Metering and plan budgets live in the proxy (deferred, on the roadmap)
+## D18. Metering and plan budgets live in the proxy (deferred, tracked in Avandar's Linear roadmap)
 
 - **Decision (Pablo, 2026-11-07, confirmed 2026-11-08).** Not needed for
   the demo: `demo/measles` is a demo branch. Tracked with the free plan's cap
-  as future work before the agent moves to `develop` (roadmap F1 and F2).
+  as future work before the agent moves to `develop` (tracked in Avandar's Linear roadmap).
 - **Proposal.** The proxy records each request's billed cost (Pi reports it
   in the `done` event) against the user, workspace, and plan, and refuses
   requests past the plan's monthly AI budget with a readable message.
@@ -529,8 +529,8 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 
 ## D33. The plan to the full Avandar agent (approved)
 
-- **Decision (Pablo, 2026-11-08).** Approved the four phases in
-  [roadmap.md](roadmap.md): (1) the data agent becomes the default, (2) the
+- **Decision (Pablo, 2026-11-08).** Approved the four phases of the plan (now
+  tracked in Linear): (1) the data agent becomes the default, (2) the
   shared foundations (tool registry, router, confirmation for changes, a
   general host, context management, an eval per area, untrusted data), (3)
   areas one at a time, (4) one agent, retiring today's chat function.
@@ -563,15 +563,14 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   spec, plan, and implementation: 1A page-agnostic agent, 1B attachable
   context (`@` mentions and a context picker), 1C multiple chats and an
   archive, 1D dashboard actions from anywhere, 1E "Try again", 1F the
-  browser test and on by default. Roadmap 2.4 (the general host) moves into
+  browser test and on by default. The general host moves into
   1A.
 - **Why R4.** All AI work happens in one place, while entry points can sit
   wherever users look for them (the case manager's "add new case", a future
   question box in the data catalog), and starting one never loses the
   session the user already had.
-- **Added to the roadmap.** Chat history in the database (F4; 1C keeps it in
-  the browser for now) and chat session limits for free and basic accounts
-  (F5).
+- **Added to Avandar's Linear roadmap.** Chat history in the database (1C keeps it in
+  the browser for now) and chat session limits for free and basic accounts.
 - **Case manager.** Until 1C its chat keeps running on today's `chat`
   function. After 1C it opens as a new session in the main panel, still
   answered by today's case-manager chat until Phase 3.5.
@@ -651,7 +650,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   to the explorer is the one action that moves the user, so it needs positive
   proof that the user is already there. When the context is unknown, the safe
   answer is the chat, which works from every page. Offline turns keep the
-  explorer because the offline agent only runs there (roadmap 4.2).
+  explorer because the offline agent only runs there (tracked in Avandar's Linear roadmap).
 - **Alternatives.** Default to the explorer when unsure, as the agent did
   before 1A (a failed page read would navigate the user away from what they
   were doing).
@@ -880,7 +879,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Left out.** Try again, question-card parity, and
   `dashboard.block_added_via_chat` (1E, D40). Editing, moving, removing,
   and creating dashboards (Phase 3.1). Confirmation for other tools
-  (roadmap 2.3).
+  (tracked in Avandar's Linear roadmap).
 
 ## D45. Try again keeps the first attempt, and cards and analytics share today's code (built)
 

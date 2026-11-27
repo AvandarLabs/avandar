@@ -9,7 +9,7 @@
 **Tech Stack:** TypeScript, React 19, Mantine 9.2 (`@mantine/dates` is **not** a dependency, so date inputs use `TextInput type="date"`), `react-querybuilder` 8.20 with `@react-querybuilder/mantine`, knex (SQL string building), `node-sql-parser` 5 (SQL to form), DuckDB WASM, vitest, Playwright, Lingui.
 
 **Spec:** `docs/superpowers/specs/2026-08-17-manual-query-filters-design.md`
-**Findings:** `docs/superpowers/2026-08-17-manual-query-filters-review.md`
+**Findings:** the retired manual query filters review
 
 ---
 
@@ -5967,7 +5967,7 @@ git commit -m "fix(filters): address issues found in manual verification"
 ```
 
 Write the outcome into
-`docs/superpowers/2026-08-17-manual-query-filters-review.md` as a short
+the retired manual query filters review as a short
 "Resolved" section listing the finding ids now covered by tests, so the review
 document stays the index of what was wrong and what closed it.
 

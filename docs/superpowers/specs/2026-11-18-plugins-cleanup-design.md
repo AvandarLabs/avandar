@@ -4,8 +4,8 @@
 **Date:** 2026-11-18
 **Status:** Design approved (each open decision was approved one at a time)
 **Parent:** `docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md`
-**Closes follow-ups from:** `docs/superpowers/2026-11-09-plugins-1b-handoff.md`
-("Open follow-ups", items 1-7), `docs/superpowers/2026-11-10-plugins-1c-handoff.md`
+**Closes follow-ups from:** the retired plugins 1b handoff
+("Open follow-ups", items 1-7), the retired plugins 1c handoff
 ("Open follow-ups from 1c", items 2-7),
 `docs/superpowers/specs/2026-11-16-plugins-uninstall-content-design.md`
 (its known limits), and the React Doctor warning in the epidemiology plugin.

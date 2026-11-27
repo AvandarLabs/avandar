@@ -2,7 +2,7 @@
 
 Internal naming for the ontology subsystem, formerly "entities" and "entity
 configs". This is the dictionary for the rename tracked as P5.1 in
-`docs/production-plan-world-humanitarian-day.md`, which has shipped; it now
+Avandar's Linear roadmap, which has shipped; it now
 doubles as the reference for what each name means.
 
 Some of the new names have since been removed, and the rename tables below
@@ -353,7 +353,7 @@ it manages, individuals, rather than for the layer they sit in.
 - `src/views/DataExplorerApp/useDataExplorerUrlSync.ts`,
   `dataExplorerUrlHydration.ts` (`entityFieldConfigs` → `conceptAttributes`).
 - `src/config/FeatureFlagConfig.ts`: the `DisableManualData` doc comment.
-- `docs/production-plan-world-humanitarian-day.md`: the DL reframing glossary
+- Avandar's Linear roadmap: the DL reframing glossary
   is updated to point at the new names.
 
 ## Generated files (regenerate, never hand-edit)
