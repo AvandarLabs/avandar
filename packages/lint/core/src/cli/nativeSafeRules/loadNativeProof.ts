@@ -15,7 +15,7 @@ import { createNativeSeedFromSource } from "./createNativeSeedFromSource.ts";
 import { getNativeDiagnosticsFromOutput } from "./getNativeDiagnosticsFromOutput.ts";
 import { mirrorNativeDirectory } from "./mirrorNativeDirectory.ts";
 import { UNPROVEN } from "./nativeSafeRules.constants.ts";
-import { UnsupportedProofContext } from "./UnsupportedProofContext.ts";
+import { UnsupportedProofContextError } from "./UnsupportedProofContextError.ts";
 import type { CoverageEvidence } from "../coverageHelpers.ts";
 import type {
   EngineResult,
@@ -254,7 +254,7 @@ async function _proveSeed({
       }),
     });
   } catch (error) {
-    if (!(error instanceof UnsupportedProofContext)) {
+    if (!(error instanceof UnsupportedProofContextError)) {
       throw error;
     }
     return _createUnproven({

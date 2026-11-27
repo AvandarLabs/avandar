@@ -584,6 +584,16 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   }
   ```
 
+## AF-22: Error subclass suffix
+
+- A class that extends `Error`, or a class whose name ends in `Error`, ends in
+  `Error` itself. The suffix tells a reader at the throw and catch sites that
+  the value is an error. Rename every reference, the file name when it matches
+  the class, and any string that repeats the old name.
+
+  This is bad: `export class WorkspaceMembershipDenied extends Error {}`
+  This is good: `export class WorkspaceMembershipDeniedError extends Error {}`
+
 ## Deferred detector ownership
 
 AF-18 remains in `functional-style-checklist.md` (typed Error guards).

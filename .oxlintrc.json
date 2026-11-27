@@ -77,6 +77,7 @@
     "avandar/private-helper-prefix": "error",
     "avandar/component-props-name": "error",
     "avandar/module-context-witness": "error",
+    "avandar/error-class-suffix": "error",
     "avandar/jsx-conditional-ternary": "error",
     "avandar/property-helper-callbacks": "error",
     "avandar/straight-line-object-construction": "error",

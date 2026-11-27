@@ -1,5 +1,6 @@
 import { eslintCompatPlugin } from "@oxlint/plugins";
 import componentPropsName from "./rules/component-props-name.js";
+import errorClassSuffix from "./rules/error-class-suffix.js";
 import exportKeyJsdoc from "./rules/export-key-jsdoc.js";
 import functionBodyLineComments from "./rules/function-body-line-comments.js";
 import jsxConditionalTernary from "./rules/jsx-conditional-ternary.js";
@@ -31,6 +32,7 @@ const plugin = eslintCompatPlugin({
     "property-helper-callbacks": propertyHelperCallbacks,
     "straight-line-object-construction": straightLineObjectConstruction,
     "optional-array-candidates": optionalArrayCandidates,
+    "error-class-suffix": errorClassSuffix,
   },
 });
 export default plugin;

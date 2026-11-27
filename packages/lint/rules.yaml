@@ -292,6 +292,19 @@ rules:
       - 5
     owner: lint
     boundary: SQL parser proves declaration ownership or statement body
+  - id: AF-22
+    slug: error-class-suffix
+    class: AF
+    title: Error subclass names end in `Error`
+    scope: TS/JS
+    applicability:
+      - typescript
+      - javascript
+    repair: safe
+    phases:
+      - 3
+    owner: lint
+    boundary: Reports any class extending `Error` or a class named `*Error` without the suffix; renames module-private class declarations whose references all stay in the file; exported classes, string contracts, reflective names and collisions are reported without a fix
   - id: GD-01
     slug: no-em-dashes
     class: GD

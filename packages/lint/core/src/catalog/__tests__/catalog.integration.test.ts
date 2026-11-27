@@ -9,7 +9,7 @@ describe("canonical catalog", () => {
   it("includes every inventory ID once with unique documentation slugs", () => {
     const catalog = loadRuleCatalog();
     const expected = [
-      ...Array.from({ length: 21 }, (_, index) => {
+      ...Array.from({ length: 22 }, (_, index) => {
         return `AF-${String(index + 1).padStart(2, "0")}`;
       }).filter((id) => {
         return id !== "AF-13";

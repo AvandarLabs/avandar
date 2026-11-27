@@ -10,7 +10,7 @@ import {
 import { dirname, join, resolve } from "node:path";
 import { createNativePluginContextFromConfig } from "../createNativePluginContextFromConfig.ts";
 import { isRecord } from "../isRecord.ts";
-import { UnsupportedProofContext } from "./UnsupportedProofContext.ts";
+import { UnsupportedProofContextError } from "./UnsupportedProofContextError.ts";
 import type { PluginContext } from "./nativeSafeRules.types.ts";
 
 function _rebasePlugins({
@@ -21,7 +21,7 @@ function _rebasePlugins({
     return undefined;
   }
   if (!Array.isArray(plugins)) {
-    throw new UnsupportedProofContext(
+    throw new UnsupportedProofContextError(
       "Coverage cannot safely relocate this plugin configuration.",
     );
   }
@@ -33,7 +33,7 @@ function _rebasePlugins({
           ? plugin.specifier
           : undefined;
     if (typeof specifier !== "string") {
-      throw new UnsupportedProofContext(
+      throw new UnsupportedProofContextError(
         "Coverage cannot safely relocate this plugin configuration.",
       );
     }
@@ -59,7 +59,7 @@ function _rebaseInheritedPaths({
       return typeof entry !== "string" || !/\.jsonc?$/.test(entry);
     })
   ) {
-    throw new UnsupportedProofContext(
+    throw new UnsupportedProofContextError(
       "Coverage cannot safely relocate this inherited configuration.",
     );
   }
@@ -73,7 +73,7 @@ function _rebaseConfig({
   origin,
 }: Readonly<{ config: unknown; origin: string }>): unknown {
   if (!isRecord(config)) {
-    throw new UnsupportedProofContext(
+    throw new UnsupportedProofContextError(
       "Coverage requires a supported JSON object configuration.",
     );
   }
@@ -84,7 +84,7 @@ function _rebaseConfig({
   });
   const overrides = config.overrides;
   if (overrides !== undefined && !Array.isArray(overrides)) {
-    throw new UnsupportedProofContext(
+    throw new UnsupportedProofContextError(
       "Coverage cannot safely relocate these overrides.",
     );
   }
@@ -110,7 +110,7 @@ function _copyConfig({
     try {
       return JSON.parse(readFileSync(origin, "utf8"));
     } catch {
-      throw new UnsupportedProofContext(
+      throw new UnsupportedProofContextError(
         "Coverage requires strict JSON when relocating local plugin configuration.",
       );
     }
@@ -149,7 +149,7 @@ export function mirrorNativeDirectory({
       ) ||
       (entry.isSymbolicLink() && /^\.oxlintrc(?:\..+)?$/.test(entry.name))
     ) {
-      throw new UnsupportedProofContext(
+      throw new UnsupportedProofContextError(
         "Coverage cannot safely mirror dynamic or symlinked lint configuration.",
       );
     }
