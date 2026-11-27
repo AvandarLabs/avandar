@@ -3280,8 +3280,7 @@ git commit -m "test(ai-agent): browser spec for agent results on a dashboard"
   `docs/ai-agent/eval.md` with the runs from Task 14 (correct, needless
   or missed questions, cost per question, input tokens, latency) and the
   `--questions P` command under "Reproducing every result".
-- [ ] **Step 3: Update the roadmap and architecture.** Mark 1A done in
-  `roadmap.md`. In `architecture.md` section 3, add the page block and the
+- [ ] **Step 3: Update the architecture.** In `architecture.md` section 3, add the page block and the
   chat result part; in section 2's diagram, change "Data Explorer ->
   DuckDB-Wasm" to "Data Explorer or chat result -> DuckDB-Wasm". Update
   `README.md`'s "Try it": with the switch on, the agent answers on every

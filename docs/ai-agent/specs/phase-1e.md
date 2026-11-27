@@ -44,7 +44,7 @@ Out:
 - New analytics events or payload fields.
 - Quirks today's chat already has. They are listed under [Risks](#risks)
   and kept.
-- A Playwright spec. The roadmap puts the browser test in 1F. The chat
+- A Playwright spec. The browser test is planned for 1F. The chat
   runtime's integration tests cover the flow here.
 
 ## Decisions
@@ -948,34 +948,6 @@ The build adds one sentence to **Decision** with the final wording of the
 line, and one to **Fallbacks** naming the fallback that shipped, if either
 did. If one shipped, its design replaces the A1 wording in **Decision**.
 
-### `roadmap.md`
-
-- The 1E row becomes, with the date and numbers filled in:
-
-  > | 1E | **"Try again" and parity in the agent.** Done (date). Try again
-  > reruns the agent's latest answer with its first attempt kept in context
-  > and a line saying the user wants a different answer, and Try again on
-  > an earlier answer starts the agent over from the thread. The agent's
-  > question cards are audit-logged and bias-checked through today's
-  > function, and it logs `chat.sql_generated` and
-  > `dashboard.block_added_via_chat` (D40, D45) ([spec](specs/phase-1e.md)).
-  > | Met: unit tests and the chat runtime's integration tests. The Try
-  > again set T01 to T06 met its bars against today's chat: the agent's
-  > passes and repeats against the baseline's, and T03, T04, and T06 on
-  > every run. No prompt change, so the 45, P, M, and D were not rerun.
-  > Eval label `phase-1e` ([results](eval.md#phase-1e)). The browser test
-  > is 1F's. |
-
-- In **What keeps the agent off**, the sentence above the table becomes
-  "Turning it on before 1D and 1E would have lost what today's chat does
-  below. Both are done:", and the last three rows become:
-
-  | Today's chat feature | Agent today | Planned |
-  |---|---|---|
-  | "Try again" sends the previous attempt (`retryContext`) | Keeps its first attempt, and a hosted retry adds a Try again line. Try again on an earlier answer starts over from the thread. | Done in 1E (D45) |
-  | Clarification cards are audit-logged and bias-checked | Its `ask_user` and value cards go through the same `recordClarificationShown` | Done in 1E (D40, D45) |
-  | Analytics `chat.sql_generated`, `dashboard.block_added_via_chat` | One `chat.sql_generated` per answer that showed a query, and `dashboard.block_added_via_chat` per block that reaches a dashboard | Done in 1E (D40, D45) |
-
 ### `specs/phase-1.md`
 
 The 1E row becomes:
@@ -1022,7 +994,7 @@ files above.
 |---|---|
 | The model reads the line as chat and replies "Sure, trying again" with no tool call. | The Try again eval grades it. New wordings, then A3. |
 | The kept first attempt misleads a later follow-up ("show that by month" builds on the first attempt). | T06. Fallback: A2. |
-| Each extra Try again adds an attempt to the transcript. | The attempts are cached prefix, a few hundred tokens each. Context pruning is roadmap 2.5. |
+| Each extra Try again adds an attempt to the transcript. | The attempts are cached prefix, a few hundred tokens each. Context pruning is tracked in Avandar's Linear roadmap. |
 | Starting over after an earlier answer's Try again uses a new vault, so the thread's placeholders read `[earlier value]` and cards resolved earlier are not reported again. | The same as after a reload or a session switch today (D39). |
 | Two different threads match by accident. | The key covers every user message's text. Their user messages repeat exactly only when assistant-ui reruns the thread. Two branches with the same user messages and different replies would match, but the app has no branch picker or edit action to make one. |
 | A change slips into the text of turns that are not a Try again and shifts the 45 unnoticed. | The guard test in `buildAgentTurnText.test.ts` and the existing Pi harness turn tests. |
@@ -1043,7 +1015,6 @@ files above.
   the two guards and the unchanged `useAvandarChatRuntime.retryContext.test.tsx`.
 - `pnpm exec tsc -b --force --noEmit`, `pnpm lint`, `pnpm i18n:check`
   (with no change to the catalogs), and `pnpm test:frontend` pass.
-- `decisions.md` has D45 and the index rows, `roadmap.md` and
-  `specs/phase-1.md` have the 1E rows and the "What keeps the agent off"
-  table above, `eval.md` has the Phase 1E section, and the PR feature log
+- `decisions.md` has D45 and the index rows, `specs/phase-1.md` has the
+  1E row, `eval.md` has the Phase 1E section, and the PR feature log
   has the 1E feature.

@@ -182,4 +182,4 @@ Red/green TDD with Vitest, plus one browser spec:
 - The unit tests and the browser spec pass.
 - `pnpm exec tsc -b --noEmit` and `pnpm i18n:check` pass.
 - A data session's turn text is unchanged, covered by the turn tests.
-- `roadmap.md` points here, and `decisions.md` records D43.
+- `decisions.md` records D43.

@@ -256,4 +256,4 @@ tool stays available behind an option (see [eval.md](eval.md#offline-mode)).
 
 **What is not offline.** Chat outside the Data Explorer keeps the old
 multi-pass offline pipeline, now on the bundle's model. Dashboards in the
-offline agent wait for the same work online (roadmap R3).
+offline agent wait for the same work online (tracked in Avandar's Linear roadmap).

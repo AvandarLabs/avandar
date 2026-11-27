@@ -32,7 +32,7 @@ Out:
   `dashboard.block_added_via_chat` event. They stay in 1E (D40).
 - Editing, moving, or removing blocks, and creating dashboards. They stay
   in Phase 3.1.
-- A general confirmation system for every tool (roadmap 2.3). The card
+- A general confirmation system for every tool (tracked in Avandar's Linear roadmap). The card
   here serves `add_dashboard_block` only.
 - More than one block per answer.
 - Case-design sessions. They keep today's case-manager chat, online and
@@ -348,5 +348,4 @@ Red/green TDD with Vitest, plus one browser spec:
 - The eval runs meet their bars and are recorded in `eval.md`.
 - The unit tests and the browser spec pass.
 - `pnpm exec tsc -b --force --noEmit` and `pnpm i18n:check` pass.
-- `roadmap.md` marks 1D built, `decisions.md` records D44, and the PR
-  feature log has F129.
+- `decisions.md` records D44, and the PR feature log has F129.

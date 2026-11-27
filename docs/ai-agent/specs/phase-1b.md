@@ -40,7 +40,7 @@ Out:
   chat so 1C can give each tab its own.
 - Mentions with the agent switch off. Today's chat keeps today's textarea.
 - Metadata blocks on offline turns. Offline turns still send no page block
-  (roadmap 4.2).
+  (tracked in Avandar's Linear roadmap).
 
 ## Decisions made while designing
 
@@ -359,4 +359,4 @@ each fixed on this branch:
 - The eval bar is met and archived.
 - The browser spec passes on its own.
 - A live check passes.
-- `roadmap.md` marks 1B done and `decisions.md` records any new decisions.
+- `decisions.md` records any new decisions.

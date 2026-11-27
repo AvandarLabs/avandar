@@ -4927,7 +4927,7 @@ Run the four full-suite commands. Expected: all PASS, no catalog change.
 
 **Files:**
 - Modify: `docs/ai-agent/decisions.md`, `docs/ai-agent/README.md`
-- Modify: `docs/ai-agent/roadmap.md`, `docs/ai-agent/specs/phase-1.md`
+- Modify: `docs/ai-agent/specs/phase-1.md`
 - Modify: `docs/ai-agent/eval.md`, `docs/ai-agent/architecture.md`
 - Modify: `docs/measles-demo/pr-feature-log.md`
 
@@ -4935,9 +4935,9 @@ Run the four full-suite commands. Expected: all PASS, no catalog change.
 
 Add the D45 entry after D44, with the text under "Docs that ship with 1E" in the spec, word for word. Then add one sentence to **Decision** quoting the final wording of `TRY_AGAIN_LINE` (the constant at the commit that deploys 1E), and, if a fallback shipped, one sentence to **Fallbacks** naming it, with its design replacing the line's in **Decision**. Add rows for D43, D44, and D45 to the index table at the top (it ends at D42), each with the status its entry's heading gives: D43 Approved, D44 Approved, D45 Built. In `README.md`, change "D01 to D44" to "D01 to D45".
 
-- [ ] **Step 2: `roadmap.md` and `specs/phase-1.md`**
+- [ ] **Step 2: `specs/phase-1.md`**
 
-Replace the 1E row and the "What keeps the agent off" sentence and last three rows with the spec's text under "`roadmap.md`", filling in the date and the numbers from Unit 4.2. Replace the 1E row of `specs/phase-1.md` with the spec's text under "`specs/phase-1.md`".
+Replace the 1E row of `specs/phase-1.md` with the spec's text under "`specs/phase-1.md`".
 
 - [ ] **Step 3: `eval.md`**
 

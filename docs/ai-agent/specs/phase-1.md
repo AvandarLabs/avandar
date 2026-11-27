@@ -3,17 +3,17 @@
 Status: approved by Pablo on 2026-11-08 (D34). Each sub-project below gets
 its own spec, plan, and implementation, in order. This page holds what they
 share: the rules that came out of speccing Phase 1, the split, and what was
-added to the roadmap.
+added to Avandar's Linear roadmap.
 
 ## Why Phase 1 changed
 
-The roadmap's Phase 1 had four items: dashboards in the agent, "Try
+The original Phase 1 had four items: dashboards in the agent, "Try
 again", a browser test, and the agent on by default for Data Explorer
 questions. While speccing the first item, Pablo widened it: the agent is no
 longer tied to a page. Any action works from any page, users can attach
 context with `@` mentions and a context picker, results show in the chat,
-and the chat holds several sessions with an archive. That pulls roadmap 2.4
-(the general host) into Phase 1 and adds work the roadmap did not have.
+and the chat holds several sessions with an archive. That pulls the general host
+into Phase 1 and adds work the original plan did not have.
 
 ## Rules
 
@@ -42,7 +42,7 @@ as it does now. After 1C it opens as a new session in the main panel, still
 answered by today's case-manager chat until Phase 3.5 moves case management
 into the agent.
 
-## Added to the roadmap
+## Added to Avandar's Linear roadmap
 
 - **Chat history in the database** (future work): 1C keeps sessions and the
   archive in the browser only; real persisted history of every chat comes

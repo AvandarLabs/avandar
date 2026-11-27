@@ -1873,7 +1873,6 @@ EOF
 ### Task 13: Done when
 
 **Files:**
-- Modify: `docs/ai-agent/roadmap.md` (the 1C row only)
 - Modify: `src/i18n/locales/**` only by the extract and compile commands, never by hand
 
 - [ ] **Step 1: Typecheck and translate**
@@ -1912,14 +1911,10 @@ pnpm vitest run \
 
 Expected: PASS.
 
-- [ ] **Step 3: Update the roadmap row**
-
-In `docs/ai-agent/roadmap.md`, change the 1C row from "Specced (2026-11-09), not built" to "Built" with the date, and point at this plan and the spec. Do not change D43. It already records the decision.
-
 - [ ] **Step 4: Commit**
 
 ```bash
-git add docs/ai-agent/roadmap.md src/i18n/locales
+git add src/i18n/locales
 git commit -m "$(cat <<'EOF'
 docs(ai-agent): mark multiple chat sessions built
 

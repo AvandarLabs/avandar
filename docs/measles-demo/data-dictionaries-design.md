@@ -1000,7 +1000,7 @@ entry description per column, Pi data agent only. `truncateSchemaForOffline`
 keeps a bound column's list whole, as it does for statuses.
 
 Code lists are metadata, not rows, so decision D05 (the model never sees
-rows) holds. Following the agent roadmap's bar, the eval gets cases before
+rows) holds. Following the agent's eval bar, the eval gets cases before
 this ships: questions phrased in labels against coded columns ("how many
 female cases were hospitalized"), for online and offline, with no accuracy
 loss on the existing suite.

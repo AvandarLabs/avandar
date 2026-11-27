@@ -3981,7 +3981,6 @@ Report each result to Pablo with the screenshot paths.
 - `docs/ai-agent/specs/phase-1b.md`: status "built", a "Decisions made
   while planning" table copied from this plan's, and any change the work
   forced.
-- `docs/ai-agent/roadmap.md`: 1B done, with its eval label.
 - `docs/ai-agent/decisions.md`: any new decision.
 - `docs/measles-demo/gadgets.md`: under "How it works", one paragraph on
   the chat's `@` menu and tray (chat types, links only, tokens in message
