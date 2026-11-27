@@ -176,7 +176,7 @@ export async function runCustomerList({
 }
 
 /** List all customers in Polar */
-export const CustomerListCli = Acclimate.createCLI("list")
+export const CustomerListCli = Acclimate.createCli("list")
   .description(
     "List all customers in Polar. By default only lists emails and names. Use options to add other columns.",
   )

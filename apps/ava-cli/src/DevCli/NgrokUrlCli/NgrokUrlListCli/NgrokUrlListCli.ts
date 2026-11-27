@@ -59,6 +59,6 @@ export async function runNgrokUrlList(): Promise<void> {
 }
 
 /** List all registered dev ngrok URLs. */
-export const NgrokUrlListCli = Acclimate.createCLI("list")
+export const NgrokUrlListCli = Acclimate.createCli("list")
   .description("List all registered dev ngrok URLs.")
   .action(runNgrokUrlList);

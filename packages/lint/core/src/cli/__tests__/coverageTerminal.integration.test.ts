@@ -115,7 +115,7 @@ it.each([
   "accepts terminal %s through Acclimate wizard without dropping keys or hanging",
   (_, input, exitCode, expected) => {
     const cliPath = resolve(import.meta.dirname, "../cliHelpers.ts");
-    const script = `import { CLIError } from "@avandar/acclimate"; import { runCoverageWizard } from ${JSON.stringify(cliPath)}; try { const result = await runCoverageWizard(); console.log(JSON.stringify(result)); } catch (error) { console.error(error instanceof CLIError ? error.code : String(error)); process.exitCode = error instanceof CLIError && error.code === "prompt_cancelled" ? 130 : 1; }`;
+    const script = `import { CliError } from "@avandar/acclimate"; import { runCoverageWizard } from ${JSON.stringify(cliPath)}; try { const result = await runCoverageWizard(); console.log(JSON.stringify(result)); } catch (error) { console.error(error instanceof CliError ? error.code : String(error)); process.exitCode = error instanceof CliError && error.code === "prompt_cancelled" ? 130 : 1; }`;
     const result = spawnSync(
       "python3",
       [

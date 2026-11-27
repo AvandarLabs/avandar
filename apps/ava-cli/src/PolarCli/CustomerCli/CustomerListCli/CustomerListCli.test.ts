@@ -78,14 +78,10 @@ describe("runCustomerList", () => {
 
     await import("@polar-sh/sdk");
 
-    vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => {
-      loggedOutput.push(
-        args
-          .map((a) => {
-            return _stripANSI(String(a));
-          })
-          .join(" "),
-      );
+    // Acclimate.log writes to process.stderr.
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      loggedOutput.push(_stripANSI(String(chunk)));
+      return true;
     });
 
     // reset logged output between tests
@@ -211,7 +207,7 @@ describe("runCustomerList", () => {
     await expect(
       runCustomerList({ withIds: false, withCreatedAt: false }),
     ).rejects.toThrow();
-    expect(console.log).toHaveBeenCalled();
+    expect(process.stderr.write).toHaveBeenCalled();
   });
 
   it("prints error and rethrows when listCustomers fails", async () => {

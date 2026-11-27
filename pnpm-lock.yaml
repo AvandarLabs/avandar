@@ -394,8 +394,8 @@ importers:
         specifier: ^0.18.5
         version: 0.18.5
       '@avandar/acclimate':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.6.0
+        version: 0.6.0
       '@avandar/lint':
         specifier: workspace:*
         version: link:packages/lint/core
@@ -619,8 +619,8 @@ importers:
   apps/ava-cli:
     dependencies:
       '@avandar/acclimate':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.6.0
+        version: 0.6.0
       '@avandar/clients':
         specifier: workspace:*
         version: link:../../packages/shared/clients
@@ -946,8 +946,8 @@ importers:
   packages/lint/core:
     dependencies:
       '@avandar/acclimate':
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.6.0
+        version: 0.6.0
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -1582,12 +1582,8 @@ packages:
   '@astrojs/compiler@4.0.0':
     resolution: {integrity: sha512-eouss7G8ygdZqHuke033VMcVw5HTZUu+PXd/h06DGDUg/jt5btPYPqh66ENWw/mU78rBrf/oeC4oqoBwMtDMNA==}
 
-  '@avandar/acclimate@0.4.0':
-    resolution: {integrity: sha512-yOtwL/7YpB9JBpys80cvLVbAe1DCRr4NJx0k+/HGMUUw9S8e9SFTgc1vTdIp8AEcHjkWRL5P5kzqFU09B1QOjQ==}
-    engines: {node: '>=18'}
-
-  '@avandar/acclimate@0.5.0':
-    resolution: {integrity: sha512-mH0ub9vCraIMmPCaR0kyK7T1vcIi/Q81q6rMu+U+OKmRefLt7BzYIQ44i3JhwQAHt2CvbRM9FEjPePf1Ql4IFA==}
+  '@avandar/acclimate@0.6.0':
+    resolution: {integrity: sha512-vmJJBI5BW6g+Poo5HAl21++x9AhMDwGPMtRkJvGZRQubQRWp+uqmIgpS7gLB+yYPUmbhQ/ukb98O5bv06CFwYw==}
     engines: {node: '>=18'}
 
   '@aws-sdk/client-bedrock-runtime@3.1127.0':
@@ -14150,12 +14146,7 @@ snapshots:
 
   '@astrojs/compiler@4.0.0': {}
 
-  '@avandar/acclimate@0.4.0':
-    dependencies:
-      change-case: 5.4.4
-      ts-pattern: 5.9.0
-
-  '@avandar/acclimate@0.5.0':
+  '@avandar/acclimate@0.6.0':
     dependencies:
       change-case: 5.4.4
       ts-pattern: 5.9.0
@@ -19951,6 +19942,14 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: 7.3.1(@types/node@22.19.19)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
+
+  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))':
+    dependencies:
+      '@vitest/spy': 3.2.4
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: 7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -27511,7 +27510,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@22.19.19)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4

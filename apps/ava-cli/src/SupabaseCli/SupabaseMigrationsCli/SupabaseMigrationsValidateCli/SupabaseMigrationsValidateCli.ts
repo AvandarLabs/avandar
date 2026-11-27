@@ -124,7 +124,7 @@ function _runValidation(): number {
 }
 
 /** Validates this branch's Supabase migrations against the base branch. */
-export const SupabaseMigrationsValidateCli = Acclimate.createCLI("validate")
+export const SupabaseMigrationsValidateCli = Acclimate.createCli("validate")
   .description(
     "Check this branch's migrations for ordering conflicts and other common mistakes",
   )

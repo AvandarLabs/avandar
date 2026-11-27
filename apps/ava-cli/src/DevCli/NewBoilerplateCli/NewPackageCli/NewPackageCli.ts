@@ -4,7 +4,7 @@ import { Acclimate } from "@avandar/acclimate";
 import type { PackageType } from "@ava-cli/DevCli/NewBoilerplateCli/NewPackageCli/writeNewPackageBoilerplate";
 
 /** CLI for scaffolding a new workspace package. */
-export const NewPackageCli = Acclimate.createCLI("package")
+export const NewPackageCli = Acclimate.createCli("package")
   .addOption({
     name: "--name",
     aliases: ["-n"],

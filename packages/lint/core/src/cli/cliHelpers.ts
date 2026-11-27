@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /* oxlint-disable import/extensions -- Node needs source extensions. */
-import { Acclimate, CLIError, openTerminalSession } from "@avandar/acclimate";
+import { Acclimate, CliError, openTerminalSession } from "@avandar/acclimate";
 import { collectCoverage } from "./coverageHelpers.ts";
 import { createCssCoverageProbes } from "./createCssCoverageProbes.ts";
 import { createNativeCoverageProbes } from "./nativeSafeRules/createNativeCoverageProbes.ts";
 import type {
-  AnyCLI,
+  AnyCli,
   ChoiceMenuItem,
   PromptIo,
   TerminalInputStream,
@@ -157,7 +157,7 @@ async function _resolveMissingFormatArg({
     });
     return { args: args.toSpliced(missingIndex + 1, 0, chosen) };
   } catch (error) {
-    if (error instanceof CLIError && error.code === "prompt_cancelled") {
+    if (error instanceof CliError && error.code === "prompt_cancelled") {
       Acclimate.printError(error.message, {
         stream: _toOutputStream(io.stderr, io.isStderrTTY),
         env: io.env,
@@ -247,8 +247,8 @@ function _createCoverageCli(
     isBareCoverage: boolean;
     onOperationalExitCode?: (exitCode: number) => void;
   }>,
-): AnyCLI {
-  return Acclimate.createCLI("coverage")
+): AnyCli {
+  return Acclimate.createCli("coverage")
     .description("Report enforced, not-applicable, or fallback outcomes.")
     .usage(USAGE_SYNOPSIS)
     .addPositionalArg({
@@ -376,13 +376,13 @@ export function createAvandarLintCli(
     isBareCoverage?: boolean;
     onOperationalExitCode?: (exitCode: number) => void;
   }> = {},
-): AnyCLI {
+): AnyCli {
   const coverageCli = _createCoverageCli({
     io: options.io ?? {},
     isBareCoverage: options.isBareCoverage ?? false,
     onOperationalExitCode: options.onOperationalExitCode,
   });
-  return Acclimate.createCLI("avandar-lint")
+  return Acclimate.createCli("avandar-lint")
     .description(
       "Inspect proven lint coverage for exact files and capabilities.",
     )

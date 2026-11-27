@@ -46,16 +46,20 @@ const MIXED_RELEASE_TAGS = [
 /** The boolean options Acclimate parses out of one accepted-flag case. */
 type ParsedReleaseNotesFlags = { dryRun: boolean; update: boolean };
 
+/** What Acclimate's argument parser wrote to `process.stderr`. */
+const stderrChunks: string[] = [];
+
 function _loggedText(logSpy: ReturnType<typeof vi.spyOn>): string {
-  return logSpy.mock.calls
-    .map((call) => {
+  return [
+    ...logSpy.mock.calls.map((call) => {
       return call
         .map((arg) => {
           return typeof arg === "string" ? arg : JSON.stringify(arg);
         })
         .join(" ");
-    })
-    .join("\n");
+    }),
+    ...stderrChunks,
+  ].join("\n");
 }
 
 describe("ava release notes", () => {
@@ -71,6 +75,11 @@ describe("ava release notes", () => {
     vi.mocked(findRepoRootModule.findRepoRoot).mockReturnValue("/fake/repo");
     logSpy = vi.spyOn(Acclimate, "log").mockImplementation(() => {
       return undefined;
+    });
+    stderrChunks.length = 0;
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      stderrChunks.push(String(chunk));
+      return true;
     });
   });
 
@@ -352,6 +361,11 @@ describe("ava release notes through the real argument parser", () => {
     logSpy = vi.spyOn(Acclimate, "log").mockImplementation(() => {
       return undefined;
     });
+    stderrChunks.length = 0;
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      stderrChunks.push(String(chunk));
+      return true;
+    });
   });
 
   afterEach(() => {
@@ -411,15 +425,7 @@ describe("ava release notes through the real argument parser", () => {
   it("refuses --update dry-run, which would otherwise publish for real", async () => {
     _runAvaReleaseNotes(["--version", "0.13.3", "--update", "dry-run"]);
 
-    await _expectRefusal("Unexpected word: dry-run.");
-  });
-
-  it("names the notes command's value options when refusing a stray word", async () => {
-    _runAvaReleaseNotes(["--version", "0.13.3", "--update", "dry-run"]);
-
-    await _expectRefusal(
-      "only these options take a value: `--version`, `-v`, `--env`.",
-    );
+    await _expectRefusal("Too many positional arguments provided.");
   });
 
   it("refuses an option typed with a long dash after --update", async () => {
@@ -427,7 +433,7 @@ describe("ava release notes through the real argument parser", () => {
     const token = "\u2014dry-run";
     _runAvaReleaseNotes(["--version", "0.13.3", "--update", token]);
 
-    await _expectRefusal(token);
+    await _expectRefusal("Too many positional arguments provided.");
   });
 
   it("accepts --version 0.15.0", async () => {

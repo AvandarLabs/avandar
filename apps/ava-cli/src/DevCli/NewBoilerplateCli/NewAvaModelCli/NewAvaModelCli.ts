@@ -8,7 +8,7 @@ import { Acclimate } from "@avandar/acclimate";
 const OUTPUT_MODELS_DIR_BASE = "shared/models";
 const OUTPUT_CLIENTS_DIR_BASE = "src/clients";
 
-export const NewAvaModelCli = Acclimate.createCLI("model")
+export const NewAvaModelCli = Acclimate.createCli("model")
   .addPositionalArg({
     name: "modelName",
     required: true,

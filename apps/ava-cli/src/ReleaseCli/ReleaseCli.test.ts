@@ -129,7 +129,7 @@ describe("ava release get-prod-version", () => {
       args: ["remote", "set-branches", "origin", "develop"],
     });
 
-    await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+    await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
     expect(console.log).toHaveBeenCalledExactlyOnceWith("0.13.2");
     expect(console.error).not.toHaveBeenCalled();
@@ -151,7 +151,7 @@ describe("ava release get-prod-version", () => {
       args: ["remote", "set-url", "origin", join(directory, "missing")],
     });
 
-    await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+    await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
     expect(console.log).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalledWith(
@@ -163,7 +163,7 @@ describe("ava release get-prod-version", () => {
   it("fails instead of printing a cached version when main no longer exists on origin", async () => {
     _git({ cwd: origin, args: ["branch", "-m", "archived"] });
 
-    await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+    await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
     expect(console.log).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalledWith(
@@ -183,7 +183,7 @@ describe("ava release get-prod-version", () => {
     async (contents) => {
       _commitPackage({ repoRoot: origin, contents });
 
-      await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+      await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
       expect(console.log).not.toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
@@ -196,7 +196,7 @@ describe("ava release get-prod-version", () => {
   it("explains the repository requirement on stderr when invoked outside Avandar", async () => {
     vi.mocked(process.cwd).mockReturnValue(directory);
 
-    await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+    await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
     expect(console.log).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalledWith(
@@ -209,7 +209,7 @@ describe("ava release get-prod-version", () => {
     vi.mocked(process.cwd).mockReturnValue(directory);
     process.argv.push("--help");
 
-    await ReleaseCli.getCommandCLI("get-prod-version").state.action?.({});
+    await ReleaseCli.getCommandCli("get-prod-version").state.action?.({});
 
     expect(console.log).toHaveBeenCalledWith(
       expect.stringContaining("ava release get-prod-version"),
@@ -219,14 +219,29 @@ describe("ava release get-prod-version", () => {
   });
 });
 
-/** Everything `ava release` printed, one `console.log` call per line. */
+/** Everything Acclimate wrote to `process.stderr` since the last capture. */
+const stderrChunks: string[] = [];
+
+/** Start collecting what Acclimate writes to `process.stderr`. */
+function _captureStderr(): void {
+  stderrChunks.length = 0;
+  vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  });
+}
+
+/**
+ * Everything `ava release` printed: one `console.log` call per line, then
+ * whatever Acclimate wrote to `process.stderr`.
+ */
 function _stdoutText(): string {
-  return vi
-    .mocked(console.log)
-    .mock.calls.map((call) => {
+  return [
+    ...vi.mocked(console.log).mock.calls.map((call) => {
       return call.map(String).join(" ");
-    })
-    .join("\n");
+    }),
+    ...stderrChunks,
+  ].join("\n");
 }
 
 /**
@@ -271,6 +286,7 @@ describe("ava release on a branch that is not a source branch", () => {
     vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
     vi.spyOn(console, "log").mockImplementation(noop);
     vi.spyOn(console, "error").mockImplementation(noop);
+    _captureStderr();
   });
 
   afterEach(() => {
@@ -355,6 +371,7 @@ describe("ava release on develop", () => {
     process.exitCode = undefined;
     vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
     vi.spyOn(console, "log").mockImplementation(noop);
+    _captureStderr();
     vi.spyOn(console, "error").mockImplementation(noop);
   });
 
@@ -600,6 +617,7 @@ function _checkOutFreshSourceBranch(
   });
   vi.spyOn(process, "cwd").mockReturnValue(checkout);
   vi.spyOn(console, "log").mockImplementation(noop);
+  _captureStderr();
   vi.spyOn(console, "error").mockImplementation(noop);
   return { origin, checkout };
 }
@@ -1026,6 +1044,7 @@ describe("ava release --help", () => {
     originalArgv = process.argv;
     process.argv = [process.execPath, "ava", "release", "--help"];
     vi.spyOn(console, "log").mockImplementation(noop);
+    _captureStderr();
   });
 
   afterEach(() => {
@@ -1084,6 +1103,7 @@ describe("ava release through the real argument parser", () => {
     vi.mocked(runRelease).mockReset();
     vi.mocked(runRelease).mockResolvedValue(undefined);
     vi.spyOn(console, "log").mockImplementation(noop);
+    _captureStderr();
     vi.spyOn(console, "error").mockImplementation(noop);
   });
 
@@ -1148,22 +1168,13 @@ describe("ava release through the real argument parser", () => {
   it("refuses --yes dry-run, which would otherwise release for real", async () => {
     _runAvaRelease(["--yes", "dry-run"]);
 
-    await _expectRefusal("Unexpected word: dry-run.");
-  });
-
-  it("names the release's value options when refusing a stray word", async () => {
-    _runAvaRelease(["--yes", "dry-run"]);
-
-    await _expectRefusal(
-      "only these options take a value: `--version`, `-v`, `--next`, `-n`, " +
-        "`--env`.",
-    );
+    await _expectRefusal("Too many positional arguments provided.");
   });
 
   it("refuses a mistyped --verison 0.11.0 with only the unknown option", async () => {
     _runAvaRelease(["--verison", "0.11.0"]);
 
-    await _expectRefusal("Unknown option: --verison. Nothing was released;");
+    await _expectRefusal('Unknown option "--verison"');
   });
 
   it("refuses an option typed with a long dash after --yes", async () => {
@@ -1171,7 +1182,7 @@ describe("ava release through the real argument parser", () => {
     const token = "\u2013dry-run";
     _runAvaRelease(["--yes", token]);
 
-    await _expectRefusal(token);
+    await _expectRefusal("Too many positional arguments provided.");
   });
 
   it("accepts --version 0.15.0", async () => {

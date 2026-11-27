@@ -24,7 +24,7 @@ import { Acclimate } from "@avandar/acclimate";
 //
 // The entry point below reads `--env` off argv rather than from a parsed
 // action, because the env file has to be chosen before any action runs.
-const cli = Acclimate.createCLI("ava")
+const cli = Acclimate.createCli("ava")
   .addGlobalOption({
     name: "--env",
     description:

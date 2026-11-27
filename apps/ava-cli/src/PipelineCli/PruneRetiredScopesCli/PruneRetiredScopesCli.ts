@@ -312,7 +312,7 @@ export async function pruneRetiredScopesCommand(
 }
 
 /** `ava pipeline prune-retired-scopes`. */
-export const PruneRetiredScopesCli = Acclimate.createCLI("prune-retired-scopes")
+export const PruneRetiredScopesCli = Acclimate.createCli("prune-retired-scopes")
   .description(
     "Remove what a pipeline wrote for scopes it no longer declares. Prints " +
       "what each retired scope's prune would do, then asks before changing " +

@@ -2084,7 +2084,7 @@ type Args = {
 };
 
 /** CLI for starting a branch-isolated local Supabase project. */
-export const SupabaseSwitchCLI = Acclimate.createCLI("switch")
+export const SupabaseSwitchCLI = Acclimate.createCli("switch")
   .description("Start an isolated local Supabase project for this Git branch")
   .addPositionalArg({
     name: "newId",
@@ -2141,7 +2141,7 @@ import { printError, printSuccess } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
 /** CLI for restoring this branch's original local Supabase configuration. */
-export const SupabaseRestoreCLI = Acclimate.createCLI("restore")
+export const SupabaseRestoreCLI = Acclimate.createCli("restore")
   .description("Stop this branch's isolated Supabase project and restore files")
   .action(() => {
     const io = createSupabaseLocalEnvironmentIO(process.cwd());
@@ -2166,7 +2166,7 @@ import { SupabaseSwitchCLI } from "@ava-cli/SupabaseCLI/SupabaseSwitchCLI/Supaba
 import { Acclimate } from "@avandar/acclimate";
 
 /** A CLI for managing Avandar's Supabase database. */
-export const SupabaseCLI = Acclimate.createCLI("supabase")
+export const SupabaseCLI = Acclimate.createCli("supabase")
   .description(
     "Manage Supabase in Avandar. All commands default to the local database.",
   )

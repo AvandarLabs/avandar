@@ -17,7 +17,7 @@ import type { MockInstance } from "vitest";
 export function runAvaThroughRealParser(argvAfterAva: readonly string[]): void {
   process.argv = [process.execPath, "ava", ...argvAfterAva];
   Acclimate.run(
-    Acclimate.createCLI("ava")
+    Acclimate.createCli("ava")
       // The tests' only copy of the root CLI's global options. `main.ts`
       // declares the real ones but runs the CLI on import, so it cannot be
       // imported here. The `AVA_GLOBAL_FLAGS` test pins main.ts's names.

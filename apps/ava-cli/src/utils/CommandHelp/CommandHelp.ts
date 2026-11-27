@@ -1,9 +1,9 @@
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
 import { objectValues } from "@avandar/utils";
 import type {
-  AnyCLI,
-  CLIOptionParam,
-  CLIPositionalParam,
+  AnyCli,
+  CliOptionParam,
+  CliPositionalParam,
 } from "@avandar/acclimate";
 
 /** One labelled line of a help screen: an argument, option, or example. */
@@ -21,7 +21,7 @@ export type CommandHelpEntry = {
 export type CommandHelpSpec = {
   /** Words after `ava` that name the command, e.g. `["supabase", "prune"]`. */
   commandPath: string[];
-  cli: AnyCLI;
+  cli: AnyCli;
   usage: string[];
   examples: CommandHelpEntry[];
   /**
@@ -62,7 +62,7 @@ function _findSpecFromArgv(
 }
 
 function _getFlagsFromOptions(
-  optionParams: readonly CLIOptionParam[],
+  optionParams: readonly CliOptionParam[],
 ): string[] {
   return optionParams.flatMap(({ name, aliases }) => {
     return [name, ...(aliases ?? [])];
@@ -73,7 +73,7 @@ function _findUnknownFlags(
   options: Readonly<{
     argv: readonly string[];
     spec: Readonly<CommandHelpSpec>;
-    rootCli: AnyCLI;
+    rootCli: AnyCli;
   }>,
 ): string[] {
   const knownFlags = new Set([
@@ -90,7 +90,7 @@ function _findUnknownFlags(
 
 function _makeOptionEntries(
   options: Readonly<{
-    params: readonly CLIOptionParam[];
+    params: readonly CliOptionParam[];
     labels: Readonly<Record<string, string>>;
   }>,
 ): CommandHelpEntry[] {
@@ -104,7 +104,7 @@ function _makeOptionEntries(
 
 function _makeArgumentEntries(
   options: Readonly<{
-    params: readonly CLIPositionalParam[];
+    params: readonly CliPositionalParam[];
     labels: Readonly<Record<string, string>>;
   }>,
 ): CommandHelpEntry[] {
@@ -118,7 +118,7 @@ function _makeArgumentEntries(
 
 /** Every titled section of a help screen, in the order they print. */
 function _makeHelpSections(
-  options: Readonly<{ spec: Readonly<CommandHelpSpec>; rootCli: AnyCLI }>,
+  options: Readonly<{ spec: Readonly<CommandHelpSpec>; rootCli: AnyCli }>,
 ): Array<{ title: string; entries: CommandHelpEntry[] }> {
   const { spec } = options;
   const labels = spec.labels ?? {};
@@ -158,7 +158,7 @@ function _makeHelpSections(
 function _makeHelpLines(
   options: Readonly<{
     spec: Readonly<CommandHelpSpec>;
-    rootCli: AnyCLI;
+    rootCli: AnyCli;
     isColorEnabled: boolean;
   }>,
 ): string[] {
@@ -197,7 +197,7 @@ function _isHelpRequested(argv: readonly string[]): boolean {
 function _writeHelp(
   options: Readonly<{
     spec: Readonly<CommandHelpSpec>;
-    rootCli: AnyCLI;
+    rootCli: AnyCli;
     stream: NodeJS.WriteStream;
   }>,
 ): void {
@@ -216,7 +216,7 @@ function _handleArgv(
   options: Readonly<{
     argv: readonly string[];
     specs: readonly CommandHelpSpec[];
-    rootCli: AnyCLI;
+    rootCli: AnyCli;
   }>,
 ): CommandHelpOutcome {
   const { argv, rootCli } = options;

@@ -6718,7 +6718,7 @@ export function initPluginCommand(options: {
   printInfo(`Next: pnpm install, then ava plugin validate ${name}, then pnpm dev.`);
 }
 
-export const InitPluginCli = Acclimate.createCLI("init")
+export const InitPluginCli = Acclimate.createCli("init")
   .description("Scaffold a bundled plugin under plugins/ with a working hello command.")
   .addPositionalArg({
     name: "name",
@@ -6820,7 +6820,7 @@ export function validatePluginCommand(options: {
   }
 }
 
-export const ValidatePluginCli = Acclimate.createCLI("validate")
+export const ValidatePluginCli = Acclimate.createCli("validate")
   .description("Validate a plugin's manifest, types, and imports. Validates every bundled plugin when no name is given.")
   .addPositionalArg({
     name: "name",
@@ -6841,7 +6841,7 @@ import { ValidatePluginCli } from "@ava-cli/PluginCli/ValidatePluginCli/Validate
 import { Acclimate } from "@avandar/acclimate";
 
 /** Create and validate bundled plugins. */
-export const PluginCli = Acclimate.createCLI("plugin")
+export const PluginCli = Acclimate.createCli("plugin")
   .description("Create and validate bundled Avandar plugins.")
   .addCommand("init", InitPluginCli)
   .addCommand("validate", ValidatePluginCli);

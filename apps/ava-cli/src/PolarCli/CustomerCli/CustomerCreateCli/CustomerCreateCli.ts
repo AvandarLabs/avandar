@@ -81,6 +81,6 @@ export async function runCustomerCreate(): Promise<void> {
 }
 
 /** Create a test customer and subscribe them to the Free plan. */
-export const CustomerCreateCli = Acclimate.createCLI("create")
+export const CustomerCreateCli = Acclimate.createCli("create")
   .description("Create a test customer and subscribe them to the Free plan.")
   .action(runCustomerCreate);

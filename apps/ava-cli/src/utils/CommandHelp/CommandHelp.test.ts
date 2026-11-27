@@ -3,7 +3,7 @@ import { Acclimate } from "@avandar/acclimate";
 import { describe, expect, it } from "vitest";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
-const ROOT_CLI = Acclimate.createCLI("ava").addGlobalOption({
+const ROOT_CLI = Acclimate.createCli("ava").addGlobalOption({
   name: "--staging",
   description: "Use staging.",
   required: false,
@@ -12,7 +12,7 @@ const ROOT_CLI = Acclimate.createCLI("ava").addGlobalOption({
 
 const SWITCH_SPEC: CommandHelpSpec = {
   commandPath: ["supabase", "switch"],
-  cli: Acclimate.createCLI("switch")
+  cli: Acclimate.createCli("switch")
     .description("Start an isolated local Supabase project for this branch.")
     .addPositionalArg({
       name: "temporaryProjectId",
@@ -36,7 +36,7 @@ const SWITCH_SPEC: CommandHelpSpec = {
 
 const SWITCH_REMOTE_SPEC: CommandHelpSpec = {
   commandPath: ["supabase", "switch", "remote"],
-  cli: Acclimate.createCLI("remote")
+  cli: Acclimate.createCli("remote")
     .description("Point this worktree at a hosted Supabase project.")
     .addOption({
       name: "--project-id",

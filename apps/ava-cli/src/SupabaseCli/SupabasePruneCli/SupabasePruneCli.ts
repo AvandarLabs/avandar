@@ -119,7 +119,7 @@ async function _run(flags: Readonly<SupabasePruneFlags>): Promise<void> {
 }
 
 /** CLI for deleting local Supabase projects whose branch is gone. */
-export const SupabasePruneCli = Acclimate.createCLI("prune")
+export const SupabasePruneCli = Acclimate.createCli("prune")
   .description(
     "Delete the local Supabase projects whose branch or worktree no longer exists: their containers, networks, and database volumes. The shared develop project and every project a current branch uses are never offered.",
   )

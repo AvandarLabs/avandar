@@ -5,7 +5,7 @@ import { RunPipelineCli } from "@ava-cli/PipelineCli/RunPipelineCli/RunPipelineC
 import { Acclimate } from "@avandar/acclimate";
 
 /** Manage pipeline-server operations. */
-export const PipelineCli = Acclimate.createCLI("pipeline")
+export const PipelineCli = Acclimate.createCli("pipeline")
   .description("Manage and run pipelines.")
   .addCommand("list", PipelineListCli)
   .addCommand("reset", ResetPipelineCli)

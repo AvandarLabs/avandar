@@ -72,7 +72,7 @@ async function _confirmReuse(existingProjectId: string): Promise<boolean> {
 }
 
 /** CLI for starting a branch-isolated local Supabase project. */
-export const SupabaseSwitchCli = Acclimate.createCLI("switch")
+export const SupabaseSwitchCli = Acclimate.createCli("switch")
   .description(
     "Start a local Supabase project of this branch's own, so its database is isolated from every other worktree. `ava supabase switch remote` points the worktree at a hosted project instead.",
   )

@@ -4,7 +4,7 @@ import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils
 import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
-import type { IAcclimateCLI } from "@avandar/acclimate";
+import type { IAcclimateCli } from "@avandar/acclimate";
 
 function _getProdVersion(): string {
   const repoRoot = findRepoRoot();
@@ -36,7 +36,7 @@ function _getProdVersion(): string {
 }
 
 /** Print the production version recorded in origin/main's root package.json. */
-export const GetProdVersionCli: IAcclimateCLI = Acclimate.createCLI(
+export const GetProdVersionCli: IAcclimateCli = Acclimate.createCli(
   "get-prod-version",
 )
   .description("Print the production version from main after fetching origin.")

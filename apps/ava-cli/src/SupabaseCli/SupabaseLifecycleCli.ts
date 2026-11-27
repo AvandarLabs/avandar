@@ -4,7 +4,7 @@ import { SupabaseTargetHeadline } from "@ava-cli/SupabaseCli/SupabaseTargetHeadl
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
 import { Acclimate } from "@avandar/acclimate";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
-import type { AnyCLI } from "@avandar/acclimate";
+import type { AnyCli } from "@avandar/acclimate";
 
 /** A Supabase CLI subcommand `ava` wraps with a branch-aware headline. */
 type SupabaseLifecycleCommand = "start" | "stop";
@@ -29,7 +29,7 @@ const COPY_FROM_COMMAND = {
 
 /** The help screen of one wrapped command, read from its own CLI. */
 function _makeHelpSpec(
-  options: Readonly<{ command: SupabaseLifecycleCommand; cli: AnyCLI }>,
+  options: Readonly<{ command: SupabaseLifecycleCommand; cli: AnyCli }>,
 ): CommandHelpSpec {
   const { command } = options;
   return {
@@ -98,7 +98,7 @@ async function _run(
 
 /** The Acclimate command that runs one wrapped Supabase command. */
 function _createCli(command: SupabaseLifecycleCommand) {
-  return Acclimate.createCLI(command)
+  return Acclimate.createCli(command)
     .description(COPY_FROM_COMMAND[command].summary)
     .addOption({
       name: "--branch",

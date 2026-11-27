@@ -43,7 +43,7 @@ async function _printUsage(): Promise<void> {
 }
 
 /** A CLI for running an abitrary .ts file with a Supabase Admin Client */
-export const SupabaseRunCli = Acclimate.createCLI("run")
+export const SupabaseRunCli = Acclimate.createCli("run")
   .description("Run an arbitrary .ts function with a Supabase Admin Client")
   .addOption({
     name: "--script",

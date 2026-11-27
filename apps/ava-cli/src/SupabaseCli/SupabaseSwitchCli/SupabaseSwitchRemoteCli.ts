@@ -97,7 +97,7 @@ async function _run(options: Readonly<RemoteOptions>): Promise<void> {
 }
 
 /** CLI for pointing a worktree at a hosted Supabase project. */
-export const SupabaseSwitchRemoteCli = Acclimate.createCLI("remote")
+export const SupabaseSwitchRemoteCli = Acclimate.createCli("remote")
   .description(
     "Point this worktree's development env files at a hosted Supabase project, so `pnpm dev` uses that database. `ava supabase restore` puts them back.",
   )

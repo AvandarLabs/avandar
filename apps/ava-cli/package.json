@@ -19,7 +19,7 @@
     "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
-    "@avandar/acclimate": "^0.4.0",
+    "@avandar/acclimate": "^0.6.0",
     "@avandar/clients": "workspace:*",
     "@avandar/models": "workspace:*",
     "@avandar/plugin-manifest": "workspace:*",

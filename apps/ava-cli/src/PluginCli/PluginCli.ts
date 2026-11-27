@@ -3,7 +3,7 @@ import { ValidatePluginCli } from "@ava-cli/PluginCli/ValidatePluginCli/Validate
 import { Acclimate } from "@avandar/acclimate";
 
 /** Create and validate bundled plugins. */
-export const PluginCli = Acclimate.createCLI("plugin")
+export const PluginCli = Acclimate.createCli("plugin")
   .description("Create and validate bundled Avandar plugins.")
   .addCommand("init", InitPluginCli)
   .addCommand("validate", ValidatePluginCli);
