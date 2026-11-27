@@ -38,7 +38,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Skip React Doctor when every pushed or PR commit says `[skip deploy]` or
+  # only touches safe documentation and agent-skill files.
+  check-skip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      should-skip: ${{ steps.skip.outputs.should-skip }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - id: skip
+        uses: ./.github/actions/check-skip
+
   react-doctor:
+    needs: check-skip
+    if: needs.check-skip.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

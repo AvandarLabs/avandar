@@ -14,6 +14,24 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
+  # Skip heavy PR checks when every PR commit says `[skip deploy]` or only
+  # touches safe documentation and agent-skill files. `lint-pr-title` still
+  # runs unconditionally so malformed titles never reach develop.
+  check-skip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      should-skip: ${{ steps.skip.outputs.should-skip }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - id: skip
+        uses: ./.github/actions/check-skip
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
   # Validates that the PR title follows this repo's Conventional Commit
   # format (see AGENTS.md). release-packages.yaml's auto-changeset step
   # reads the title to infer the npm version bump for packages/** changes,
@@ -39,6 +57,8 @@ jobs:
 
   # Lint and TypeScript checks.
   lint-typecheck:
+    needs: check-skip
+    if: needs.check-skip.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -183,6 +203,8 @@ jobs:
   #
   # Independent of the job above (no Supabase, no Playwright), so it stays fast.
   verify-packages:
+    needs: check-skip
+    if: needs.check-skip.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
