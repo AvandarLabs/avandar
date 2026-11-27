@@ -14,7 +14,7 @@ function _emptyToUndefined(value: string | undefined): string | undefined {
   return value === undefined || value.length === 0 ? undefined : value;
 }
 
-const cli = Acclimate.createCLI("should-skip-ci")
+const cli = Acclimate.createCli("should-skip-ci")
   .description("Decides whether a commit range may skip GitHub Actions.")
   .addOption({
     name: "--event-name",

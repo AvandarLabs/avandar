@@ -2,7 +2,7 @@ import { GoogleTokenGetCli } from "@ava-cli/SupabaseCli/GoogleTokenCli/GoogleTok
 import { Acclimate } from "@avandar/acclimate";
 
 /** A CLI for inspecting the Google OAuth tokens stored in `tokens__google`. */
-export const GoogleTokenCli = Acclimate.createCLI("google-token")
+export const GoogleTokenCli = Acclimate.createCli("google-token")
   .description(
     "Inspect stored Google OAuth tokens. All commands default to the local " +
       "database.",

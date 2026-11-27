@@ -33,7 +33,7 @@ export async function runNgrokUrlRemove(options: {
 }
 
 /** Remove a dev ngrok URL from the registry. */
-export const NgrokUrlRemoveCli = Acclimate.createCLI("remove")
+export const NgrokUrlRemoveCli = Acclimate.createCli("remove")
   .description("Remove a dev ngrok URL from the registry.")
   .addPositionalArg({
     name: "url",

@@ -3,7 +3,7 @@ import { isKebabCase } from "@ava-cli/utils/validators/isKebabCase/isKebabCase";
 import { Acclimate } from "@avandar/acclimate";
 
 /** CLI: scaffold a Supabase edge function (replaces `pnpm new:fn`). */
-export const NewEdgeFunctionCli = Acclimate.createCLI("edge")
+export const NewEdgeFunctionCli = Acclimate.createCli("edge")
   .addPositionalArg({
     name: "functionName",
     required: true,

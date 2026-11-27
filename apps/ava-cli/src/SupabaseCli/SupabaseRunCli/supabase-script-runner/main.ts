@@ -35,7 +35,7 @@ async function _runPGQuery(
 }
 
 Acclimate.run(
-  Acclimate.createCLI("supabase-script-runner")
+  Acclimate.createCli("supabase-script-runner")
     .description("Run a Supabase script")
     .addOption({
       name: "--dbLocationType",

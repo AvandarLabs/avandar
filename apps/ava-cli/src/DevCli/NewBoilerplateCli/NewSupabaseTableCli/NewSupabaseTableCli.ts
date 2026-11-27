@@ -35,7 +35,7 @@ function writeNewSupabaseTable({
   console.log(`Created supabase schema file: ${dir}/${outputFileName}`);
 }
 
-export const NewSupabaseTableCli = Acclimate.createCLI("table")
+export const NewSupabaseTableCli = Acclimate.createCli("table")
   .addPositionalArg({
     name: "tableName",
     description: "snake_case table name (e.g. dataset_columns).",

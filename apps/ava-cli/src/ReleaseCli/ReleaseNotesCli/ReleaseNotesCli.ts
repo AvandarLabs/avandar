@@ -142,7 +142,7 @@ async function _runReleaseNotes(
  * `ava release notes`: generate and publish GitHub release notes for an
  * existing release tag.
  */
-export const ReleaseNotesCli = Acclimate.createCLI("notes")
+export const ReleaseNotesCli = Acclimate.createCli("notes")
   .description(
     "Generate and publish GitHub release notes for an existing release tag, via an LLM.",
   )

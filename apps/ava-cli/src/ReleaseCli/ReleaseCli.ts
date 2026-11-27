@@ -52,7 +52,7 @@ type ReleaseCliArgs = {
  * `releasePromptHelpers.ts` for why the asking happens inside the action rather
  * than through `askIfEmpty`.
  */
-export const ReleaseCli = Acclimate.createCLI("release")
+export const ReleaseCli = Acclimate.createCli("release")
   .addCommand("get-prod-version", GetProdVersionCli)
   .addCommand("notes", ReleaseNotesCli)
   .description(

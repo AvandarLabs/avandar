@@ -83,7 +83,7 @@ export async function runSupabaseSql(options: {
 }
 
 /** Run SQL against the local Supabase database, or open a psql shell. */
-export const SupabaseSqlCli = Acclimate.createCLI("sql")
+export const SupabaseSqlCli = Acclimate.createCli("sql")
   .description(
     "Run SQL against the local Supabase database with psql, or open a psql " +
       "shell when no SQL is given. Follows ava supabase switch. Refuses " +

@@ -125,7 +125,7 @@ async function _run(branch: string | undefined): Promise<void> {
 }
 
 /** CLI for reporting which Supabase a worktree is pointed at. */
-export const SupabaseStatusCli = Acclimate.createCLI("status")
+export const SupabaseStatusCli = Acclimate.createCli("status")
   .description(
     "Report which Supabase a branch uses (the shared develop stack, its own switched project, or a remote one) and its ports, keys, and endpoints.",
   )

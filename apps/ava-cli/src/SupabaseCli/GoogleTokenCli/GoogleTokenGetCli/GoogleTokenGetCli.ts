@@ -143,7 +143,7 @@ export async function runGoogleTokenGet(
 }
 
 /** Print the stored Google refresh token for one connected account. */
-export const GoogleTokenGetCli = Acclimate.createCLI("get")
+export const GoogleTokenGetCli = Acclimate.createCli("get")
   .description(
     "Print the stored Google refresh token for a connected Google account.",
   )
