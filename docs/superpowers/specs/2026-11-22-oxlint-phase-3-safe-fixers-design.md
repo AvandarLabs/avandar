@@ -11,7 +11,7 @@ Inventory:
 Phase 3 establishes the polyglot lint umbrella, its canonical rule catalog,
 the core host, TypeScript, and CSS packages, and every TypeScript, JavaScript,
 or CSS current-file convention with a behavior-preserving repair. A green Phase 3 run
-lets `avandar-code-review` skip shipped AF detection only for file and
+lets `avandar-code-review` skip shipped safe-fix detection only for file and
 capability outcomes whose coverage command proves that the repository enables
 them.
 
@@ -25,7 +25,7 @@ them.
   `not-applicable`, or `fallback` for reviewed paths.
 - Enable native Oxlint safe rules before writing local equivalents.
 - Implement only fixers that can prove their safety boundary.
-- Move shipped AF detection from the always-loaded skill into an on-demand
+- Move shipped safe-fix detection from the always-loaded skill into an on-demand
   deterministic fallback checklist.
 - Record cold and warm lint timing plus the package-size baseline.
 
@@ -34,7 +34,7 @@ them.
 - Phase 3 does not implement diagnostics whose repair needs judgment.
 - Phase 3 does not add repository, TypeScript compiler, Git diff, SQL, Python,
   Rust, or universal companion analysis.
-- Phase 3 does not claim non-TypeScript coverage for generic AF-06 or AF-07.
+- Phase 3 does not claim non-TypeScript coverage for generic avlint-common-001 or avlint-common-002.
 - Phase 3 does not run suggestions or dangerous fixes automatically.
 - Phase 3 does not delete fallback detection for missing tools, disabled rules,
   unsupported languages, or repositories that do not install Avandar lint.
@@ -141,17 +141,17 @@ remain independently visible.
 
 ## Rule scope
 
-Phase 3 owns AF-01 through AF-17, AF-19, and AF-20 for their TypeScript,
-JavaScript, JSX, TSX, and CSS scope. AF-18 and AF-21 belong to Phase 5. AF-06
-and AF-07 are generic, so Phase 3 covers only their JavaScript-family syntax
+Phase 3 owns avlint-ts-001 through avlint-ts-014, avlint-ts-016, and avlint-css-001 for their TypeScript,
+JavaScript, JSX, TSX, and CSS scope. avlint-ts-015 and avlint-sql-001 belong to Phase 5. avlint-common-001
+and avlint-common-002 are generic, so Phase 3 covers only their JavaScript-family syntax
 and leaves every other applicable language in fallback until Phase 6.
 
 | Batch | Inventory | Enforcement |
 | --- | --- | --- |
-| Native Oxlint | AF-01 through AF-05, AF-19 | Existing native rules, including type-aware rules when required |
-| Comment and documentation fixers | AF-06, AF-07, AF-11 | `@avandar/lint-typescript/oxlint`; AF-06 and AF-07 coverage limited to TS/JS |
-| Function, naming, React, and utility fixers | AF-08 through AF-10, AF-12 through AF-17 | `@avandar/lint-typescript/oxlint` |
-| CSS comment fixer | AF-20 | `@avandar/lint-css/stylelint` |
+| Native Oxlint | avlint-ts-001 through avlint-ts-005, avlint-ts-016 | Existing native rules, including type-aware rules when required |
+| Comment and documentation fixers | avlint-common-001, avlint-common-002, avlint-ts-009 | `@avandar/lint-typescript/oxlint`; avlint-common-001 and avlint-common-002 coverage limited to TS/JS |
+| Function, naming, React, and utility fixers | avlint-ts-006 through avlint-ts-008, avlint-ts-010 through avlint-ts-014 | `@avandar/lint-typescript/oxlint` |
+| CSS comment fixer | avlint-css-001 | `@avandar/lint-css/stylelint` |
 
 Unsupported syntax remains unchanged. A deterministic but unsafe shape becomes
 a Phase 4 diagnostic; an unsupported language remains a fallback outcome.
@@ -177,7 +177,7 @@ supported and unsupported capability fixtures prove conservative aggregation.
 
 Phase 3 creates
 `agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/deterministic-fallback-checklist.md`.
-Shipped AF detection moves there rather than being deleted. The always-loaded
+Shipped safe-fix detection moves there rather than being deleted. The always-loaded
 skill runs lint and coverage first, then loads only the returned fallback IDs
 for the languages in the diff.
 
@@ -207,7 +207,7 @@ Update the pnpm workspace to include the package directories beneath
   contracts.
 - Every in-scope fixture proves safe, idempotent repair.
 - Root lint and package verification pass after applying the fixers.
-- Covered AF outcomes leave the normal skill path, while uncovered outcomes
+- Covered safe-fix outcomes leave the normal skill path, while uncovered outcomes
   still load the deterministic fallback.
 - The benchmark and package-size baseline are committed.
 - No compiler program, repository graph, Git diff, SQL parser, Python checker,

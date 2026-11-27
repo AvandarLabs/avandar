@@ -2,7 +2,6 @@
 export type CatalogRule = {
   id: string;
   slug: string;
-  class: "AF" | "GD" | "RP" | "JR";
   title: string;
   scope: string;
   applicability: string[];

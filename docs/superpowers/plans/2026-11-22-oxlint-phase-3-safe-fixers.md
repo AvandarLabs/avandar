@@ -146,7 +146,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 - [ ] **Step 1: Write the failing catalog and README drift tests**
 
   Assert that `rules.yaml` validates, IDs and slugs are unique, every
-  deterministic rule has applicability and a phase, every JR rule names the
+  deterministic rule has applicability and a phase, every judgment rule names the
   skill as owner, and `renderRuleCatalog(catalog)` exactly matches the catalog
   section checked into `packages/lint/README.md`.
 
@@ -158,8 +158,8 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 
 - [ ] **Step 3: Add the umbrella catalog and generated README**
 
-  Encode AF-01 through AF-21, GD-01 through GD-32, RP-01 through RP-19 with
-  RP-16A and RP-16B, and JR-01 through JR-17 from the inventory. Implement
+  Encode avlint-ts-001 through avlint-sql-001, avlint-common-003 through avlint-ts-041, avlint-ts-042 through avlint-ts-055 with
+  avlint-ts-054 and avlint-common-011, and avlint-common-012 through avlint-ts-058 from the inventory. Implement
   schema validation and a renderer whose output is deterministic.
 
 - [ ] **Step 4: Write the failing package and coverage tests**
@@ -239,7 +239,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Root Oxlint configuration and the benchmark command from Task 1.
-- Produces: Enabled AF-01 through AF-05 and AF-19 native rules with tested
+- Produces: Enabled avlint-ts-001 through avlint-ts-005 and avlint-ts-016 native rules with tested
   repository options and proven TS/JS coverage claims.
 
 - [ ] **Step 1: Write failing fixtures for each native rule**
@@ -301,9 +301,9 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Oxlint plugin registry and rule metadata from Task 1.
-- Produces: `avandar/function-body-line-comments` (AF-06),
-  `avandar/single-line-short-jsdoc` (AF-07), and
-  `avandar/export-key-jsdoc` (AF-11), with AF-06 coverage limited to
+- Produces: `avandar/function-body-line-comments` (avlint-common-001),
+  `avandar/single-line-short-jsdoc` (avlint-common-002), and
+  `avandar/export-key-jsdoc` (avlint-ts-009), with avlint-common-001 coverage limited to
   TypeScript and JavaScript.
 
 - [ ] **Step 1: Write failing RuleTester cases**
@@ -321,7 +321,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 - [ ] **Step 3: Implement and register the three rules**
 
   Export one ESLint-compatible rule object from each module. Mark each rule
-  fixable only for the exact AF boundary. Use a shared `createOnce` traversal
+  fixable only for the exact safe-fix boundary. Use a shared `createOnce` traversal
   if it removes a repeated full-file walk.
 
 - [ ] **Step 4: Run rule tests, root lint, and the batch benchmark**
@@ -367,7 +367,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Task 1 plugin registry and Oxlint scope analysis.
-- Produces: AF-08 through AF-10 and AF-12 through AF-17 under stable
+- Produces: avlint-ts-006 through avlint-ts-008 and avlint-ts-010 through avlint-ts-014 under stable
   `avandar/*` rule IDs matching each filename.
 
 - [ ] **Step 1: Write failing safety matrices for all nine rules**
@@ -389,7 +389,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
   Use Oxlint scope information for references and collisions. Insert imports
   only through a shared import utility after its own tests prove merge,
   ordering, alias, and existing-import behavior. Unsupported syntax produces no
-  AF fix.
+  safe-fix fix.
 
 - [ ] **Step 4: Register and enable the rules**
 
@@ -432,7 +432,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Stylelint entry from Task 1.
-- Produces: `avandar/canonical-block-comments` implementing AF-20.
+- Produces: `avandar/canonical-block-comments` implementing avlint-css-001.
 
 - [ ] **Step 1: Write failing Stylelint rule tests**
 
@@ -489,7 +489,7 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
 
 - Consumes: All enabled phase 3 rules.
 - Produces: A green repository, an idempotent safe-fix pass, and a skill that
-  loads AF detectors only for uncovered rule-language-file-capability outcomes.
+  loads safe-fix detectors only for uncovered rule-language-file-capability outcomes.
 
 - [ ] **Step 1: Load the rule-writing and skill-writing instructions**
 
@@ -506,13 +506,13 @@ plugins, `@oxlint/plugins`, Stylelint plugin API, Vitest, tsup, pnpm workspaces.
   whose rule violated its documented safety boundary, then fix the rule and
   add the regression fixture before rerunning.
 
-- [ ] **Step 3: Move deterministic AF detection into the fallback checklist**
+- [ ] **Step 3: Move deterministic safe-fix detection into the fallback checklist**
 
-  Remove shipped AF prose from always-loaded full review, focused packs, find
+  Remove shipped safe-fix prose from always-loaded full review, focused packs, find
   lanes, common checks, and phase checklists. Preserve each detector under its
   canonical ID in the fallback checklist. Update the core skill to run lint,
   call `avandar-lint coverage` for reviewed paths, and load only returned
-  fallback IDs. Preserve AF-18 and AF-21 for Phase 5 and all JR prose.
+  fallback IDs. Preserve avlint-ts-015 and avlint-sql-001 for Phase 5 and all judgment prose.
 
 - [ ] **Step 4: Write and run skill coverage-handoff fixtures**
 

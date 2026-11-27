@@ -39,7 +39,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 - Missing tools, disabled rules, unsupported frameworks, parser failures, and
   unknown languages never count as covered merely because an implementation
   exists somewhere in the monorepo.
-- Only AF-06 and AF-07 proven syntax shapes may receive a generic safe fix.
+- Only avlint-common-001 and avlint-common-002 proven syntax shapes may receive a generic safe fix.
   Every other Phase 6 rule is diagnostic-only.
 - New production behavior follows red-green TDD.
 - Help exits zero before repository, configuration, dependency, or toolchain
@@ -126,8 +126,8 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 
 - [ ] **Step 2: Write the failing matrix and fallback tests**
 
-  Expand AF-06, AF-07, GD-01, GD-02, GD-03, GD-06, GD-07, GD-09, GD-22,
-  GD-25, and RP-16B across their catalog applicability. Begin with a tested
+  Expand avlint-common-001, avlint-common-002, avlint-common-003, avlint-common-004, avlint-common-005, avlint-common-006, avlint-common-007, avlint-common-008, avlint-common-009,
+  avlint-common-010, and avlint-common-011 across their catalog applicability. Begin with a tested
   fallback registration for every unimplemented applicable outcome, not a
   blank cell. Add same-language files with supported and unsupported framework
   capabilities and assert conservative aggregation.
@@ -193,10 +193,10 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 
 - Consumes: Generated Python catalog constants and the host engine interface.
 - Produces: the `pylint-avandar` distribution, plugin registration function,
-  message symbols mapped to GD-01, GD-02, the public-value subset of GD-03,
-  GD-06, GD-22, and GD-25, `runPylint(options): Promise<EngineRunResult>`, and
-  native config for the module, class, function, and method subset of GD-03,
-  plus GD-07 and GD-09.
+  message symbols mapped to avlint-common-003, avlint-common-004, the public-value subset of avlint-common-005,
+  avlint-common-006, avlint-common-009, and avlint-common-010, `runPylint(options): Promise<EngineRunResult>`, and
+  native config for the module, class, function, and method subset of avlint-common-005,
+  plus avlint-common-007 and avlint-common-008.
 
 - [ ] **Step 1: Write failing native-config and checker tests**
 
@@ -205,7 +205,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   undocumented public values and constants, collection loops and valid
   reasons, pytest and unittest assertions, empty tests, and closed tautologies.
   Add integration fixtures for native missing-docstring, too-many-lines, and
-  disallowed-name behavior. Prove the native and custom GD-03 subsets do not
+  disallowed-name behavior. Prove the native and custom avlint-common-005 subsets do not
   duplicate each other.
 
 - [ ] **Step 2: Create an isolated test environment and verify failure**
@@ -223,7 +223,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 
   Register checkers through `avandar_pylint.plugin.register(linter)`. Emit
   canonical IDs in message metadata. Treat a function's first string literal
-  as a docstring, never AF-06. Add the public-value checker rather than
+  as a docstring, never avlint-common-001. Add the public-value checker rather than
   claiming that Pylint's native missing-docstring family covers constants and
   objects. Require a reason on custom checker disables.
 
@@ -276,7 +276,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Generated Rust catalog constants and the host engine interface.
-- Produces: native config for GD-03, GD-06, and GD-09,
+- Produces: native config for avlint-common-005, avlint-common-006, and avlint-common-008,
   `avandar_dylint::IMPERATIVE_COLLECTION_LOOP`,
   `avandar_dylint::TEST_ASSERTIONS`, and
   `runRustLint(options): Promise<EngineRunResult>`.
@@ -359,7 +359,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 - Consumes: `LanguageAdapter`, repository languages, ignored paths, and owner
   resolution from Task 1.
 - Produces: file classification, one cached lexical context per file, and
-  GD-01, GD-02, and GD-07 diagnostics. It does not claim declaration or
+  avlint-common-003, avlint-common-004, and avlint-common-007 diagnostics. It does not claim declaration or
   function-body ownership before structural adapters exist.
 
 - [ ] **Step 1: Write failing classifier and delimiter fixtures**
@@ -367,14 +367,14 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   Cover every configured extension and shell shebang, generated files,
   migrations, dependencies, caches, strings, template literals, raw strings,
   regex literals, heredocs, nested comments, malformed input, and disable
-  regions. Assert CSS receives GD-01 through Stylelint rather than duplicate
+  regions. Assert CSS receives avlint-common-003 through Stylelint rather than duplicate
   generic output, JSON is not applicable, and JSONC comments are recognized.
 
 - [ ] **Step 2: Write failing lexical metric fixtures**
 
   Cover comment punctuation and width, file thresholds and exclusions,
   tokenizer failures, and exact comment ranges. Assert this task reports no
-  AF-06 or AF-07 fix because it cannot yet prove declaration, nested-node, or
+  avlint-common-001 or avlint-common-002 fix because it cannot yet prove declaration, nested-node, or
   function-body ownership.
 
 - [ ] **Step 3: Run focused tests to verify they fail**
@@ -432,8 +432,8 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: the generic file classifier, `LanguageAdapter`, and owner resolver.
-- Produces: one cached syntax tree per file and exact GD-03, GD-06, GD-09, and
-  GD-22 adapters, plus syntax-proven AF-06 and AF-07 safe fixes, for Go, Ruby,
+- Produces: one cached syntax tree per file and exact avlint-common-005, avlint-common-006, avlint-common-008, and
+  avlint-common-009 adapters, plus syntax-proven avlint-common-001 and avlint-common-002 safe fixes, for Go, Ruby,
   Java, Kotlin, Swift, C, C++, C#, shell, SQL where applicable, and any Python
   or Rust outcome not owned by a direct engine.
 
@@ -453,7 +453,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   them. Assert direct Pylint or Rust owners suppress companion duplicates when
   available and that a failed parse returns a file-level coverage gap.
 
-- [ ] **Step 3: Write failing AF-06 and AF-07 safety fixtures**
+- [ ] **Step 3: Write failing avlint-common-001 and avlint-common-002 safety fixtures**
 
   Cover Rust, Go, Java, Kotlin, Swift, C, C++, and C# unattached function-body
   block comments. Reject declaration docs, nested declarations, comment forms
@@ -461,9 +461,9 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   directives or source maps. Cover short, tag-free block docstrings in Python,
   Rust, SQL, and other applicable adapters. Reject any collapse that changes a
   string value, indentation, quoting, escapes, comment ownership, or complete
-  rendered width. The integration test copies mixed AF and GD fixtures to a
+  rendered width. The integration test copies mixed safe-fix and guided fixtures to a
   temporary repository, asserts the first run's documented nonzero status and
-  diagnostics, verifies only AF output changed, and asserts second-run
+  diagnostics, verifies only safe-fix output changed, and asserts second-run
   idempotence without modifying checked-in fixtures.
 
 - [ ] **Step 4: Run structural tests to verify they fail**
@@ -477,7 +477,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   Each adapter returns normalized public declarations, functions, identifiers,
   collection loops, comment ranges when needed, and parse errors. Keep
   language-specific queries in the adapter and canonical rule semantics in the
-  shared rule modules. Attach AF-06 and AF-07 edits only after the syntax tree
+  shared rule modules. Attach avlint-common-001 and avlint-common-002 edits only after the syntax tree
   proves ownership and every safety fixture passes.
 
 - [ ] **Step 6: Run adapter, owner, fixes, package, and benchmark checks**
@@ -521,7 +521,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 
 - Consumes: normalized syntax contexts from Task 5 and repository control-flow
   evidence from the companion host.
-- Produces: framework registries, GD-25 generic test diagnostics, and RP-16B
+- Produces: framework registries, avlint-common-010 generic test diagnostics, and avlint-common-011
   generic E2E mutation and cleanup diagnostics.
 
 - [ ] **Step 1: Write failing test-framework fixtures**
@@ -540,8 +540,8 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   Pin setup-only mutations before load, read-only oracles, database writes
   after load that perform the behavior under test, cleanup in `finally` or
   lifecycle hooks, early-return cleanup gaps, and unknown database clients.
-  Assert RP-16A Playwright static rules remain owned by the TypeScript pack and
-  RP-16B owns only the generic mutation contract. Mix a configured client and
+  Assert avlint-ts-054 Playwright static rules remain owned by the TypeScript pack and
+  avlint-common-011 owns only the generic mutation contract. Mix a configured client and
   unknown client in one language fixture and assert per-file capability
   outcomes.
 
@@ -596,12 +596,12 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
 - Consumes: every Phase 6 engine, adapter, framework registry, catalog cell,
   and the Phase 3 through 5 skill handoff.
 - Produces: a closed coverage matrix, lazy root lint integration, package test
-  CI, and a review skill whose normal path contains only JR and disable-reason
+  CI, and a review skill whose normal path contains only judgment and disable-reason
   judgment while retaining deterministic fallback on demand.
 
 - [ ] **Step 1: Write failing complete-matrix and lazy-loading tests**
 
-  Assert the mandatory Python, Rust, declared-language, and configured RP-16B
+  Assert the mandatory Python, Rust, declared-language, and configured avlint-common-011
   framework outcomes from the spec are enforced and every inapplicable outcome
   is explicit. Accept fallback only for an enumerated parser or syntax
   limitation, unregistered framework or API, missing or unavailable tool,
@@ -635,7 +635,7 @@ toolchain, Vitest, pytest, Cargo test, pnpm workspaces.
   Remove generic deterministic prose from always-loaded lanes. Keep every rule
   under its canonical ID in the fallback checklist. Run `avandar-lint coverage`
   for reviewed paths after lint is green, load only returned fallback IDs, then
-  run JR phases and changed-disable-reason review. Preserve current behavior
+  run judgment phases and changed-disable-reason review. Preserve current behavior
   when the command is absent or fails.
 
 - [ ] **Step 6: Run the complete verification matrix**

@@ -29,8 +29,8 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
   companion process.
 - Every coverage claim updates `packages/lint/rules.yaml` and its generated
   README catalog.
-- A GD rule reports only a deterministic violation and never a candidate.
-- No phase 4 rule is fixable unless its safe AF subset shipped in phase 3.
+- A guided rule reports only a deterministic violation and never a candidate.
+- No phase 4 rule is fixable unless its safe safe-fix subset shipped in phase 3.
 - A branching repair points to `packages/lint/docs/rules/<rule>.md`.
 - Every `avandar/*` disable requires a non-empty reason.
 - Before each green root-lint gate, run the newly enabled batch across the
@@ -168,8 +168,8 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Task 1 diagnostic and documentation contract.
-- Produces: Native enforcement for GD-06 through GD-10, GD-12 through GD-14,
-  GD-19, native subsets of GD-22, GD-23, and GD-25, plus GD-32.
+- Produces: Native enforcement for avlint-common-006 through avlint-ts-021, avlint-ts-023 through avlint-ts-025,
+  avlint-ts-030, native subsets of avlint-common-009, avlint-ts-033, and avlint-common-010, plus avlint-ts-041.
 
 - [ ] **Step 1: Write failing native-rule configuration fixtures**
 
@@ -233,9 +233,9 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Task 1 diagnostic builder.
-- Produces: GD-01 and GD-03 through GD-05 for TS/JS, CSS coverage for GD-01,
+- Produces: avlint-common-003 and avlint-common-005 through avlint-ts-019 for TS/JS, CSS coverage for avlint-common-003,
   and no non-TS coverage claim. Existing comment-aware `max-len` continues to
-  own TS/JS GD-02.
+  own TS/JS avlint-common-004.
 
 - [ ] **Step 1: Write failing valid and invalid fixtures**
 
@@ -252,12 +252,12 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 3: Implement, document, register, and enable the rules**
 
-  Reuse one comment attachment utility. Keep documentation quality in JR-01;
+  Reuse one comment attachment utility. Keep documentation quality in avlint-common-012;
   these rules prove presence and ownership only.
 
 - [ ] **Step 4: Run package tests, lint, and benchmark**
 
-  Run root lint once, remediate every GD-01 through GD-05 diagnostic introduced
+  Run root lint once, remediate every avlint-common-003 through avlint-ts-019 diagnostic introduced
   by this batch across the complete linted path set, then rerun the command
   below.
 
@@ -296,8 +296,8 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Task 1 diagnostics and Task 2 native partial coverage.
-- Produces: GD-11, GD-15, GD-16, GD-18, GD-21, and the custom exception
-  portion of GD-22.
+- Produces: avlint-ts-022, avlint-ts-026, avlint-ts-027, avlint-ts-029, avlint-ts-032, and the custom exception
+  portion of avlint-common-009.
 
 - [ ] **Step 1: Write failing fixtures for each deterministic boundary**
 
@@ -364,8 +364,8 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 **Interfaces:**
 
 - Consumes: Task 1 diagnostic builder and Task 2 native React and test rules.
-- Produces: Custom portions of GD-23 and GD-25, plus GD-24, GD-26, GD-27,
-  and GD-30.
+- Produces: Custom portions of avlint-ts-033 and avlint-common-010, plus avlint-ts-034, avlint-ts-035, avlint-ts-036,
+  and avlint-ts-039.
 
 - [ ] **Step 1: Write failing boundary fixtures**
 
@@ -385,7 +385,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
   Use JSX prop and call-position allowlists for display copy. Report only static
   styles and closed Tailwind syntax. Leave dynamic style legitimacy and token
-  choice in JR-17.
+  choice in avlint-ts-058.
 
 - [ ] **Step 4: Run package tests, lint, and benchmark**
 
@@ -438,11 +438,11 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 3: Move shipped Phase 4 detectors behind coverage gating**
 
-  Remove enabled GD prose from always-loaded full review, focused packs, find
+  Remove enabled guided prose from always-loaded full review, focused packs, find
   lanes, common checks, and phase checklists. Preserve each deterministic
-  detector under its canonical ID in the fallback checklist. Preserve JR-01
-  through JR-17 and Phase 5 rows GD-17, GD-20, repository-aware GD-21, GD-28,
-  GD-29, and GD-31. Review only new or changed disable reasons after lint is
+  detector under its canonical ID in the fallback checklist. Preserve avlint-common-012
+  through avlint-ts-058 and Phase 5 rows avlint-ts-028, avlint-ts-031, repository-aware avlint-ts-032, avlint-ts-037,
+  avlint-ts-038, and avlint-ts-040. Review only new or changed disable reasons after lint is
   green.
 
 - [ ] **Step 4: Prove mixed-language coverage behavior**
@@ -450,7 +450,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
   Seed the same generic violation in TypeScript, Python, and Rust fixtures.
   Assert the configured TypeScript rule is `enforced`, while Python and Rust
   remain `fallback`. Disable the Oxlint plugin and assert TypeScript returns to
-  fallback. Assert CSS reports only GD-01 and does not claim GD-02. Add two
+  fallback. Assert CSS reports only avlint-common-003 and does not claim avlint-common-004. Add two
   TypeScript test files using supported and unknown framework capabilities and
   assert that the unknown capability remains fallback without hiding the
   enforced file.

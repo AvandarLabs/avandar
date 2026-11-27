@@ -170,15 +170,15 @@ command/status, exact reviewed paths, and retained/omitted
    Read `operational` and every exact `outcomes` row. Supplied current command
    evidence may be reused in a routing-only exercise; state which evidence
    was supplied. A real review reruns after source/config changes.
-3. Partition each relevant AF capability using the table below. When no usable
+3. Partition each relevant safe-fix capability using the table below. When no usable
    exact outcome exists, retain the applicable detector. Installed packages,
    green lint and language summaries alone leave every capability unresolved.
-4. Load only retained AF IDs from
+4. Load only retained safe-fix IDs from
    [Deterministic fallback](docs/code-reviews/deterministic-fallback-checklist.md).
    Match the ID's language, path and capability inside that file. Preserve
    partial families: an enforced safe capability omits only itself, while an
    explicit `unsupported-shapes` fallback still runs for the same path.
-5. Continue every normal JR/semantic, guided, contextual, avlint-ts-015, avlint-sql-001 and selected
+5. Continue every normal judgment/semantic, guided, contextual, avlint-ts-015, avlint-sql-001 and selected
    pack obligation. Coverage subtraction applies only to proven deterministic
    capabilities. Recompute this record after changing source or lint config.
 
@@ -186,11 +186,11 @@ command/status, exact reviewed paths, and retained/omitted
 | --- | --- |
 | Successful operational report, exact operational `enforced` outcome | Omit only that capability on that path/language. |
 | Successful operational report, exact operational `not-applicable` outcome | Omit only that inapplicable capability. |
-| Exact `fallback`, partial or unsupported capability | Retain that capability and load its AF ID. |
+| Exact `fallback`, partial or unsupported capability | Retain that capability and load its safe-fix ID. |
 | Missing command/package/plugin/rule, disabled/excluded path, config/operational error, absent row or summary-only report | Retain applicable detector obligations. |
 | Unknown extension/language | Retain fallback; assess actual language applicability before choosing native syntax. |
 
-Full reviews select all relevant shipped AF IDs. Focused reviews select only
+Full reviews select all relevant shipped safe-fix IDs. Focused reviews select only
 IDs assigned to their packs in the focused reference. avlint-ts-002, avlint-ts-005, avlint-ts-016, unsupported
 avlint-ts-014 JS shapes, and any missing proof remain fallback. Generic avlint-common-001, avlint-common-002
 fallback assesses the actual language; it does not impose JS syntax on an
@@ -225,7 +225,7 @@ checks that language's comment forms. Summary-only evidence omits none.
    whether `extra-checklist.md` exists. The phase order is:
    1. **Most Common Mistakes** (common/general reference, always runs).
    2. **General Checks** (same reference, always runs).
-   3. **Deterministic fallback** for retained AF capabilities.
+   3. **Deterministic fallback** for retained safe-fix capabilities.
    4. Each **language-specific phase** under "Phase Checklists", in the
       order listed, gated on the diff.
    5. Each **library-gated phase** under "Library-Gated Phases", gated on
@@ -252,7 +252,7 @@ Before deciding whether to fan out, read
 [Review execution](docs/code-reviews/review-execution.md) completely. It defines
 phase counting, focused/full find lanes, read-only Find/Verify and serial
 Merge/Apply, plus the inline fallback. Supply every lane its exact coverage
-partition; only the deterministic-fallback lane loads selected AF detectors.
+partition; only the deterministic-fallback lane loads selected safe-fix detectors.
 
 ## Testing At The End Of Review
 
@@ -310,7 +310,7 @@ typecheck script runs, its final result must contain zero typecheck errors.
 
 On full reviews, read and apply
 [Common and general checks](docs/code-reviews/common-and-general-checklist.md)
-completely. Focused reviews apply only their pack's named subsets. All JR,
+completely. Focused reviews apply only their pack's named subsets. All judgment,
 semantic, guided and repo-local obligations retain their original gates.
 
 ## Phase Checklists
@@ -321,7 +321,7 @@ SKILL file.
 
 ### Phase: deterministic fallback
 
-- **Gate:** the handoff retains at least one AF capability for a reviewed path.
+- **Gate:** the handoff retains at least one safe-fix capability for a reviewed path.
 - **Reference:** load only selected IDs from
   [deterministic-fallback-checklist.md](docs/code-reviews/deterministic-fallback-checklist.md).
 - **Find lane:** one selected-capability lane on full reviews; selected pack

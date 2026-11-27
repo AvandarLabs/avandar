@@ -1,8 +1,8 @@
 # Deterministic fallback checklist
 
-Load only the selected AF IDs after **Automation coverage handoff** in
+Load only the selected safe-fix IDs after **Automation coverage handoff** in
 `SKILL.md`. Each finding still requires an eligible added line and verified
-rule applicability. With no usable exact report, select every applicable AF
+rule applicability. With no usable exact report, select every applicable safe-fix
 family in the review's packs. These instructions work without Avandar lint.
 
 ## Language and capability selection
@@ -598,6 +598,6 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
 
 avlint-ts-015 remains in `functional-style-checklist.md` (typed Error guards).
 avlint-sql-001 remains in `sql-checklist.md` (SQL declaration/body comment forms).
-These later automation families and every JR judgment obligation remain active
+These later automation families and every judgment obligation remain active
 under their normal full/focused phase gates; coverage subtraction here does
 not discharge them.

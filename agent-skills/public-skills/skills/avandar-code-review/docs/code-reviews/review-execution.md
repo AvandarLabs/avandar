@@ -68,8 +68,8 @@ Give each agent only:
   `+` lines; Files To Skip),
 - its own checklist,
 - exact retained/omitted rule-language-file-capability outcomes from the handoff.
-  The fallback lane applies only retained AF capabilities. Every other lane
-  keeps its contextual/JR obligations without repeating omitted detectors.
+  The fallback lane applies only retained safe-fix capabilities. Every other lane
+  keeps its contextual/judgment obligations without repeating omitted detectors.
 
 Each find agent is READ-ONLY. It returns structured findings, one record
 per finding: `{ file, lines, phase, severity, description,
@@ -83,7 +83,7 @@ below for a focused review.
 
 | Lane | Checklist(s) | Gate |
 |------|--------------|------|
-| `deterministic-fallback` | selected AF IDs and exact uncovered capabilities only | full review; at least one retained detector obligation |
+| `deterministic-fallback` | selected safe-fix IDs and exact uncovered capabilities only | full review; at least one retained detector obligation |
 | `common-and-general` | common-and-general-checklist | full review (always) |
 | `comments-and-module` | comments + module hierarchy | full review; diff has `.ts`/`.tsx` |
 | `code-smells` | code-smells-checklist | full review; diff has `.ts`/`.tsx` |

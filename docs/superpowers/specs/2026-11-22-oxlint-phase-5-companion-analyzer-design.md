@@ -38,8 +38,8 @@ these packs and move to Phase 6.
   Swift, C-family, shell, YAML, or JSONC coverage.
 - Phase 5 does not put generic file length, function length, comment,
   identifier, loop, or test rules inside the TypeScript pack.
-- Phase 5 does not implement RP-16B generic E2E mutation analysis.
-- Phase 5 does not turn JR candidates into deterministic violations.
+- Phase 5 does not implement avlint-common-011 generic E2E mutation analysis.
+- Phase 5 does not turn judgment candidates into deterministic violations.
 - Phase 5 does not mutate production data, run migrations, or reset a database.
 
 ## Selected architecture
@@ -209,17 +209,17 @@ program, Git snapshot, or SQL parser unless an enabled rule requires it.
 
 ## Rule scope
 
-Phase 5 owns AF-18, AF-21, the repository-aware subset of GD-21, GD-17, GD-20,
-GD-28, GD-29, GD-31, RP-01 through RP-15, RP-16A, and RP-17 through RP-19.
+Phase 5 owns avlint-ts-015, avlint-sql-001, the repository-aware subset of avlint-ts-032, avlint-ts-028, avlint-ts-031,
+avlint-ts-037, avlint-ts-038, avlint-ts-040, avlint-ts-042 through avlint-ts-053, avlint-ts-054, and avlint-sql-005 through avlint-ts-055.
 
 | Pack | Inventory |
 | --- | --- |
-| TypeScript filesystem, module graph, tests, packages, Playwright | RP-01 through RP-09, RP-14, RP-16A, RP-19 |
-| TypeScript type-aware rules | AF-18, repository-aware GD-21, GD-17, GD-20, GD-28, GD-29, GD-31, RP-09, RP-13, RP-15 |
-| SQL and migration state | AF-21, RP-10 through RP-12, RP-17, RP-18 |
-| Shared Git evidence | RP-10, RP-11, RP-13, RP-15, RP-18, RP-19 |
+| TypeScript filesystem, module graph, tests, packages, Playwright | avlint-ts-042 through avlint-ts-050, avlint-ts-052, avlint-ts-054, avlint-ts-055 |
+| TypeScript type-aware rules | avlint-ts-015, repository-aware avlint-ts-032, avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038, avlint-ts-040, avlint-ts-050, avlint-ts-051, avlint-ts-053 |
+| SQL and migration state | avlint-sql-001, avlint-sql-002 through avlint-sql-004, avlint-sql-005, avlint-sql-006 |
+| Shared Git evidence | avlint-sql-002, avlint-sql-003, avlint-ts-051, avlint-ts-053, avlint-sql-006, avlint-ts-055 |
 
-RP-16B moves to the Phase 6 generic pack. Phase 5 Playwright analysis may
+avlint-common-011 moves to the Phase 6 generic pack. Phase 5 Playwright analysis may
 provide reusable framework interfaces, but it cannot claim generic E2E
 coverage.
 
@@ -252,7 +252,7 @@ negative, cross-platform path, configuration, and repository integration
 fixtures pass. The skill keeps the detector in its on-demand fallback and
 loads it whenever the pack is absent, disabled, or unable to analyze a file.
 
-The always-loaded skill retains JR-01 through JR-17 and the truthfulness review
+The always-loaded skill retains avlint-common-012 through avlint-ts-058 and the truthfulness review
 for changed disable reasons.
 
 ## Acceptance criteria

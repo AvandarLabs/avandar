@@ -48,8 +48,8 @@ corpus testing, tsup.
 - New production behavior follows red-green TDD.
 - Stop and profile a batch whose warm median adds both more than 25 percent
   and more than 2 seconds to the preceding complete lint baseline.
-- Generic AF-06, AF-07, GD-01, GD-02, GD-03, GD-06, GD-07, GD-09, GD-22,
-  GD-25, and RP-16B remain Phase 6 fallback outside covered earlier-language
+- Generic avlint-common-001, avlint-common-002, avlint-common-003, avlint-common-004, avlint-common-005, avlint-common-006, avlint-common-007, avlint-common-008, avlint-common-009,
+  avlint-common-010, and avlint-common-011 remain Phase 6 fallback outside covered earlier-language
   outcomes.
 - A detector leaves the normal review path only after the exact pack, rule,
   language, file, capability, and repository integration are proven.
@@ -264,14 +264,14 @@ corpus testing, tsup.
 
 - Consumes: Task 2 file index and lazy pack-context interface.
 - Produces: `@avandar/lint-typescript/companion`, plus the TypeScript pack's
-  RP-01 through RP-08, RP-14, RP-16A, and RP-19. RP-09 remains for Task 4;
-  RP-16B remains Phase 6 fallback.
+  avlint-ts-042 through avlint-ts-049, avlint-ts-052, avlint-ts-054, and avlint-ts-055. avlint-ts-050 remains for Task 4;
+  avlint-common-011 remains Phase 6 fallback.
 
 - [ ] **Step 1: Write failing synthetic-repository fixtures**
 
   Give every rule family one clean tree, one invalid tree, mixed-case and
   Windows-separator projections, ignored generated paths, and an ambiguous case
-  that must not report. For RP-19, assert an idempotent exact import-map edit;
+  that must not report. For avlint-ts-055, assert an idempotent exact import-map edit;
   all other multi-file repairs remain guided unless separately proven.
 
 - [ ] **Step 2: Run the rule tests to verify they fail**
@@ -286,7 +286,7 @@ corpus testing, tsup.
   diagnostics through the Task 1 schema. Register every rule under that pack
   and declare only `files` and `modules` evidence. Keep test
   behavior, domain naming quality, generic E2E mutation semantics, and CSS
-  token choice in JR or Phase 6 fallback. Export the registration through
+  token choice in judgment or Phase 6 fallback. Export the registration through
   `@avandar/lint-typescript/companion` and preserve the existing Oxlint export.
 
 - [ ] **Step 4: Run tests, package verification, and benchmark**
@@ -331,8 +331,8 @@ corpus testing, tsup.
 
 - Consumes: Task 2 lazy context and cache.
 - Produces: One cached TypeScript `Program` and `TypeChecker` per selected
-  project, plus AF-18, repository-aware GD-21, GD-17, GD-20, GD-28, GD-29,
-  GD-31, RP-09, RP-13, and RP-15.
+  project, plus avlint-ts-015, repository-aware avlint-ts-032, avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038,
+  avlint-ts-040, avlint-ts-050, avlint-ts-051, and avlint-ts-053.
 
 - [ ] **Step 1: Write failing TypeScript-context tests**
 
@@ -356,7 +356,7 @@ corpus testing, tsup.
 
 - [ ] **Step 4: Implement the shared type context and rules**
 
-  Resolve each file to exactly one selected project. AF-18 may expose a safe
+  Resolve each file to exactly one selected project. avlint-ts-015 may expose a safe
   edit only when the type checker and control-flow shape prove equivalence.
   Every other rule emits a guided diagnostic.
 
@@ -410,7 +410,7 @@ corpus testing, tsup.
 
 - Consumes: Task 2 lazy context and cache.
 - Produces: `@avandar/lint-sql/companion`, cached SQL documents with source
-  locations, AF-21, RP-11, RP-12, RP-17, and RP-18.
+  locations, avlint-sql-001, avlint-sql-003, avlint-sql-004, avlint-sql-005, and avlint-sql-006.
 
 - [ ] **Step 1: Build the committed SQL corpus test**
 
@@ -436,7 +436,7 @@ corpus testing, tsup.
 
 - [ ] **Step 4: Implement the SQL context and rules**
 
-  Cache by content and parser version. AF-21 exposes fixes only where parsed
+  Cache by content and parser version. avlint-sql-001 exposes fixes only where parsed
   node ownership proves the exact comment form. All structural SQL rules remain
   guided. Publish the pack through `@avandar/lint-sql/companion`, add the SQL
   package to the root workspace dependencies and fixed Changesets group, and
@@ -479,8 +479,8 @@ corpus testing, tsup.
 **Interfaces:**
 
 - Consumes: Task 2 lazy context and rule families from Tasks 3 through 5.
-- Produces: One immutable Git snapshot, RP-10, and the changed-file evidence
-  portions of RP-11, RP-13, RP-15, RP-18, and RP-19.
+- Produces: One immutable Git snapshot, avlint-sql-002, and the changed-file evidence
+  portions of avlint-sql-003, avlint-ts-051, avlint-ts-053, avlint-sql-006, and avlint-ts-055.
 
 - [ ] **Step 1: Write failing Git-state fixtures**
 
@@ -570,11 +570,11 @@ corpus testing, tsup.
 
 - [ ] **Step 5: Move shipped companion detectors behind coverage gating**
 
-  Remove AF-18, AF-21, repository-aware GD-21, GD-17, GD-20, GD-28, GD-29,
-  GD-31, RP-01 through RP-15, RP-16A, and RP-17 through RP-19 prose from
+  Remove avlint-ts-015, avlint-sql-001, repository-aware avlint-ts-032, avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038,
+  avlint-ts-040, avlint-ts-042 through avlint-ts-053, avlint-ts-054, and avlint-sql-005 through avlint-ts-055 prose from
   always-loaded review lanes. Preserve their canonical detectors in the
-  fallback checklist for repositories without enabled packs. Preserve RP-16B
-  and all other Phase 6 generic outcomes, JR-01 through JR-17, and
+  fallback checklist for repositories without enabled packs. Preserve avlint-common-011
+  and all other Phase 6 generic outcomes, avlint-common-012 through avlint-ts-058, and
   changed-disable-reason judgment.
 
 - [ ] **Step 6: Prove pack isolation and coverage fallback**
@@ -582,8 +582,8 @@ corpus testing, tsup.
   Assert that a repository enabling only `sql` never loads TypeScript context,
   a repository enabling only `typescript` never loads the SQL parser, and a
   Python file never receives a TypeScript pack diagnostic. Disable each pack
-  and assert its outcomes return `fallback`. Assert RP-16A is enforced only by
-  the Playwright adapter while RP-16B remains fallback. Inject a parser
+  and assert its outcomes return `fallback`. Assert avlint-ts-054 is enforced only by
+  the Playwright adapter while avlint-common-011 remains fallback. Inject a parser
   limitation and a mixed supported/unsupported Playwright capability and prove
   the tagged result sends only the affected files and capabilities to
   fallback.

@@ -117,28 +117,28 @@ Use native Pylint rules when exact:
 
 | Canonical ID | Python owner |
 | --- | --- |
-| GD-03 | Pylint missing-docstring rules with public/private exceptions for modules, classes, functions, and methods |
-| GD-07 | Pylint `too-many-lines` with migration, generated, dependency, and cache exclusions |
-| GD-09 | Pylint `disallowed-name` configuration |
+| avlint-common-005 | Pylint missing-docstring rules with public/private exceptions for modules, classes, functions, and methods |
+| avlint-common-007 | Pylint `too-many-lines` with migration, generated, dependency, and cache exclusions |
+| avlint-common-008 | Pylint `disallowed-name` configuration |
 
 `pylint-avandar` supplies:
 
 | Canonical ID | Checker type |
 | --- | --- |
-| GD-01, GD-02 | Raw/token checker for comments and docstrings |
-| GD-03 | Astroid checker for undocumented public values and constants not covered by Pylint's native missing-docstring family |
-| GD-06 | Astroid function and method span checker at 45 lines |
-| GD-22 | Astroid collection-loop checker with reasoned-disable support |
-| GD-25 | Astroid pytest and unittest assertion checker |
+| avlint-common-003, avlint-common-004 | Raw/token checker for comments and docstrings |
+| avlint-common-005 | Astroid checker for undocumented public values and constants not covered by Pylint's native missing-docstring family |
+| avlint-common-006 | Astroid function and method span checker at 45 lines |
+| avlint-common-009 | Astroid collection-loop checker with reasoned-disable support |
+| avlint-common-010 | Astroid pytest and unittest assertion checker |
 
-AF-06 is not applicable to Python docstrings. A function's first string
+avlint-common-001 is not applicable to Python docstrings. A function's first string
 literal has runtime documentation semantics and is not equivalent to a
-comment. AF-07 applies to a short multi-line Python docstring only when the
+comment. avlint-common-002 applies to a short multi-line Python docstring only when the
 generic companion can collapse it without changing value, indentation,
 prefix, quoting, escapes, or runtime documentation semantics.
 
 Pylint custom checkers diagnose but do not provide a standard safe-fix
-channel. Any future Python AF edit runs through `avandar-lint check --fix`.
+channel. Any future Python safe-fix edit runs through `avandar-lint check --fix`.
 
 The distribution supports normal Pylint plugin loading, contains checker unit
 tests, and ships a configuration fragment or documented `pyproject.toml`
@@ -150,23 +150,23 @@ Use native rules when exact:
 
 | Canonical ID | Rust owner |
 | --- | --- |
-| GD-03 | rustc `missing_docs` |
-| GD-06 | Clippy `too_many_lines` at 45 |
-| GD-09 | Clippy `disallowed_names` |
+| avlint-common-005 | rustc `missing_docs` |
+| avlint-common-006 | Clippy `too_many_lines` at 45 |
+| avlint-common-008 | Clippy `disallowed_names` |
 
 Use `avandar-dylint` for semantic gaps:
 
 | Canonical ID | Dylint responsibility |
 | --- | --- |
-| GD-22 | Collection loops lacking a reasoned exception |
-| GD-25 | Assertion-free `#[test]` functions and closed tautological assertions |
+| avlint-common-009 | Collection loops lacking a reasoned exception |
+| avlint-common-010 | Assertion-free `#[test]` functions and closed tautological assertions |
 
 Dylint uses unstable rustc internals, so the package pins its toolchain,
 records the required version in catalog metadata, and tests an intentional
 toolchain-mismatch failure with a recovery message. It does not own lexical
 comments or whole-file metrics.
 
-The generic companion owns Rust AF-06, AF-07, GD-01, GD-02, and GD-07 because
+The generic companion owns Rust avlint-common-001, avlint-common-002, avlint-common-003, avlint-common-004, and avlint-common-007 because
 source comments and exact file metrics are cheaper and more stable outside
 HIR.
 
@@ -177,8 +177,8 @@ The pack has four shared layers:
 | Layer | Responsibility |
 | --- | --- |
 | File classifier | Extension, shebang, generated-file, migration, dependency, cache, and configured-language decisions |
-| Lexical adapters | Comment and docstring ranges, GD-01 punctuation, GD-02 width, and file metrics |
-| Structural adapters | Declaration and function-body ownership, AF-06 and AF-07 safe edits, public declarations, function spans, identifiers, collection loops, test declarations and assertions |
+| Lexical adapters | Comment and docstring ranges, avlint-common-003 punctuation, avlint-common-004 width, and file metrics |
+| Structural adapters | Declaration and function-body ownership, avlint-common-001 and avlint-common-002 safe edits, public declarations, function spans, identifiers, collection loops, test declarations and assertions |
 | Framework registry | Test and E2E APIs, database mutation signatures, page-load boundary, cleanup paths |
 
 Tree-sitter adapters implement structural queries where a native extension does
@@ -199,7 +199,7 @@ disabled regions cannot be mistaken for comments.
 
 ## Generic E2E rule split
 
-RP-16A remains in the TypeScript/Playwright pack. RP-16B is generic and uses a
+avlint-ts-054 remains in the TypeScript/Playwright pack. avlint-common-011 is generic and uses a
 configured framework registry. Each framework adapter declares:
 
 - test declaration and lifecycle APIs;
@@ -214,7 +214,7 @@ visible cleanup path. Unknown client calls and frameworks remain fallback.
 
 ## Fix and diagnostic contract
 
-The generic pack may fix only AF-06 shapes whose comment conversion is exact,
+The generic pack may fix only avlint-common-001 shapes whose comment conversion is exact,
 local, and idempotent. Every other generic rule is diagnostic-only because the
 correct punctuation, documentation, extraction, name, functional rewrite, or
 test assertion requires judgment.
@@ -252,8 +252,8 @@ files and capabilities.
 The completion baseline is not satisfied by cataloging every cell as
 fallback. Python and Rust must enforce every applicable canonical rule listed
 for them above, including Python public values. Every declared remaining
-language must enforce AF-06, AF-07, GD-01, GD-02, GD-03, GD-06, GD-07, GD-09,
-GD-22, and GD-25 wherever its syntax supports the convention. RP-16B must be
+language must enforce avlint-common-001, avlint-common-002, avlint-common-003, avlint-common-004, avlint-common-005, avlint-common-006, avlint-common-007, avlint-common-008,
+avlint-common-009, and avlint-common-010 wherever its syntax supports the convention. avlint-common-011 must be
 enforced for every framework explicitly listed in the repository
 configuration. `fallback` is accepted only for an enumerated parser or syntax
 limitation, an unregistered framework or API, a missing or unavailable tool,
@@ -274,7 +274,7 @@ one parse tree per file.
 
 ## Skill handoff
 
-After matrix closure, the normal review path contains only JR detection,
+After matrix closure, the normal review path contains only judgment detection,
 changed-disable-reason judgment, and fallback orchestration. The deterministic
 fallback checklist remains packaged with the skill for:
 
@@ -300,7 +300,7 @@ language reach.
   the coverage closure contract.
 - Every generic rule-language-file-capability outcome is `enforced`,
   `not-applicable`, or proven `fallback`; none is silently omitted.
-- CSS coverage includes GD-01 and AF-20 but does not invent unrelated generic
+- CSS coverage includes avlint-common-003 and avlint-css-001 but does not invent unrelated generic
   CSS rules.
 - Shell, YAML, and JSONC comment rules use the generic companion; JSON is
   explicitly not applicable.

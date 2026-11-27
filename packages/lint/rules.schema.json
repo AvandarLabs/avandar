@@ -43,7 +43,6 @@
         "required": [
           "id",
           "slug",
-          "class",
           "title",
           "scope",
           "applicability",
@@ -60,9 +59,6 @@
           "slug": {
             "type": "string",
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-          },
-          "class": {
-            "enum": ["AF", "GD", "RP", "JR"]
           },
           "title": {
             "type": "string",
@@ -121,8 +117,8 @@
           {
             "if": {
               "properties": {
-                "class": {
-                  "const": "JR"
+                "repair": {
+                  "const": "judgment"
                 }
               }
             },
@@ -130,9 +126,6 @@
               "properties": {
                 "owner": {
                   "const": "avandar-code-review"
-                },
-                "repair": {
-                  "const": "judgment"
                 },
                 "phases": {
                   "maxItems": 0,
@@ -148,54 +141,6 @@
                 "phases": {
                   "minItems": 1,
                   "type": "array"
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "class": {
-                  "const": "AF"
-                }
-              }
-            },
-            "then": {
-              "properties": {
-                "repair": {
-                  "const": "safe"
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "class": {
-                  "const": "GD"
-                }
-              }
-            },
-            "then": {
-              "properties": {
-                "repair": {
-                  "const": "guided"
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "class": {
-                  "const": "RP"
-                }
-              }
-            },
-            "then": {
-              "properties": {
-                "repair": {
-                  "const": "evidence"
                 }
               }
             }

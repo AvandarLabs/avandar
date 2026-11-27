@@ -72,9 +72,9 @@ module and test layout checks, CSS rules, and skill pruning.
 
 Create follow-up plans after Task 9 for:
 
-1. Avandar-specific type-aware rules: GD-17, GD-20, GD-28, GD-29, GD-31,
-   RP-09, RP-13, and RP-15, plus AF-03 type exports and AF-05.
-2. SQL-aware rules: AF-21 and RP-10 through RP-12, RP-17, and RP-18.
+1. Avandar-specific type-aware rules: avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038, avlint-ts-040,
+   avlint-ts-050, avlint-ts-051, and avlint-ts-053, plus avlint-ts-003 type exports and avlint-ts-005.
+2. SQL-aware rules: avlint-sql-001 and avlint-sql-002 through avlint-sql-004, avlint-sql-005, and avlint-sql-006.
 3. Lower-priority repo graph rules not shipped by Task 7.
 
 Do not mix those parser and type-checker decisions into the plugin foundation.
@@ -83,26 +83,26 @@ Do not mix those parser and type-checker decisions into the plugin foundation.
 
 | Inventory rows | Delivery |
 | --- | --- |
-| AF-01 through AF-04 | Task 2, except AF-03 type exports move to the type-aware follow-up |
-| AF-05 | Type-aware follow-up |
-| AF-06, AF-07, AF-11 | Task 3 |
-| AF-08 through AF-10, AF-12 through AF-17 | Task 4 |
-| AF-18 | Type-aware follow-up |
-| AF-19 | Audit the existing native configuration in Task 2; RP-06 owns unresolved graph cases |
-| AF-20 | Task 8 |
-| AF-21 | SQL follow-up |
-| GD-01 | Task 1 |
-| GD-02 | Already enforced; Task 9 removes its duplicate review searches |
-| GD-03 through GD-05 | Task 3 |
-| GD-06 through GD-10, GD-13, GD-14, GD-19, native GD-23 and native GD-25 | Task 5 |
-| GD-11, GD-12, GD-15, GD-16, GD-18, GD-21 through GD-27, and GD-30 | Tasks 4, 6, and 8 as named in their interfaces |
-| GD-17, GD-20, GD-28, GD-29, GD-31 | Type-aware follow-up |
-| RP-01 through RP-04 and RP-07 | Task 7 |
-| RP-08 selector enforcement | Task 8; component ownership moves to the repo-graph follow-up |
-| RP-05, RP-06, RP-14, RP-16, RP-19 | Repo-graph follow-up |
-| RP-09, RP-13, RP-15 | Type-aware follow-up |
-| RP-10 through RP-12, RP-17, RP-18 | SQL follow-up |
-| JR-01 through JR-17 | Task 9 retains them in judgment review |
+| avlint-ts-001 through avlint-ts-004 | Task 2, except avlint-ts-003 type exports move to the type-aware follow-up |
+| avlint-ts-005 | Type-aware follow-up |
+| avlint-common-001, avlint-common-002, avlint-ts-009 | Task 3 |
+| avlint-ts-006 through avlint-ts-008, avlint-ts-010 through avlint-ts-014 | Task 4 |
+| avlint-ts-015 | Type-aware follow-up |
+| avlint-ts-016 | Audit the existing native configuration in Task 2; avlint-ts-047 owns unresolved graph cases |
+| avlint-css-001 | Task 8 |
+| avlint-sql-001 | SQL follow-up |
+| avlint-common-003 | Task 1 |
+| avlint-common-004 | Already enforced; Task 9 removes its duplicate review searches |
+| avlint-common-005 through avlint-ts-019 | Task 3 |
+| avlint-common-006 through avlint-ts-021, avlint-ts-024, avlint-ts-025, avlint-ts-030, native avlint-ts-033 and native avlint-common-010 | Task 5 |
+| avlint-ts-022, avlint-ts-023, avlint-ts-026, avlint-ts-027, avlint-ts-029, avlint-ts-032 through avlint-ts-036, and avlint-ts-039 | Tasks 4, 6, and 8 as named in their interfaces |
+| avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038, avlint-ts-040 | Type-aware follow-up |
+| avlint-ts-042 through avlint-ts-045 and avlint-ts-048 | Task 7 |
+| avlint-ts-049 selector enforcement | Task 8; component ownership moves to the repo-graph follow-up |
+| avlint-ts-046, avlint-ts-047, avlint-ts-052, avlint-ts-054, avlint-common-011, avlint-ts-055 | Repo-graph follow-up |
+| avlint-ts-050, avlint-ts-051, avlint-ts-053 | Type-aware follow-up |
+| avlint-sql-002 through avlint-sql-004, avlint-sql-005, avlint-sql-006 | SQL follow-up |
+| avlint-common-012 through avlint-ts-058 | Task 9 retains them in judgment review |
 
 ## File structure
 
@@ -113,7 +113,7 @@ Do not mix those parser and type-checker decisions into the plugin foundation.
 | `oxlint-plugin-avandar/vitest.config.ts` | Node-only plugin test environment |
 | `oxlint-plugin-avandar/rules/*.js` | One current-file rule per module |
 | `oxlint-plugin-avandar/rules/*.test.ts` | Rule behavior, fixer, and safety-boundary fixtures |
-| `docs/lint-rules/*.md` | On-demand repair guidance for branching GD rules |
+| `docs/lint-rules/*.md` | On-demand repair guidance for branching guided rules |
 | `scripts/lint-avandar/index.ts` | Repo analyzer CLI and diagnostic formatting |
 | `scripts/lint-avandar/LintDiagnostic.types.ts` | Shared diagnostic contract |
 | `scripts/lint-avandar/rules/*.ts` | One repository rule family per module |
@@ -179,7 +179,7 @@ Use a temporary directory per fixture, an absolute plugin specifier, Oxlint's
 JSON formatter for parsed assertions, and the agent formatter for message
 contract assertions. Always remove the temporary directory in `finally`.
 
-- [ ] **Step 3: Implement GD-01 without a fixer**
+- [ ] **Step 3: Implement avlint-common-003 without a fixer**
 
 `avandar/no-em-dash-in-comments` reports U+2014 only in comments. It ignores
 strings, templates, regular expressions, and JSX text. Its normal message
@@ -248,10 +248,10 @@ git commit -m "feat(lint): add Avandar Oxlint plugin foundation"
 
 **Interfaces:**
 
-- Enables AF-01 `curly`, AF-02 `prefer-template`, AF-03
+- Enables avlint-ts-001 `curly`, avlint-ts-002 `prefer-template`, avlint-ts-003
   `typescript/consistent-type-imports`, and its safe fixer.
-- Keeps AF-04 `typescript/prefer-as-const` enabled.
-- Does not enable type-aware AF-03 exports or AF-05 in this task.
+- Keeps avlint-ts-004 `typescript/prefer-as-const` enabled.
+- Does not enable type-aware avlint-ts-003 exports or avlint-ts-005 in this task.
 
 - [ ] **Step 1: Capture candidate counts and baseline timing**
 
@@ -307,24 +307,24 @@ Stop and profile if the global performance gate fires.
 
 **Interfaces:**
 
-- Implements AF-06, AF-07, AF-11, GD-03, GD-04, and GD-05.
-- AF-11 and GD-05 are separate message IDs in one exported-key rule. The first
+- Implements avlint-common-001, avlint-common-002, avlint-ts-009, avlint-common-005, avlint-ts-018, and avlint-ts-019.
+- avlint-ts-009 and avlint-ts-019 are separate message IDs in one exported-key rule. The first
   moves an existing comment only within its proven safety boundary. The second
   asks for judgment when useful text does not already exist.
 
 - [ ] **Step 1: Write failing rule fixtures**
 
-Each AF rule gets positive, negative, fixed-output, idempotence, and every
-Review Focus safety fixture. Each GD rule proves its location, message, linked
+Each safe-fix rule gets positive, negative, fixed-output, idempotence, and every
+Review Focus safety fixture. Each guided rule proves its location, message, linked
 doc path, exclusions for test and type-collection files, and unchanged
 `--fix` output.
 
-- [ ] **Step 2: Implement AF-06 and AF-07**
+- [ ] **Step 2: Implement avlint-common-001 and avlint-common-002**
 
 Use comment attachment and token ranges from the Oxlint plugin API. Preserve
 indentation and comment text exactly apart from the delimiter or line shape.
 
-- [ ] **Step 3: Implement AF-11 and GD-03 through GD-05**
+- [ ] **Step 3: Implement avlint-ts-009 and avlint-common-005 through avlint-ts-019**
 
 Skip declarations whose documentation comes from an explicitly annotated
 interface. Never write placeholder prose. Never delete a detached comment as
@@ -332,7 +332,7 @@ a fix.
 
 - [ ] **Step 4: Enable the rules and repair existing diagnostics**
 
-Run safe fixes first. Resolve GD hits from the diagnostics and on-demand docs,
+Run safe fixes first. Resolve guided hits from the diagnostics and on-demand docs,
 without invoking the full review skill.
 
 - [ ] **Step 5: Verify, benchmark, and commit**
@@ -374,13 +374,13 @@ git commit -m "feat(lint): enforce comment and documentation structure"
 
 **Interfaces:**
 
-- Implements AF-08 through AF-10 and AF-12 through AF-17.
+- Implements avlint-ts-006 through avlint-ts-008 and avlint-ts-010 through avlint-ts-014.
 - `prefer-function-declaration` and `prefer-nested-arrow-functions` emit a
-  no-fixer `unsafeRewrite` diagnostic outside their AF safety boundary.
+  no-fixer `unsafeRewrite` diagnostic outside their safe-fix safety boundary.
 - Rename rules use scope references and reject any export, collision,
   computed/string reference, or unresolved reference.
 
-- [ ] **Step 1: Write failing tests for every AF and unsafe boundary**
+- [ ] **Step 1: Write failing tests for every safe-fix and unsafe boundary**
 
 Include lexical `this`, `arguments`, recursion, overloads, hoisting, name
 collision, exported symbol, computed property, type reference, JSX reference,
@@ -430,8 +430,8 @@ git commit -m "feat(lint): add safe Avandar convention fixers"
 
 **Interfaces:**
 
-- Enables GD-06 through GD-10, GD-13, GD-14, GD-19, the native part of GD-23,
-  and the native part of GD-25.
+- Enables avlint-common-006 through avlint-ts-021, avlint-ts-024, avlint-ts-025, avlint-ts-030, the native part of avlint-ts-033,
+  and the native part of avlint-common-010.
 - Uses `max-lines`, `max-lines-per-function`, `import/no-default-export`,
   `id-denylist`, `react/jsx-handler-names`, `react/no-multi-comp`,
   `typescript/consistent-type-definitions`,
@@ -524,11 +524,11 @@ git commit -m "feat(lint): add deterministic guided gates"
 **Interfaces:**
 
 - Every rule ID and message maps to one row in the spec inventory.
-- GD-22 treats a reasoned inline disable as the representation of an allowed
+- avlint-common-009 treats a reasoned inline disable as the representation of an allowed
   async-sequencing, early-exit, hot-path, or framework exception.
-- GD-26 reports only the closed display positions and translation-function
+- avlint-ts-035 reports only the closed display positions and translation-function
   escape shapes listed in `docs/rules/i18n.md`.
-- GD-30 reports only static styles and closed Tailwind syntax. Dynamic style
+- avlint-ts-039 reports only static styles and closed Tailwind syntax. Dynamic style
   expressions remain outside the rule.
 
 - [ ] **Step 1: Break this task into reviewable rule batches**
@@ -595,7 +595,7 @@ Repeat Steps 2 through 5 for every batch.
 - `pnpm lint:repo` runs the analyzer across the repository.
 - Root `pnpm lint` runs Oxlint, Stylelint, then `pnpm lint:repo` before the
   non-blocking React Doctor command.
-- This task implements RP-01 through RP-04 and RP-07. RP-05 and RP-06 receive
+- This task implements avlint-ts-042 through avlint-ts-045 and avlint-ts-048. avlint-ts-046 and avlint-ts-047 receive
   a follow-up batch after these tree primitives are stable.
 
 - [ ] **Step 1: Write formatter and path-discovery tests**
@@ -653,7 +653,7 @@ git commit -m "feat(lint): enforce module and test layout"
 
 **Interfaces:**
 
-- Implements AF-20 and the selector half of RP-08.
+- Implements avlint-css-001 and the selector half of avlint-ts-049.
 - `avandar/comment-shape` safely fixes delimiter and leading-marker shape.
 - `avandar/domain-class-prefix` reports a CSS Module class whose closed prefix
   does not match the component module basename. It has no fixer.
@@ -701,16 +701,16 @@ before editing the skill.
   `agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/`
 - Modify: corresponding canonical files under `docs/rules/`
 - Modify: `docs/code-reviews/extra-checklist.md` and referenced rulesets only
-  for shipped RP rules
+  for shipped evidence rules
 - Create or modify: skill validation fixtures required by `writing-skills`
 
 **Interfaces:**
 
 - Review starts by running safe formatting and `pnpm lint` before loading
   judgment checklists.
-- A green lint run suppresses all shipped AF, GD, and RP detector prose and
+- A green lint run suppresses all shipped safe-fix, guided, and evidence detector prose and
   candidate searches.
-- The skill keeps JR rules, judgment repair guidance that is not already in a
+- The skill keeps judgment rules, judgment repair guidance that is not already in a
   lint doc, and review of changed disable reasons.
 - The skill does not contain a second catalog of lint rule explanations.
 
@@ -724,7 +724,7 @@ General Checks, phase checklists, library checklists, and repo-local references.
 
 Prove that a green-lint review does not ask agents to re-find shipped rules,
 that a changed disable reason is reviewed, and that mixed conventions retain
-their JR portion.
+their judgment portion.
 
 - [ ] **Step 3: Add the lint-first remediation protocol**
 
@@ -734,7 +734,7 @@ the judgment phases triggered by the diff.
 
 - [ ] **Step 4: Delete every duplicate shipped detector**
 
-Delete focused packs that no longer contain a JR rule. Otherwise retain the
+Delete focused packs that no longer contain a judgment rule. Otherwise retain the
 pack and remove only deterministic searches. Update the focused-review lane
 table and invocation syntax in the same change.
 
@@ -759,7 +759,7 @@ git commit -m "docs(review): delegate deterministic checks to lint"
 **Interfaces:**
 
 - Produces final cold and warm timings for Oxlint alone and full `pnpm lint`.
-- Produces a final ownership matrix with no AF, GD, or shipped RP detector left
+- Produces a final ownership matrix with no safe-fix, guided, or shipped evidence detector left
   in judgment review.
 
 - [ ] **Step 1: Run all focused suites**

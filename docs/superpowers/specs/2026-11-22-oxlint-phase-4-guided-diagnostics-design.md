@@ -19,7 +19,7 @@ outcomes.
 
 ## Goals
 
-- Add every Phase 4 current-file GD rule that Oxlint or Stylelint can own.
+- Add every Phase 4 current-file guided rule that Oxlint or Stylelint can own.
 - Define one agent-efficient diagnostic and documentation contract.
 - Require a non-empty reason when an Avandar rule is disabled.
 - Keep judgment repairs out of automatic fix paths.
@@ -27,7 +27,7 @@ outcomes.
   catalog.
 - Move only covered detector-language-file-capability outcomes out of the
   normal review path.
-- Leave JR detection and changed-disable-reason review in the skill.
+- Leave judgment detection and changed-disable-reason review in the skill.
 
 ## Non-goals
 
@@ -38,7 +38,7 @@ outcomes.
 - Phase 4 does not claim that TypeScript coverage satisfies a generic rule for
   another language.
 - Phase 4 does not make unsafe edits to reduce diagnostic count.
-- Phase 4 does not remove JR conventions from `avandar-code-review`.
+- Phase 4 does not remove judgment conventions from `avandar-code-review`.
 
 ## Diagnostic architecture
 
@@ -74,23 +74,23 @@ Phase 6 extends the same requirement to `avandar_pylint` and
 
 ## Rule scope
 
-Phase 4 owns GD-01 through GD-16, GD-18, GD-19, the current-file subset of
-GD-21, GD-22 through GD-27, GD-30, and GD-32 only for the TypeScript,
+Phase 4 owns avlint-common-003 through avlint-ts-027, avlint-ts-029, avlint-ts-030, the current-file subset of
+avlint-ts-032, avlint-common-009 through avlint-ts-036, avlint-ts-039, and avlint-ts-041 only for the TypeScript,
 JavaScript, JSX, TSX, and CSS applicability recorded below. The
-repository-aware GD-21 subset, GD-17, GD-20, GD-28, GD-29, and GD-31 move to
+repository-aware avlint-ts-032 subset, avlint-ts-028, avlint-ts-031, avlint-ts-037, avlint-ts-038, and avlint-ts-040 move to
 Phase 5.
 
 | Batch | Inventory | Enforcement and coverage |
 | --- | --- | --- |
-| Native guided rules | GD-06 through GD-10, GD-12 through GD-14, GD-19, native parts of GD-22, GD-23, GD-25, GD-32 | Native Oxlint for TS/JS paths only |
-| Comments and public contracts | GD-01 through GD-05 | `@avandar/lint-typescript/oxlint`; GD-01 through GD-03 remain fallback for other languages |
-| TypeScript and API shape | GD-11, GD-15, GD-16, GD-18, current-file GD-21, custom GD-22 | `@avandar/lint-typescript/oxlint` |
-| React, tests, localization, modules | GD-23 through GD-27 | `@avandar/lint-typescript/oxlint`; generic GD-25 remains fallback elsewhere |
-| CSS comment punctuation | CSS part of GD-01 | `@avandar/lint-css/stylelint` |
-| Static UI styling | GD-30 | Oxlint plus Stylelint |
+| Native guided rules | avlint-common-006 through avlint-ts-021, avlint-ts-023 through avlint-ts-025, avlint-ts-030, native parts of avlint-common-009, avlint-ts-033, avlint-common-010, avlint-ts-041 | Native Oxlint for TS/JS paths only |
+| Comments and public contracts | avlint-common-003 through avlint-ts-019 | `@avandar/lint-typescript/oxlint`; avlint-common-003 through avlint-common-005 remain fallback for other languages |
+| TypeScript and API shape | avlint-ts-022, avlint-ts-026, avlint-ts-027, avlint-ts-029, current-file avlint-ts-032, custom avlint-common-009 | `@avandar/lint-typescript/oxlint` |
+| React, tests, localization, modules | avlint-ts-033 through avlint-ts-036 | `@avandar/lint-typescript/oxlint`; generic avlint-common-010 remains fallback elsewhere |
+| CSS comment punctuation | CSS part of avlint-common-003 | `@avandar/lint-css/stylelint` |
+| Static UI styling | avlint-ts-039 | Oxlint plus Stylelint |
 
-GD-02 does not gain CSS coverage because the live skill's CSS gate does not
-apply the 80-column comment rule. AF-20 remains the separate CSS comment-shape
+avlint-common-004 does not gain CSS coverage because the live skill's CSS gate does not
+apply the 80-column comment rule. avlint-css-001 remains the separate CSS comment-shape
 rule from Phase 3.
 
 Where a native rule proves only part of a convention, the Avandar rule covers
@@ -112,10 +112,10 @@ The normal agent flow is:
 4. rerun lint until green;
 5. run coverage for the reviewed paths;
 6. load deterministic fallback rules only for uncovered outcomes;
-7. run JR review and changed-disable-reason judgment.
+7. run judgment review and changed-disable-reason judgment.
 
-The fallback checklist keeps generic GD-01, GD-02, GD-03, GD-06, GD-07,
-GD-09, GD-22, and GD-25 available for other languages. TypeScript-specific
+The fallback checklist keeps generic avlint-common-003, avlint-common-004, avlint-common-005, avlint-common-006, avlint-common-007,
+avlint-common-008, avlint-common-009, and avlint-common-010 available for other languages. TypeScript-specific
 rules also remain available when a repository does not install or enable the
 corresponding lint implementation.
 
@@ -130,12 +130,12 @@ rules need the same facts.
 
 - Every in-scope TypeScript, JavaScript, JSX, TSX, or CSS violation is
   deterministically detected by Oxlint or Stylelint without a companion.
-- No rule is marked fixable unless its safe AF subset shipped in Phase 3.
+- No rule is marked fixable unless its safe safe-fix subset shipped in Phase 3.
 - Every branching repair is actionable without loading the review skill.
 - Every Avandar disable requires a reason.
 - Coverage integration fixtures prove each registered file and capability
   outcome through the root lint command.
 - Covered outcomes leave the normal full and focused lanes, while uncovered
   outcomes still load fallback detection.
-- JR-01 through JR-17 remain in `avandar-code-review`.
+- avlint-common-012 through avlint-ts-058 remain in `avandar-code-review`.
 - Root lint and package verification pass inside the performance threshold.

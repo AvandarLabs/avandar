@@ -35,7 +35,7 @@ describe("canonical catalog", () => {
     expect(
       catalog.rules
         .filter((rule) => {
-          return rule.class !== "JR";
+          return rule.repair !== "judgment";
         })
         .every((rule) => {
           return rule.applicability.length > 0 && rule.phases.length > 0;
@@ -44,7 +44,7 @@ describe("canonical catalog", () => {
     expect(
       catalog.rules
         .filter((rule) => {
-          return rule.class === "JR";
+          return rule.repair === "judgment";
         })
         .every((rule) => {
           return rule.owner === "avandar-code-review";
@@ -89,7 +89,7 @@ describe("canonical catalog", () => {
     }).toThrow("Catalog slug values must be unique");
   });
 
-  it("rejects repair classes that disagree with deterministic rule classes", () => {
+  it("rejects judgment repair on a lint-owned rule", () => {
     const catalog = loadRuleCatalog();
     expect(() => {
       return validateRuleCatalog({
@@ -112,7 +112,7 @@ describe("canonical catalog", () => {
     }).toThrow("Catalog namespace disagrees with avlint-sql-001");
   });
 
-  it.each(["AF-01", "avlint-ts-1", "avlint-go-001"])(
+  it.each(["ts-001", "avlint-ts-1", "avlint-go-001"])(
     "rejects a rule ID outside the avlint namespaces: %s",
     (id) => {
       const catalog = loadRuleCatalog();
@@ -164,7 +164,7 @@ describe("canonical catalog", () => {
     const catalog = loadRuleCatalog();
     const broad = catalog.rules.filter((rule) => {
       return (
-        rule.class === "JR" &&
+        rule.repair === "judgment" &&
         ![
           "avlint-ts-056",
           "avlint-ts-057",

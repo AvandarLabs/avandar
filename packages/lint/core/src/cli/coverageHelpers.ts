@@ -178,7 +178,7 @@ async function _getOutcomes({
   const outcomes = await Promise.all(
     catalog.rules
       .filter((rule) => {
-        return rule.class !== "JR";
+        return rule.repair !== "judgment";
       })
       .map(async (rule) => {
         const base: CoverageOutcome = {

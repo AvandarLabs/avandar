@@ -61,21 +61,21 @@ The Doctor command and its advisory exit handling are unchanged. The profiled
 measurement is retained as the pre-review result. Its 16,772 ms median was the
 preceding baseline for the review correction below.
 
-At that initial measurement, root native repair enabled AF-01 through AF-04.
-AF-05 remains disabled because native assertion removal breaks TypeScript 5.9 generic CRUD
-contracts. The initial 33-file exclusion attempt was discarded entirely. AF-19
+At that initial measurement, root native repair enabled avlint-ts-001 through avlint-ts-004.
+avlint-ts-005 remains disabled because native assertion removal breaks TypeScript 5.9 generic CRUD
+contracts. The initial 33-file exclusion attempt was discarded entirely. avlint-ts-016
 remains repair fallback because Oxlint 1.93.0 implements no safe extension fixer.
 No assertion-removal source edits or per-file assertion exceptions are retained.
 
 ## Review correction
 
 `phase-3-native-safe-rules-review-fixes` measures the corrected safe subset.
-AF-02 is now disabled and has no production safe probe: native `prefer-template`
+avlint-ts-002 is now disabled and has no production safe probe: native `prefer-template`
 changes custom object coercion and exposes no operand-restriction option.
 All 21 introduced template expressions were reverted. Ordinary root repair
 preserves concatenation, and every original template expression is unchanged.
-AF-05 and AF-19 remain fallback as recorded above. AF-01, both AF-03
-capabilities, and AF-04 retain proven coverage. A canonical seeded diagnostic
+avlint-ts-005 and avlint-ts-016 remain fallback as recorded above. avlint-ts-001, both avlint-ts-003
+capabilities, and avlint-ts-004 retain proven coverage. A canonical seeded diagnostic
 must itself have error severity; another capability's error cannot make a
 warning-only rule enforced.
 
@@ -88,10 +88,10 @@ now scans 364 files. **7,321 ms is the preceding warm median for the next batch.
 
 ## Comment and documentation batch
 
-The batch enables AF-06 standalone function-body prose, AF-07 short plain
-JSDoc, and AF-11 unambiguous exported-object documentation relocation. Root
+The batch enables avlint-common-001 standalone function-body prose, avlint-common-002 short plain
+JSDoc, and avlint-ts-009 unambiguous exported-object documentation relocation. Root
 safe repair changed 305 existing files: nine block-to-line comment repairs and
-426 short JSDoc collapses. No root AF-11 candidate met the narrow boundary.
+426 short JSDoc collapses. No root avlint-ts-009 candidate met the narrow boundary.
 Every one of the 435 comment-only hunks preserves prose. Independent TypeScript
 syntax-tree comparisons confirm unchanged code in all 305 files. Generated
 files and compiled Lingui catalogs were excluded. A subsequent whole-root
@@ -127,9 +127,9 @@ and no Doctor configuration or process scheduler was changed.
 Coverage inserts custom diagnostic seeds into the existing serialized per-file
 native proof run. This adds no engine invocations per reviewed file. The known
 per-file serial latency remains. Safe comment capabilities can be enforced,
-but every custom AF rule also retains an explicit `unsupported-shapes`
+but every custom safe-fix rule also retains an explicit `unsupported-shapes`
 fallback. No exact classifier proves their absence, so rule-level review
-fallback IDs must remain active. Non-JS AF-06/AF-07 outcomes also stay fallback.
+fallback IDs must remain active. Non-JS avlint-common-001/avlint-common-002 outcomes also stay fallback.
 
 | Comment batch package | Tarball bytes |
 | --- | --- |
@@ -143,7 +143,7 @@ comment rules. **19,093 ms is the preceding warm median for the next batch.**
 
 ## Function declarations and private helpers
 
-The function batch enables AF-08, AF-09, and AF-10 for narrowly proved direct
+The function batch enables avlint-ts-006, avlint-ts-007, and avlint-ts-008 for narrowly proved direct
 call shapes. The complete root ordinary safe-fix pass found **zero eligible
 existing source candidates**. No application, generated, or compiled catalog
 files changed. Every changed and new file was byte-identical after the next
@@ -162,8 +162,8 @@ covering TypeScript and native tests pass, as do the refreshed root fix and
 main TypeScript build checks. The completed timing row is retained rather than
 repeating six samples for this small additional refusal check.
 
-AF-08 and AF-09 reject hoisting, recursion, overloads, escapes, lexical bindings,
-and competing repair syntax. AF-10 requires scope-proved calls inside the
+avlint-ts-006 and avlint-ts-007 reject hoisting, recursion, overloads, escapes, lexical bindings,
+and competing repair syntax. avlint-ts-008 requires scope-proved calls inside the
 immediately adjacent exported function and rejects unresolved-name capture.
 These stable boundaries keep native fixes, comment fixes, and independently
 disabled function rules separate in one ordinary native fix invocation. Each
@@ -175,10 +175,10 @@ proof scheduler and cache are unchanged.
 
 ## Component props, local acronym and JSX ternaries
 
-This batch enables AF-12, AF-13 and AF-14 for their narrow proved subsets.
+This batch enables avlint-ts-010, `local-e2e-casing` (removed) and avlint-ts-011 for their narrow proved subsets.
 The complete-root ordinary application changes one source file: the private
 `EditableProps` alias and its parameter reference become `Props`. It applies
-no existing AF-13 or AF-14 candidates. Unknown scalar JSX conditions retain
+no existing `local-e2e-casing` (removed) or avlint-ts-011 candidates. Unknown scalar JSX conditions retain
 exact values, and the supported boolean ternary uses `false` as its false arm.
 
 The preceding warm median is **7,550 ms**. Samples below run sequentially
@@ -209,7 +209,7 @@ scheduler remain intact.
 
 ## Property helpers and straight-line collections
 
-This batch enables AF-15, AF-16 and AF-17 for their documented conservative
+This batch enables avlint-ts-012, avlint-ts-013 and avlint-ts-014 for their documented conservative
 subsets. The complete root ordinary safe-fix application finds no eligible
 existing source candidates in any family. All 10,293 selected files are
 byte-identical across consecutive ordinary fix passes. The 193 tracked
@@ -231,21 +231,21 @@ not establish causal attribution for the small median difference.
 The completed measurement precedes the final declaration-envelope correction.
 Native keyword normalization reserves the entire declaration. Both construction
 rules therefore retain the initializer and construct at the final return,
-keeping all custom fix spans after the declaration. AF-16 rejects annotated
-bindings. AF-17 now requires typed TS/TSX primitive arrays, an existing helper,
+keeping all custom fix spans after the declaration. avlint-ts-013 rejects annotated
+bindings. avlint-ts-014 now requires typed TS/TSX primitive arrays, an existing helper,
 and ordinary Array intrinsics. The same visitors and serialized proof scheduler
 remain, with no additional engine invocations. The single completed benchmark
 is retained for this narrow correction; root correctness gates were refreshed.
 
-AF-15 map and equality probes have independent seed spans. Utility seeds add no
-imports or module markers, and AF-17 seeds satisfy the explicit array-type
+avlint-ts-012 map and equality probes have independent seed spans. Utility seeds add no
+imports or module markers, and avlint-ts-014 seeds satisfy the explicit array-type
 boundary only for TS/TSX. Unsupported shapes retain fallback throughout.
 
 **7,468 ms is the preceding warm median for the next batch.**
 
 ## CSS comment markers
 
-The CSS batch enables AF-20 for standalone ordinary prose comment nodes using
+The CSS batch enables avlint-css-001 for standalone ordinary prose comment nodes using
 Stylelint and PostCSS source ranges. Repairs only change comment delimiters,
 spacing and leading markers. Declaration documentation, legal notices,
 directives, maps, hacks, inline comments, ambiguous markers and repairs beyond
@@ -285,7 +285,7 @@ CSS coverage uses the real repository, original filename, full root path
 selection, actual error-severity seed and nonzero child status. Overrides,
 disables, missing engines/plugins, unknown commands and operational failures
 remain fail-closed. Unsupported syntax retains an independent fallback
-outcome. The native proof scheduler and native AF rule boundaries are unchanged;
+outcome. The native proof scheduler and native safe-fix rule boundaries are unchanged;
 CSS proof startup and full-selection cost remain for later scaling work.
 
 The plugin leaves parsed source-map comment nodes intact. Stylelint/PostCSS
@@ -305,9 +305,9 @@ seed range. Unknown envelopes, truncation indicators, runtime/configuration
 errors, stderr, unexpected exits and incomplete output fail closed. The engine's
 nested-config output can legitimately report `number_of_rules: null`.
 
-AF-08/09/10 additionally require the early AF-13 error diagnostic as a witness
+avlint-ts-006, avlint-ts-007, avlint-ts-008 additionally require the early `local-e2e-casing` (removed) error diagnostic as a witness
 of an original AST import/export marker. This witness precedes every synthetic
-module marker. A script, textual marker, disabled/warning/suppressed AF-13 rule,
+module marker. A script, textual marker, disabled/warning/suppressed `local-e2e-casing` (removed) rule,
 or missing witness leaves those function capabilities in fallback with context
 recovery. Function fixer behavior is unchanged. Every custom rule still has its
 independent `unsupported-shapes` fallback.
@@ -321,7 +321,7 @@ config references to their original files. Aliases, overrides and rule settings
 are preserved without flattening. Root/nested string/object plugin fixtures
 also review the plugin and its helper, proving that seeded copies never execute
 as engine plugins. Import origins alone do not establish runtime applicability:
-custom AF proofs also require the actual host-resolved, version-matched official
+custom safe-fix proofs also require the actual host-resolved, version-matched official
 Avandar implementation, a static public export and explicit canonical alias.
 Conditional/package wrappers, ambiguous declaration groups and inherited custom
 plugin contexts remain fallback. The official extension and utility-directory
@@ -354,7 +354,7 @@ covered by focused process-failure tests. Root/subcommand help remains lazy and
 JSON stdout remains machine-clean.
 
 Shared multi-file seed batching is deliberately not enabled. Its closed
-AF-03 dependency and cross-seeded config/plugin/import independence gates have
+avlint-ts-003 dependency and cross-seeded config/plugin/import independence gates have
 not been established. Isolated proofs avoid batch poisoning and preserve
 conservative semantics, but still pay one engine startup and one mirror per
 native path. CSS is unchanged: its provider starts at most one Node proof child
@@ -370,9 +370,9 @@ The public review skill runs configured lint and exact-path coverage before
 selecting deterministic detectors. Exact operational enforced/not-applicable
 outcomes omit only the matching rule, language, file and capability. Missing,
 partial, unsupported, disabled, excluded, operationally failed, unknown-language
-and summary-only evidence retains fallback. Native AF-02/05/19 and JS AF-17
-remain outside safe repair. Plain CSS gets AF-20 fallback independently of the
-CSS-module review phase. All JR/contextual obligations and AF-18/21 remain.
+and summary-only evidence retains fallback. Native avlint-ts-002, avlint-ts-005, avlint-ts-016 and JS avlint-ts-014
+remain outside safe repair. Plain CSS gets avlint-css-001 fallback independently of the
+CSS-module review phase. All judgment/contextual obligations and avlint-ts-015, avlint-sql-001 remain.
 
 The core skill is 569 lines after coherent extraction of its existing focused
 packs, execution pipeline, common/general checks and repo-local routing.
@@ -499,11 +499,11 @@ the seed. Original cwd/path, selection, severity, disableFix, suppression and
 operational contracts remain; native evidence stays independent.
 
 The CSS fixer also refuses mixed LF/CRLF within a prose comment, preserving its
-exact bytes. Homogeneous LF/CRLF support remains. AF-17 refusal fixtures now use
+exact bytes. Homogeneous LF/CRLF support remains. avlint-ts-014 refusal fixtures now use
 typed native inputs, existing `isDefined` and valid primitive annotations, with
 an eligible positive and explicit JavaScript fallback. All four named oversized
 source/test units, including the native adapter, were split at behavior boundaries.
-Extracted AF-05/06/16 fallback pointers now link to their contextual rules.
+Extracted avlint-ts-005, avlint-common-001, avlint-ts-013 fallback pointers now link to their contextual rules.
 
 Cleanup assertions now inspect only fixture-owned mirror paths. Core test setup
 copies source/config into owned temporary packages, builds and packs the three
@@ -532,7 +532,7 @@ produced 12 failures with 2 positive controls passing; static-wrapper identity
 produced 1 failure; named-module/object-default registration produced 2 failures
 with the official-final positive passing. The unrelated-mirror fixture failed
 the old global temporary inventory assertion. Both mixed-ending fixtures failed
-before refusal was added. Removing AF-17 undefined/candidate guard clauses caused
+before refusal was added. Removing avlint-ts-014 undefined/candidate guard clauses caused
 3 expected typed-fixture failures; the production rule was restored unchanged.
 
 ### Latest measured compressed archives

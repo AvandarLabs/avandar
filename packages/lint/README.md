@@ -41,7 +41,7 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | avlint-common-008 | closed-vague-identifier-denylist | Closed vague-identifier denylist | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Identifier equals an approved denied name |
 | avlint-ts-021 | event-handlers-use-on | Event handlers use `on...` | typescript, javascript | guided | 4 | lint | Proven handler position uses disallowed name |
 | avlint-ts-022 | helpers-appear-before-exports-that-use-them | Helpers appear before exports that use them | typescript, javascript | guided | 4 | lint | Same-file dependency order violates exceptions |
-| avlint-ts-023 | function-declaration-style-outside-af-shapes | Function declaration style outside AF shapes | typescript, javascript | guided | 4 | lint | Native/custom function-style diagnostic |
+| avlint-ts-023 | function-declaration-style-outside-safe-fix-shapes | Function declaration style outside safe-fix shapes | typescript, javascript | guided | 4 | lint | Native/custom function-style diagnostic |
 | avlint-ts-024 | object-types-prefer-type | Object types prefer `type` | typescript | guided | 4 | lint | Native type-definition diagnostic |
 | avlint-ts-025 | no-explicit-any | No explicit `any` | typescript | guided | 4 | lint | Native AST diagnostic |
 | avlint-ts-026 | no-double-assertions | No double assertions | typescript | guided | 4 | lint | `as unknown as` or `as any as` |
