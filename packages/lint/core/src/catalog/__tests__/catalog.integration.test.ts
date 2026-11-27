@@ -11,6 +11,8 @@ describe("canonical catalog", () => {
     const expected = [
       ...Array.from({ length: 21 }, (_, index) => {
         return `AF-${String(index + 1).padStart(2, "0")}`;
+      }).filter((id) => {
+        return id !== "AF-13";
       }),
       ...Array.from({ length: 32 }, (_, index) => {
         return `GD-${String(index + 1).padStart(2, "0")}`;

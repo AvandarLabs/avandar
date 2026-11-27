@@ -50,7 +50,6 @@ capabilities below never discharge a separate unsupported-shapes outcome.
 | AF-10 | `private-direct-calls` |
 | AF-11 | `one-to-one-module-key` |
 | AF-12 | `single-component-props` |
-| AF-13 | `local-primitive-bindings` |
 | AF-14 | `boolean-jsx-children` |
 | AF-15 | `literal-property-map`, `literal-property-equality` independently |
 | AF-16 | `fresh-data-object` |
@@ -314,16 +313,6 @@ A local Props name stays readable as a component is renamed. Verify ownership an
   grep -rEn '^(export )?type [A-Z][a-zA-Z]*Props\b' --include="*.tsx" . \
     | grep -Ev '\btype Props\b'
   ```
-
-## AF-13: Local E2e casing
-
-- Spell the acronym `E2e` inside camelCase/PascalCase local names, not `E2E`.
-  Treating acronyms as words keeps identifiers predictable. Check scope and
-  all references when renaming. Exceptions: UPPERCASE constants, environment
-  variables and external string contracts stay unchanged.
-
-  This is bad: `const localE2ECount = 1; consume(localE2ECount);`
-  This is good: `const localE2eCount = 1; consume(localE2eCount);`
 
 ## AF-14: JSX conditional ternaries
 

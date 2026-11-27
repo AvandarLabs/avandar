@@ -18,7 +18,7 @@ export const ROOT: string = resolve(import.meta.dirname, "../../../../../..");
 
 /** Source fixture retained byte-for-byte during plugin context probes. */
 export const ORIGINAL: string =
-  "export {};\nconst _originalE2ECount = 1;\nconsume(_originalE2ECount);\n";
+  "export {};\nconst _originalCount = 1;\nconsume(_originalCount);\n";
 
 /** Temporary fixture repositories cleaned up after each test. */
 export const directories: string[] = [];
@@ -29,7 +29,10 @@ export function createRuntimePluginRepository(parent: string = tmpdir()): {
   config: {
     categories: { correctness: string };
     jsPlugins: Array<{ name: string; specifier: string }>;
-    rules: { curly: string; "avandar/local-e2e-casing": string };
+    rules: {
+      curly: string;
+      "avandar/straight-line-object-construction": string;
+    };
   };
 } {
   const directory = realpathSync(
@@ -50,7 +53,10 @@ export function createRuntimePluginRepository(parent: string = tmpdir()): {
     jsPlugins: [
       { name: "avandar", specifier: "@avandar/lint-typescript/oxlint" },
     ],
-    rules: { curly: "error", "avandar/local-e2e-casing": "error" },
+    rules: {
+      curly: "error",
+      "avandar/straight-line-object-construction": "error",
+    },
   };
   writeFileSync(join(directory, ".oxlintrc.json"), JSON.stringify(config));
   return { directory, config };

@@ -3,7 +3,7 @@ import componentPropsName from "./rules/component-props-name.js";
 import exportKeyJsdoc from "./rules/export-key-jsdoc.js";
 import functionBodyLineComments from "./rules/function-body-line-comments.js";
 import jsxConditionalTernary from "./rules/jsx-conditional-ternary.js";
-import localE2eCasing from "./rules/local-e2e-casing.js";
+import moduleContextWitness from "./rules/module-context-witness.js";
 import nestedArrowFunctions from "./rules/nested-arrow-functions.js";
 import optionalArrayCandidates from "./rules/optional-array-candidates.js";
 import privateHelperPrefix from "./rules/private-helper-prefix.js";
@@ -26,7 +26,7 @@ const plugin = eslintCompatPlugin({
     "nested-arrow-functions": nestedArrowFunctions,
     "private-helper-prefix": privateHelperPrefix,
     "component-props-name": componentPropsName,
-    "local-e2e-casing": localE2eCasing,
+    "module-context-witness": moduleContextWitness,
     "jsx-conditional-ternary": jsxConditionalTernary,
     "property-helper-callbacks": propertyHelperCallbacks,
     "straight-line-object-construction": straightLineObjectConstruction,

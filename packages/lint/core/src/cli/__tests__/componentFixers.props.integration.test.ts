@@ -41,67 +41,6 @@ it.each([
   expect(fixComponentSource({ source: moduleSource })).toBe(moduleSource);
 });
 
-it("renames a primitive local binding and its resolved reads", () => {
-  expect(
-    fixComponentSource({
-      source:
-        "export function read(): number { const myE2ECount = 2; return myE2ECount + myE2ECount; }",
-      extension: "ts",
-    }),
-  ).toBe(
-    "export function read(): number { const myE2eCount = 2; return myE2eCount + myE2eCount; }",
-  );
-});
-
-it.each([
-  "export const myE2ECount = 2; consume(myE2ECount);",
-  "const myE2ECount = 2; export { myE2ECount };",
-  "const E2E_GOOGLE_SHEET_ID = 'sheet'; consume(E2E_GOOGLE_SHEET_ID);",
-  "const myE2eCount = 2; consume(myE2eCount);",
-  "const e2eCount = 2; consume(e2eCount);",
-  "const myE2ECount = 2; const myE2eCount = 3; consume(myE2ECount);",
-  "const myE2ECount = 2; consume(myE2ECount + myE2eCount);",
-  "const myE2ECount = 2; consume({ myE2ECount });",
-  "const myE2ECount = 2; consume({ [myE2ECount]: 1 });",
-  "const myE2ECount = 2; consume(object[myE2ECount]);",
-  "const myE2ECount = 2; const contract = 'myE2ECount'; consume(myE2ECount);",
-  "const contract = 'myE2ECount'; const myE2ECount = 2; consume(myE2ECount);",
-  "const contract = 'myE2E\\u0043ount'; const myE2ECount = 2; consume(myE2ECount);",
-  "const myE2ECount = 2; eval(code); consume(myE2ECount);",
-  "const myE2ECount = function() { return 2; }; consume(myE2ECount.name);",
-  "function myE2ECount() { return myE2ECount(); } consume(myE2ECount);",
-  "const myE2ECount = { get value() { return 2; } }; consume(myE2ECount.value);",
-  "let myE2ECount = 2; myE2ECount = 3; consume(myE2ECount);",
-  "const myE2ECount = 2; consume(() => myE2ECount);",
-  "export function read() { const myE2ECount = 2; if (flag) return myE2ECount; return 0; }",
-  "const myE2ECount = 2; consume(); consume(myE2ECount);",
-])("preserves unsupported acronym contracts: %s", (source) => {
-  const moduleSource = `export {}; ${source}`;
-  expect(
-    fixComponentSource({
-      source: moduleSource,
-      extension: "ts",
-      rules: ["local-e2e-casing"],
-    }),
-  ).toBe(moduleSource);
-});
-
-it("keeps local acronym renames inside their own shadowed scopes", () => {
-  const source =
-    "const myE2ECount = 9; export function read(): number { const myE2ECount = 2; return myE2ECount; }";
-  const fixed = fixComponentSource({
-    source: source,
-    extension: "ts",
-    rules: ["local-e2e-casing"],
-  });
-  expect(fixed).toBe(
-    source.replace(
-      "const myE2ECount = 2; return myE2ECount",
-      "const myE2eCount = 2; return myE2eCount",
-    ),
-  );
-});
-
 it.each(["tsx", "jsx"])(
   "replaces a boolean child with an exact false-arm ternary for %s",
   (extension) => {
@@ -232,10 +171,9 @@ it.each(["tsx", "jsx", "ts", "js"])(
         return;
       }
       const supported =
-        ruleId === "AF-13" ||
-        (ruleId === "AF-12"
+        ruleId === "AF-12"
           ? extension === "tsx"
-          : ["tsx", "jsx"].includes(extension));
+          : ["tsx", "jsx"].includes(extension);
       expect(result.outcomes).toContainEqual(
         expect.objectContaining({
           ruleId,

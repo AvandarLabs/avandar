@@ -94,11 +94,11 @@ it.each([
 it.each([
   [
     "export function build() { const result = { count: 0 }; result.count = 2; return result; }",
-    "export function build() { const result = { count: 0 };  return { ...result, count: 2 }; }",
+    "export function build() { return { count: 2 }; }",
   ],
   [
     "export function build() { const result = { __proto__: null }; result.count = 2; result.ready = true; return result; }",
-    "export function build() { const result = { __proto__: null };   return { __proto__: null, ...result, count: 2, ready: true }; }",
+    "export function build() { return { __proto__: null, count: 2, ready: true }; }",
   ],
 ])(
   "folds fresh own-data construction without changing its descriptor: %s",
@@ -153,11 +153,11 @@ it.each([true, false])(
 );
 
 it.each(["let", "var"])(
-  "folds an unreassigned %s local without editing its keyword",
+  "folds an unreassigned %s local into the returned literal",
   (kind) => {
     const source = `export function build() { ${kind} result = { count: 0 }; result.count = 2; return result; }`;
     expect(_fix({ source: source, enabled: [RULE_NAMES[1]] })).toBe(
-      `export function build() { ${kind} result = { count: 0 };  return { ...result, count: 2 }; }`,
+      "export function build() { return { count: 2 }; }",
     );
   },
 );
@@ -166,4 +166,16 @@ it("review R1 retains null comparisons that can infer filter predicates", () => 
   const source =
     'import { propEq } from "@avandar/utils";\nexport const result = [{ id: null }, { id: 1 }].filter(function(row) { return row.id === null; });';
   expect(_fix({ source: source, enabled: [RULE_NAMES[0]] })).toBe(source);
+});
+
+it("merges writes into the literal in original key order", () => {
+  expect(
+    _fix({
+      source:
+        'export function build() { const result = { first: 0, second: "a", third: false }; result.third = true; result.first = 1; return result; }',
+      enabled: [RULE_NAMES[1]],
+    }),
+  ).toBe(
+    'export function build() { return { first: 1, second: "a", third: true }; }',
+  );
 });

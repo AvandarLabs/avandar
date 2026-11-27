@@ -37,10 +37,7 @@ export function _avandarPrivateCallerSeed() {
   return avandarPrivateHelperSeed();
 }
 `;
-const LOCAL_ACRONYM_SEED: string = `
-const _avandarE2ECount = 1;
-console.log(_avandarE2ECount);
-`;
+const MODULE_CONTEXT_SEED: string = "\nconst _avandarModuleContext = 1;\n";
 const PROPS_ALIAS_SEED: string =
   "\ntype AvandarSeedCardProps = { count: number };\n";
 const PROPS_COMPONENT_SEED: string = `
@@ -79,10 +76,16 @@ function _avandarObjectSeed() {
   [
     "optional-parameter-candidates",
     `
-function _avandarCandidatesSeed(candidate: number | undefined) {
+function _avandarCandidatesSeed(
+  first: number | undefined,
+  second: number | undefined,
+) {
   const result: number[] = [];
-  if (candidate !== undefined) {
-    result.push(candidate);
+  if (first !== undefined) {
+    result.push(first);
+  }
+  if (second !== undefined) {
+    result.push(second);
   }
   return result;
 }
@@ -98,7 +101,7 @@ const LITERAL_SEED: string =
 function _getSeedSections(path: string): Array<[string, string]> {
   // Keep the witness first. Only original AST module markers qualify.
   const sections: Array<readonly [string, string]> = [
-    ["local-primitive-bindings", LOCAL_ACRONYM_SEED],
+    ["module-context", MODULE_CONTEXT_SEED],
     ...(/\.tsx$/.test(path)
       ? ([
           ["single-component-props", PROPS_ALIAS_SEED],

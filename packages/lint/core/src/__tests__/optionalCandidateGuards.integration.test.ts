@@ -26,7 +26,7 @@ it("repairs typed candidates with the existing helper and preserves null, zero a
     diagnostics: "",
   });
   const fixed = fixUtilitySource({ source: source }).fixed;
-  expect(fixed).toContain("[...result, first].filter(isDefined)");
+  expect(fixed).toContain("return first !== undefined ? [first] : [];");
   expect(getUtilityTypeDiagnosticsFromSource({ source: fixed })).toEqual({
     status: 0,
     diagnostics: "",

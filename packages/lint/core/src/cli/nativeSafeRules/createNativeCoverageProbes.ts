@@ -72,9 +72,9 @@ function _hasOriginalModule(proof: Readonly<Proof>): boolean {
     proof.hasProvenPluginContext === true &&
     _hasDiagnostic({
       proof: proof,
-      capability: "local-primitive-bindings",
-      code: "avandar(local-e2e-casing)",
-      prefix: "AF-13:",
+      capability: "module-context",
+      code: "avandar(module-context-witness)",
+      prefix: "Module context:",
     })
   );
 }
@@ -116,7 +116,7 @@ function _getRecovery({
           !hasOriginalModule &&
           proof.mirrorPath &&
           proof.evidence.operational
-        ? "Run fallback review. Exact early AF-13 error evidence could not establish original module context. Enable the context witness at error severity and preserve an original AST import/export marker before retrying."
+        ? "Run fallback review. Exact early module context witness error evidence could not establish original module context. Enable the context witness at error severity and preserve an original AST import/export marker before retrying."
         : proof.evidence.recovery;
 }
 

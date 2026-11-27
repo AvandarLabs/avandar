@@ -136,9 +136,50 @@ function _getArrayPlan(sourceCode, block) {
   return { ...construction, candidates };
 }
 
+function _getUnionMemberTexts(sourceCode, node) {
+  if (node.type === "TSParenthesizedType") {
+    return _getUnionMemberTexts(sourceCode, node.typeAnnotation);
+  }
+  return node.type === "TSUnionType"
+    ? node.types.flatMap((type) => {
+        return _getUnionMemberTexts(sourceCode, type);
+      })
+    : [sourceCode.getText(node)];
+}
+
+function _preservesReturnType(sourceCode, plan) {
+  if (plan.owner.returnType) {
+    return true;
+  }
+  // Without a declared return type, the fixed literal's inferred element type
+  // must match the removed array annotation exactly.
+  const elementTexts = new Set(
+    _getUnionMemberTexts(sourceCode, _getElementType(plan.entry.id)),
+  );
+  const candidateTexts = new Set(
+    plan.candidates.flatMap((candidate) => {
+      const parameter = plan.owner.params.find((param) => {
+        return param.name === candidate.name;
+      });
+      return _getUnionMemberTexts(
+        sourceCode,
+        parameter.typeAnnotation.typeAnnotation,
+      ).filter((text) => {
+        return text !== "undefined";
+      });
+    }),
+  );
+  return (
+    elementTexts.size === candidateTexts.size &&
+    [...elementTexts].every((text) => {
+      return candidateTexts.has(text);
+    })
+  );
+}
+
 /**
- * Reports eligible optional-parameter array construction and offers a filtered
- * array fix.
+ * Reports eligible optional-parameter array construction and offers a direct
+ * literal fix: a ternary for one candidate, a filtered array for several.
  * Used, for example, when linting TypeScript functions that accumulate defined
  * parameters.
  */
@@ -162,23 +203,24 @@ const rule = {
         }
         const sourceCode = context.sourceCode;
         const plan = _getArrayPlan(sourceCode, node);
+        if (!plan || !_preservesReturnType(sourceCode, plan)) {
+          return;
+        }
+        const isSingle = plan.candidates.length === 1;
         const imported =
-          plan &&
+          !isSingle &&
           getUtilityImportFromSource(
             sourceCode,
             node,
             "isDefined",
             context.filename,
           );
-        if (!imported || imported.hasEdits) {
+        if (!isSingle && (!imported || imported.hasEdits)) {
           return;
         }
-        const names = [
-          `...${plan.entry.id.name}`,
-          ...plan.candidates.map((candidate) => {
-            return candidate.name;
-          }),
-        ];
+        const names = plan.candidates.map((candidate) => {
+          return candidate.name;
+        });
         const returned = node.body.at(-1).argument;
         context.report({
           node: returned,
@@ -187,17 +229,20 @@ const rule = {
             return [
               fixer.replaceText(
                 returned,
-                buildCollectionLiteralFromConstruction(
-                  sourceCode,
-                  returned,
-                  names,
-                  "[",
-                  `].filter(${imported.localName})`,
-                ),
+                isSingle
+                  ? `${names[0]} !== undefined ? [${names[0]}] : []`
+                  : buildCollectionLiteralFromConstruction(
+                      sourceCode,
+                      returned,
+                      names,
+                      "[",
+                      `].filter(${imported.localName})`,
+                    ),
               ),
-              ...plan.operations.map((operation) => {
-                return fixer.remove(operation);
-              }),
+              fixer.removeRange([
+                node.body[0].range[0],
+                node.body.at(-1).range[0],
+              ]),
             ];
           },
         });

@@ -138,7 +138,7 @@ Apply **only**:
   shapes including the retired `resolve` / `compute` / `build` /
   `create` prefixes and the copy-function exemption; acronyms in **identifiers and type names**
   use PascalCase, whatever their length and with no exceptions (`Url`,
-  `Cli`, `Id`, `Db`, `Ci`, `Io`), while `UPPERCASE` constants and
+  `Cli`, `Id`, `Db`, `Ci`, `Io`, `E2e`), while `UPPERCASE` constants and
   env var names are unaffected. File-name acronyms and the `.types.ts`
   suffix belong to `files`, not this pack.
 

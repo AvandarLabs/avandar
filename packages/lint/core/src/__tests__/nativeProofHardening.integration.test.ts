@@ -31,7 +31,6 @@ it("accepts canonical pinned-engine diagnostics inside exact Unicode byte ranges
     "AF-10:private-direct-calls",
     "AF-11:one-to-one-module-key",
     "AF-12:single-component-props",
-    "AF-13:local-primitive-bindings",
     "AF-14:boolean-jsx-children",
     "AF-15:literal-property-map",
     "AF-15:literal-property-equality",

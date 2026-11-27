@@ -1,13 +1,8 @@
-import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { expect, it } from "vitest";
 import {
   PROOF_IMPORT,
-  ROOT,
   SAFE,
   SOURCES,
-  createUtilityRepository as _createRepository,
   evaluateUtilitySource as _evaluate,
   fixUtilitySource as _fix,
   getUtilityTypeDiagnosticsFromSource as _getTypeDiagnostics,
@@ -45,10 +40,10 @@ it.each(["ts", "tsx", "js", "jsx"])(
       root: true,
     });
     expect(fixed).toContain('.map(prop("id"))');
-    expect(fixed.includes("[...result, first, second].filter(isDefined)")).toBe(
+    expect(fixed.includes("return [first, second].filter(isDefined);")).toBe(
       typed,
     );
-    expect(fixed).toContain("{ ...result, count: 2 }");
+    expect(fixed).toContain("return { count: 2 };");
   },
 );
 
@@ -85,10 +80,16 @@ it.each([true, false])(
       "export const mapped = [{ id: 1 }].map(function(row) {",
       "  return row.id;",
       "});",
-      "export function build(first: number | undefined): number[] {",
+      "export function build(",
+      "  first: number | undefined,",
+      "  second: number | undefined,",
+      "): number[] {",
       "  const values: number[] = [];",
       "  if (first !== undefined) {",
       "    values.push(first);",
+      "  }",
+      "  if (second !== undefined) {",
+      "    values.push(second);",
       "  }",
       "  return values;",
       "}",
@@ -101,7 +102,9 @@ it.each([true, false])(
     }).fixed;
     expect(fixed).toContain(".map(function(row)");
     expect(fixed).not.toContain(".map(prop(");
-    expect(fixed.includes(".filter(isDefined)")).toBe(enabled);
+    expect(fixed.includes("return [first, second].filter(isDefined);")).toBe(
+      enabled,
+    );
   },
 );
 
@@ -165,7 +168,7 @@ it.each(["let", "var"])(
     ].join("\n");
     expect(
       _fix({ source: source, extension: "ts", root: true }).fixed,
-    ).toContain("return { ...values, count: 2 };");
+    ).toContain("return { count: 2 };");
     const disabled = _fix({
       source: source,
       extension: "ts",
@@ -220,7 +223,7 @@ it.each([
       diagnostics: "",
     });
     const fixed = _fix({ source: source, extension: "ts", root: true }).fixed;
-    expect(fixed).toContain("return [...values, first].filter(isDefined);");
+    expect(fixed).toContain("return first !== undefined ? [first] : [];");
     expect(_getTypeDiagnostics({ source: fixed })).toEqual({
       status: 0,
       diagnostics: "",
@@ -250,74 +253,6 @@ it.each([
     );
     expect(_evaluate({ source: fixed }).build!(first, second)).toEqual(
       expected,
-    );
-  },
-);
-
-it.each(["const", "let", "var"])(
-  "keeps all %s custom collection fix ranges strictly after the declaration",
-  (kind) => {
-    ["straight-line-object-construction", "optional-array-candidates"].forEach(
-      (name) => {
-        const source =
-          name === "straight-line-object-construction"
-            ? `export function build() { ${kind} values = { count: 0 }; values.count = 2; return values; }`
-            : [
-                'import { isDefined } from "@avandar/utils";',
-                `export function build(first: number | undefined) { ${kind} values: number[] = [];`,
-                "if (first !== undefined) {",
-                "  values.push(first);",
-                "}",
-                "return values; }",
-              ].join("\n");
-        const directory = _createRepository({
-          extension: "ts",
-          source: source,
-        });
-        const probe = join(directory, "range-probe.mjs");
-        writeFileSync(
-          probe,
-          [
-            `import { eslintCompatPlugin } from ${JSON.stringify(join(ROOT, "packages/lint/typescript/node_modules/@oxlint/plugins/index.js"))};`,
-            `import rule from ${JSON.stringify(join(ROOT, `packages/lint/typescript/src/oxlint/rules/${name}.js`))};`,
-            "export default eslintCompatPlugin({ rules: { probe: {",
-            "  meta: rule.meta, createOnce(context) {",
-            "    return rule.createOnce({",
-            "      get sourceCode() { return context.sourceCode; },",
-            "      get filename() { return context.filename; },",
-            "      report(descriptor) {",
-            "        const boundary = descriptor.node.parent.parent.body[0].range[1];",
-            "        context.report({ ...descriptor, fix(fixer) {",
-            "          const edits = descriptor.fix(fixer);",
-            "          if (edits.some((edit) => edit.range[0] <= boundary)) {",
-            '            throw new Error("Collection edit reserved its declaration");',
-            "          }",
-            "          return edits;",
-            "        } });",
-            "      },",
-            "    });",
-            "  },",
-            "} } });",
-          ].join("\n"),
-        );
-        writeFileSync(
-          join(directory, ".oxlintrc.json"),
-          JSON.stringify({
-            categories: { correctness: "off" },
-            jsPlugins: [{ name: "ranges", specifier: probe }],
-            rules: { "ranges/probe": "error" },
-          }),
-        );
-        const result = spawnSync(
-          join(ROOT, "node_modules/.bin/oxlint"),
-          ["--fix", "src/reviewed.ts"],
-          { cwd: directory, encoding: "utf8" },
-        );
-        expect(result.status, `${result.stdout}${result.stderr}`).toBe(0);
-        const fixed = readFileSync(join(directory, "src/reviewed.ts"), "utf8");
-        expect(fixed).not.toBe(source);
-        expect(fixed).toContain(`${kind} values`);
-      },
     );
   },
 );

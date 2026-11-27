@@ -75,6 +75,34 @@ function _getObjectPlan(sourceCode, block) {
   return { ...construction, properties, assignments, hasNullPrototype };
 }
 
+function _buildMergedEntries(sourceCode, plan) {
+  const assignedValues = new Map(
+    plan.assignments.map((assignment) => {
+      return [assignment.key, sourceCode.getText(assignment.value)];
+    }),
+  );
+  const initialKeys = new Set(
+    plan.properties.map((property) => {
+      return property.key.name;
+    }),
+  );
+  return [
+    ...plan.properties.map((property) => {
+      const key = property.key.name;
+      return assignedValues.has(key)
+        ? `${key}: ${assignedValues.get(key)}`
+        : sourceCode.getText(property);
+    }),
+    ...plan.assignments
+      .filter((assignment) => {
+        return !initialKeys.has(assignment.key);
+      })
+      .map((assignment) => {
+        return `${assignment.key}: ${assignedValues.get(assignment.key)}`;
+      }),
+  ];
+}
+
 /**
  * Reports and fixes eligible unobserved writes to fresh data objects.
  * For example, an Oxlint run can suggest constructing the returned object
@@ -100,13 +128,6 @@ const rule = {
         if (!plan) {
           return;
         }
-        const properties = [
-          ...(plan.hasNullPrototype ? ["__proto__: null"] : []),
-          `...${plan.entry.id.name}`,
-          ...plan.assignments.map((assignment) => {
-            return `${assignment.key}: ${sourceCode.getText(assignment.value)}`;
-          }),
-        ];
         const returned = node.body.at(-1).argument;
         context.report({
           node: returned,
@@ -118,14 +139,15 @@ const rule = {
                 buildCollectionLiteralFromConstruction(
                   sourceCode,
                   returned,
-                  properties,
+                  _buildMergedEntries(sourceCode, plan),
                   "{ ",
                   " }",
                 ),
               ),
-              ...plan.operations.map((operation) => {
-                return fixer.remove(operation);
-              }),
+              fixer.removeRange([
+                node.body[0].range[0],
+                node.body.at(-1).range[0],
+              ]),
             ];
           },
         });

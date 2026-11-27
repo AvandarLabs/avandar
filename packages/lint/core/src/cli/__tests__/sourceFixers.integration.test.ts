@@ -139,7 +139,7 @@ it.each([
   ["export {};\n", "disabled witness"],
   ["export {};\n", "warning witness"],
   [
-    "/* eslint-disable avandar/local-e2e-casing */\nexport {};\n",
+    "/* eslint-disable avandar/module-context-witness */\nexport {};\n",
     "suppressed witness",
   ],
 ])(
@@ -150,7 +150,7 @@ it.each([
     if (reason.endsWith("witness") && reason !== "suppressed witness") {
       const path = join(directory, ".oxlintrc.json");
       const config = JSON.parse(readFileSync(path, "utf8"));
-      config.rules["avandar/local-e2e-casing"] =
+      config.rules["avandar/module-context-witness"] =
         reason === "warning witness" ? "warn" : "off";
       writeFileSync(path, JSON.stringify(config));
     }

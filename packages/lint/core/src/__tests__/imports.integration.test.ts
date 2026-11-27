@@ -67,7 +67,7 @@ it("resolves the catalog export from the packed tarball", () => {
       { cwd: directory, encoding: "utf8" },
     );
     expect(result.status, result.stderr).toBe(0);
-    expect(Number(result.stdout)).toBe(90);
+    expect(Number(result.stdout)).toBe(89);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

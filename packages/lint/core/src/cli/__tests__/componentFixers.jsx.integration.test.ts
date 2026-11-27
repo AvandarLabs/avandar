@@ -102,7 +102,7 @@ it.each([
 it("composes props and JSX fixes with independent native and comment repairs", () => {
   const source = [
     "const _read = function() { return 1; }; _read();",
-    "export function count(): number { const myE2ECount = 2; return myE2ECount; }",
+    "export {};",
     "type CardProps = { ready: boolean };",
     "export function Card(props: CardProps): unknown {",
     "  /** Show it once. */",
@@ -120,7 +120,7 @@ it("composes props and JSX fixes with independent native and comment repairs", (
   ).toBe(
     [
       "function _read() { return 1; } _read();",
-      "export function count(): number { const myE2eCount = 2; return myE2eCount; }",
+      "export {};",
       "type Props = { ready: boolean };",
       "export function Card(props: Props): unknown {",
       "  // Show it once.",
@@ -168,8 +168,6 @@ it.each(SAFE)(
     const sources: Record<string, string> = {
       "component-props-name":
         "type CardProps = {}; export function Card(props: CardProps) { return <div />; }",
-      "local-e2e-casing":
-        "export function read() { const myE2ECount = 2; return myE2ECount; }",
       "jsx-conditional-ternary":
         "export function Card() {\n  return <Observer>{!ready && <Node />}</Observer>;\n}",
     };
@@ -199,19 +197,6 @@ it("renames a one-letter component props prefix", () => {
   );
 });
 
-it("keeps local rename envelopes outside native type annotation repairs", () => {
-  const source =
-    "export {};\nconst myE2ECount: Array<number> = 2;\nconsume(myE2ECount);";
-  expect(
-    fixComponentSource({
-      source: source,
-      extension: "ts",
-      rules: undefined,
-      root: true,
-    }),
-  ).toBe("export {};\nconst myE2ECount: number[] = 2;\nconsume(myE2ECount);");
-});
-
 it("preserves zero compiler diagnostics after a props alias rename", () => {
   const source =
     "export {}; type CardProps = { count: number }; export function Card(props: CardProps) { return <div>{props.count}</div>; }";
@@ -226,30 +211,3 @@ it("preserves zero compiler diagnostics after a props alias rename", () => {
     diagnostics: "",
   });
 });
-
-it.each(["ts", "js", "cjs"])(
-  "preserves script bindings that may be read by another file for %s",
-  (extension) => {
-    const source = "const myE2ECount = 2; consume(myE2ECount);";
-    expect(
-      fixComponentSource({
-        source: source,
-        extension: extension,
-        rules: ["local-e2e-casing"],
-      }),
-    ).toBe(source);
-  },
-);
-
-it.each(["ts", "js"])(
-  "renames a module-private top-level acronym binding for %s",
-  (extension) => {
-    expect(
-      fixComponentSource({
-        source: "export {}; const myE2ECount = 2; consume(myE2ECount);",
-        extension: extension,
-        rules: ["local-e2e-casing"],
-      }),
-    ).toBe("export {}; const myE2eCount = 2; consume(myE2eCount);");
-  },
-);

@@ -53,7 +53,7 @@ it("keeps oversized source bounded without starting a seed child", async () => {
 it("chooses seed identifiers absent from the original prefix", async () => {
   const directory = _repository();
   const source =
-    "const _avandarE2ECount = 2;\nconsume(_avandarE2ECount);\nexport {};\n";
+    "const _avandarModuleContext = 2;\nconsume(_avandarModuleContext);\nexport {};\n";
   writeFileSync(join(directory, "src/reviewed.tsx"), source);
   const result = await collectCoverage({
     catalog: loadRuleCatalog(),

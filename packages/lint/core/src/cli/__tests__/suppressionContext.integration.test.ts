@@ -59,8 +59,8 @@ it.each(
       report: report,
       directory: directory,
       path: "src/reviewed.ts",
-      ruleId: "AF-13",
-      capability: "local-primitive-bindings",
+      ruleId: "AF-16",
+      capability: "fresh-data-object",
     });
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
@@ -71,7 +71,7 @@ it.each(
   },
 );
 
-it.each(["curly", "avandar/local-e2e-casing"])(
+it.each(["curly", "avandar/straight-line-object-construction"])(
   "does not discharge %s after re-enable while unaffected rules remain enforced",
   async (rule) => {
     const directory = createSuppressionRepository();
@@ -86,12 +86,12 @@ it.each(["curly", "avandar/local-e2e-casing"])(
       report: report,
       directory: directory,
       path: "src/reviewed.ts",
-      ruleId: rule === "curly" ? "AF-01" : "AF-13",
-      capability: rule === "curly" ? "if-body" : "local-primitive-bindings",
+      ruleId: rule === "curly" ? "AF-01" : "AF-16",
+      capability: rule === "curly" ? "if-body" : "fresh-data-object",
     });
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: rule === "curly" ? "AF-13" : "AF-01",
+        ruleId: rule === "curly" ? "AF-16" : "AF-01",
         state: "enforced",
       }),
     );
@@ -111,7 +111,9 @@ it("proves unsuppressed original native/custom violations independently", async 
   expect(JSON.parse(original.stdout).diagnostics).toEqual(
     expect.arrayContaining([
       expect.objectContaining({ code: "eslint(curly)" }),
-      expect.objectContaining({ code: "avandar(local-e2e-casing)" }),
+      expect.objectContaining({
+        code: "avandar(straight-line-object-construction)",
+      }),
     ]),
   );
   const report = await collectSuppressionCoverage({
@@ -119,7 +121,7 @@ it("proves unsuppressed original native/custom violations independently", async 
     path: "src/reviewed.ts",
     source: source,
   });
-  ["AF-01", "AF-13"].forEach((ruleId) => {
+  ["AF-01", "AF-16"].forEach((ruleId) => {
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({ ruleId, state: "enforced" }),
     );

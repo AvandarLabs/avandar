@@ -21,11 +21,10 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | AF-10 | private-helper-prefix | `_` prefix on private top-level helpers | typescript, javascript | safe | 3 | lint | Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback |
 | AF-11 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback |
 | AF-12 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback |
-| AF-13 | local-e2e-casing | Local `E2e` acronym casing | typescript, javascript | safe | 3 | lint | Scope-resolved private const primitive after a module marker with immediate plain reads; PascalCase E2e, uppercase constants and external contracts unchanged; other shapes remain fallback |
 | AF-14 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback |
 | AF-15 | prefer-prop-callback | Exact `prop` and `propEq` callbacks | typescript, javascript | safe | 3 | lint | Anonymous ordinary callbacks on literal plain-data arrays with dot-free identifier keys and non-null literal strict equality; existing leading runtime utils imports, capture-safe helper bindings and isolated import edits; other shapes remain fallback |
-| AF-16 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Unannotated fresh local data objects with consecutive primitive writes and a final spread return after the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback |
-| AF-17 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards and a final filtered spread return; existing resolved isDefined, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback |
+| AF-16 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Unannotated fresh local data objects with consecutive primitive writes, folded into one returned literal that replaces the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback |
+| AF-17 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards, replaced by a ternary for one candidate or a filtered literal for several; several candidates need an existing resolved isDefined; a declared return type or exactly matching candidate types, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback |
 | AF-18 | no-redundant-error-guard | Redundant `instanceof Error` guard | typescript | safe | 5 | lint | Type information proves the value and branches equivalent |
 | AF-19 | import-extensions | File-extension convention | typescript, javascript | safe | 3 | lint | Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback |
 | AF-20 | css-block-comment | Canonical CSS block comment shape | css | safe | 3 | lint | Standalone ordinary CSS prose comment nodes within 80 columns; delimiters and leading markers only; preserve documentation, directives, maps, legal notices, hacks and ambiguous syntax; unsupported shapes remain fallback |
@@ -189,14 +188,10 @@ JSX owners, exported, shared, generic, interface, collision, array and comment
 shapes stay unchanged. The alias must immediately precede the component, so
 its rename envelope cannot reserve an unrelated native or comment repair.
 
-AF-13 (`local-primitive-bindings`) spells the PascalCase acronym `E2e`, following
-the canonical review checklist. It renames only scope-resolved module-private
-`const` primitives after an import/export, with all reads in the immediately
-following expression, or
-in the sole return of a two-statement exported function body. Script globals,
-exports, uppercase constants and environment keys, string contracts, computed
-or shorthand keys, reflective function names, aliases, writes, collisions and
-interleaved statements stay unchanged. Lowercase `e2e` stays unchanged.
+The internal `module-context-witness` rule is not a catalog rule. It reports
+only the generated coverage seed binding, and only when an original
+import/export precedes it. That proves the reviewed file is an ES module before
+AF-08, AF-09 and AF-10 count as covered. Keep it enabled at error severity.
 
 AF-14 (`boolean-jsx-children`) converts a boolean negation or comparison child
 `condition && <Node />` into `(condition) ? <Node /> : false`. Keeping `false`
@@ -209,7 +204,7 @@ self-closing child. Nested conditionals, comments, member reads, calls,
 fragments and arrow owners remain fallback. Edits also defer when they would
 introduce an overflow on a line within the root 80-column limit.
 
-The exact-path native proof seeds these three capabilities into the existing
+The exact-path native proof seeds these two capabilities into the existing
 serialized, cached engine run. AF-12 is seeded only for TSX; AF-14 only for
 JSX/TSX. Other file syntax remains fallback. Canonical error diagnostics and a
 nonzero engine status are required. Every new rule also retains explicit

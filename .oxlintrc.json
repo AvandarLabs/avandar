@@ -76,7 +76,7 @@
     "avandar/nested-arrow-functions": "error",
     "avandar/private-helper-prefix": "error",
     "avandar/component-props-name": "error",
-    "avandar/local-e2e-casing": "error",
+    "avandar/module-context-witness": "error",
     "avandar/jsx-conditional-ternary": "error",
     "avandar/property-helper-callbacks": "error",
     "avandar/straight-line-object-construction": "error",

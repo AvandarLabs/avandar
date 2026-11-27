@@ -191,19 +191,6 @@ rules:
       - 3
     owner: lint
     boundary: TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback
-  - id: AF-13
-    slug: local-e2e-casing
-    class: AF
-    title: Local `E2e` acronym casing
-    scope: TS/JS
-    applicability:
-      - typescript
-      - javascript
-    repair: safe
-    phases:
-      - 3
-    owner: lint
-    boundary: Scope-resolved private const primitive after a module marker with immediate plain reads; PascalCase E2e, uppercase constants and external contracts unchanged; other shapes remain fallback
   - id: AF-14
     slug: jsx-conditional-ternary
     class: AF
@@ -242,7 +229,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Unannotated fresh local data objects with consecutive primitive writes and a final spread return after the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback
+    boundary: Unannotated fresh local data objects with consecutive primitive writes, folded into one returned literal that replaces the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback
   - id: AF-17
     slug: optional-array-candidates
     class: AF
@@ -255,7 +242,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards and a final filtered spread return; existing resolved isDefined, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback
+    boundary: TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards, replaced by a ternary for one candidate or a filtered literal for several; several candidates need an existing resolved isDefined; a declared return type or exactly matching candidate types, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback
   - id: AF-18
     slug: no-redundant-error-guard
     class: AF

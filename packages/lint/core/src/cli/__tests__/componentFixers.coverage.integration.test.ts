@@ -8,6 +8,13 @@ import {
   SAFE,
 } from "./ComponentFixerTestHelpers";
 
+/** Capabilities that require the module context witness. */
+const MODULE_ONLY = [
+  ["AF-08", "direct-top-level-calls"],
+  ["AF-09", "direct-nested-calls"],
+  ["AF-10", "private-direct-calls"],
+] as const;
+
 it("preserves props aliases in scripts with possible cross-file type references", () => {
   const source =
     "type CardProps = { count: number }; function Card(props: CardProps) { return <div />; }";
@@ -48,9 +55,12 @@ it.each(["ts", "tsx", "js", "jsx"])(
       directory: directory,
       extension: extension,
     });
-    SAFE.filter(([ruleId]) => {
-      return ruleId === "AF-13" || (ruleId === "AF-12" && extension === "tsx");
-    }).forEach(([ruleId, capability]) => {
+    [
+      ...MODULE_ONLY,
+      ...SAFE.filter(([ruleId]) => {
+        return ruleId === "AF-12" && extension === "tsx";
+      }),
+    ].forEach(([ruleId, capability]) => {
       expect(result.outcomes).toContainEqual(
         expect.objectContaining({
           ruleId,
@@ -62,24 +72,13 @@ it.each(["ts", "tsx", "js", "jsx"])(
   },
 );
 
-it("does not treat a later module marker as a preceding rename boundary", () => {
-  const source = "const myE2ECount = 2; consume(myE2ECount); export {};";
-  expect(
-    fixComponentSource({
-      source: source,
-      extension: "ts",
-      rules: ["local-e2e-casing"],
-    }),
-  ).toBe(source);
-});
-
 it.each(["const marker = 'export {};';", "/* export {}; */"])(
   "keeps module-only proofs in fallback for a textual module marker: %s",
   async (source) => {
     const directory = createComponentRepository();
     writeFileSync(join(directory, "src/reviewed.tsx"), `${source}\n`);
     const result = await collectComponentCoverage({ directory: directory });
-    SAFE.slice(0, 2).forEach(([ruleId, capability]) => {
+    [...MODULE_ONLY, SAFE[0]].forEach(([ruleId, capability]) => {
       expect(result.outcomes).toContainEqual(
         expect.objectContaining({
           ruleId,

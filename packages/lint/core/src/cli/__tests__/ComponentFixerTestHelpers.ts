@@ -30,7 +30,6 @@ const directories: string[] = [];
 /** Capability identities exercised by these fixer regression tests. */
 export const SAFE = [
   ["AF-12", "single-component-props", "component-props-name"],
-  ["AF-13", "local-primitive-bindings", "local-e2e-casing"],
   ["AF-14", "boolean-jsx-children", "jsx-conditional-ternary"],
 ] as const;
 

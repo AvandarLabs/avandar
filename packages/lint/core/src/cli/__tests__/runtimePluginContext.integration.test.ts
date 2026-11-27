@@ -37,7 +37,7 @@ it.each(
     const ruleUrl = pathToFileURL(
       join(
         ROOT,
-        "packages/lint/typescript/src/oxlint/rules/local-e2e-casing.js",
+        "packages/lint/typescript/src/oxlint/rules/straight-line-object-construction.js",
       ),
     ).href;
     const compatUrl = pathToFileURL(
@@ -55,7 +55,7 @@ it.each(
       `import { eslintCompatPlugin } from ${JSON.stringify(compatUrl)};
 import rule from ${JSON.stringify(ruleUrl)};
 export default eslintCompatPlugin({ meta: { name: "runtime-guard" }, rules: {
-  "local-e2e-casing": { ...rule, createOnce(context) { ${runtimeGuard} } },
+  "straight-line-object-construction": { ...rule, createOnce(context) { ${runtimeGuard} } },
 } });\n`,
     );
     const guarded = {
@@ -111,8 +111,8 @@ export default eslintCompatPlugin({ meta: { name: "runtime-guard" }, rules: {
     expect(result.status).toBe(0);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-13",
-        capability: "local-primitive-bindings",
+        ruleId: "AF-16",
+        capability: "fresh-data-object",
         state: "fallback",
         recovery: expect.stringContaining("plugin runtime context"),
       }),
@@ -157,8 +157,8 @@ it.each(["root", "nested", "override", "relative-entry"])(
     expect(result.status).toBe(0);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-13",
-        capability: "local-primitive-bindings",
+        ruleId: "AF-16",
+        capability: "fresh-data-object",
         state: "enforced",
       }),
     );
@@ -196,7 +196,10 @@ it("does not equate a conditional package wrapper with its official require targ
   mkdirSync(pluginDirectory);
   const originalPath = join(directory, "src/reviewed.ts");
   const ruleUrl = pathToFileURL(
-    join(ROOT, "packages/lint/typescript/src/oxlint/rules/local-e2e-casing.js"),
+    join(
+      ROOT,
+      "packages/lint/typescript/src/oxlint/rules/straight-line-object-construction.js",
+    ),
   ).href;
   const compatUrl = pathToFileURL(
     join(
@@ -213,7 +216,7 @@ it("does not equate a conditional package wrapper with its official require targ
     `import { eslintCompatPlugin } from ${JSON.stringify(compatUrl)};
 import rule from ${JSON.stringify(ruleUrl)};
 export default eslintCompatPlugin({ meta: { name: "conditional-wrapper" }, rules: {
-  "local-e2e-casing": { ...rule, createOnce(context) {
+  "straight-line-object-construction": { ...rule, createOnce(context) {
     return { ...rule.createOnce(context), before() { return context.filename === ${JSON.stringify(originalPath)} ? false : undefined; } };
   } },
 } });\n`,
@@ -244,8 +247,8 @@ export default eslintCompatPlugin({ meta: { name: "conditional-wrapper" }, rules
   expect(result.status).toBe(0);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-13",
-      capability: "local-primitive-bindings",
+      ruleId: "AF-16",
+      capability: "fresh-data-object",
       state: "fallback",
     }),
   );
@@ -311,8 +314,8 @@ it("proves the official packed entry from a standalone core package", async () =
   expect(result.status, `${result.stdout}${result.stderr}`).toBe(0);
   expect(JSON.parse(result.stdout).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-13",
-      capability: "local-primitive-bindings",
+      ruleId: "AF-16",
+      capability: "fresh-data-object",
       state: "enforced",
     }),
   );

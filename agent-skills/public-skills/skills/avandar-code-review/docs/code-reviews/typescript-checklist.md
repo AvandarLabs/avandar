@@ -398,14 +398,10 @@ repo) so the output stays small and tied to the diff.
   architectural/design decisions in the docstring only when developers using
   the function need that context.
 
-- Review E2E-bearing file names and externally visible names under the same
-  acronym convention. Scope-resolved local E2E rename detection is AF-13 in
-  the selected fallback; retain semantic name choice and external contracts.
-
 - Acronyms in identifiers, type names, file names and directory names use
   PascalCase, not all-caps. Treat them as words, whatever their length and
   with no exceptions: `Url`, `Sql`, `Json`, `Http`, `Api`, `Css`, `Html`,
-  and equally `Id`, `Db`, `Ci`, `Io`. Mixed forms like
+  and equally `Id`, `Db`, `Ci`, `Io`, `E2e`. Mixed forms like
   `useDataExplorerURLSync` or `parseSQL` should become
   `useDataExplorerUrlSync` and `parseSql`. Apply the same rule to file and
   directory names: `DataExplorerURLState.ts` should be
@@ -421,7 +417,7 @@ repo) so the output stays small and tied to the diff.
 
   ```bash
   # Identifiers
-  grep -rEn '[a-z][A-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML|CLI|ID|DB|CI|IO)([A-Z]|\b)' \
+  grep -rEn '[a-z][A-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML|CLI|E2E|ID|DB|CI|IO)([A-Z]|\b)' \
     --include="*.ts" --include="*.tsx" .
   # File and directory names
   find . \( -name "*.ts" -o -name "*.tsx" -o -type d \) \

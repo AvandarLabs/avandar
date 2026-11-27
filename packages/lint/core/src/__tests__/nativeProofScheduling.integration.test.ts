@@ -151,7 +151,7 @@ it("keeps same basenames independent under error warning and disabled overrides"
         files: [`src/${name}/reviewed.ts`],
         rules: {
           curly: name === "warning" ? "warn" : "off",
-          "avandar/local-e2e-casing": name === "warning" ? "warn" : "off",
+          "avandar/module-context-witness": name === "warning" ? "warn" : "off",
         },
       };
     }),

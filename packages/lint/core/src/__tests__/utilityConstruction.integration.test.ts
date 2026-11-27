@@ -113,7 +113,7 @@ it.each(["let", "var"])(
     ].join("\n");
     expect(
       _fix({ source: source, extension: "ts", root: true }).fixed,
-    ).toContain("return [...values, first].filter(isDefined);");
+    ).toContain("return first !== undefined ? [first] : [];");
     const disabled = _fix({
       source: source,
       extension: "ts",
@@ -122,7 +122,7 @@ it.each(["let", "var"])(
     }).fixed;
     expect(disabled).toContain("const values: number[] = [];");
     expect(disabled).toContain("values.push(first);");
-    expect(disabled).not.toContain(".filter(isDefined)");
+    expect(disabled).not.toContain("? [first] : []");
   },
 );
 
@@ -135,8 +135,66 @@ it("keeps an annotated object binding in fallback", () => {
 it("does not add a missing optional-array helper import", () => {
   const source = [
     IMPORT,
-    "export function build(first: number | undefined) {",
+    "export function build(",
+    "  first: number | undefined,",
+    "  second: number | undefined,",
+    ") {",
     "  const values: number[] = [];",
+    "  if (first !== undefined) {",
+    "    values.push(first);",
+    "  }",
+    "  if (second !== undefined) {",
+    "    values.push(second);",
+    "  }",
+    "  return values;",
+    "}",
+  ].join("\n");
+  expect(_fix({ source: source }).fixed).toBe(source);
+});
+
+it("returns a ternary for one candidate and a filtered literal for several", () => {
+  const single = [
+    "export function build(first: number | undefined): number[] {",
+    "  const values: number[] = [];",
+    "  if (first !== undefined) {",
+    "    values.push(first);",
+    "  }",
+    "  return values;",
+    "}",
+  ].join("\n");
+  expect(_fix({ source: single }).fixed).toBe(
+    [
+      "export function build(first: number | undefined): number[] {",
+      "  return first !== undefined ? [first] : [];",
+      "}",
+    ].join("\n"),
+  );
+  const several = [
+    'import { isDefined } from "@avandar/utils";',
+    "",
+    "export function build(",
+    "  first: number | undefined,",
+    "  second: number | undefined,",
+    "): number[] {",
+    "  const values: number[] = [];",
+    "  if (first !== undefined) {",
+    "    values.push(first);",
+    "  }",
+    "  if (second !== undefined) {",
+    "    values.push(second);",
+    "  }",
+    "  return values;",
+    "}",
+  ].join("\n");
+  expect(_fix({ source: several }).fixed).toContain(
+    "  return [first, second].filter(isDefined);\n}",
+  );
+});
+
+it("keeps a widening array annotation when no return type preserves it", () => {
+  const source = [
+    'export function build(first: "a" | undefined) {',
+    "  const values: string[] = [];",
     "  if (first !== undefined) {",
     "    values.push(first);",
     "  }",

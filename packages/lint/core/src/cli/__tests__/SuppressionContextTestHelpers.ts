@@ -32,7 +32,7 @@ export const NATIVE: string = 'if (Boolean(1)) console.log("uncovered");';
 
 /** Custom rule violation used to test suppression-sensitive coverage. */
 export const CUSTOM: string =
-  "const _localE2ECount = 1;\nconsole.log(_localE2ECount);";
+  "function _localObject() { const result = { count: 0 }; result.count = 1; return result; }";
 
 /** Multiline CSS prose used to test suppression-sensitive coverage. */
 export const PROSE: string = "/* First sentence.\n   Second sentence. */";
@@ -67,7 +67,7 @@ export function createSuppressionRepository(): string {
       ],
       rules: {
         curly: "error",
-        "avandar/local-e2e-casing": "error",
+        "avandar/straight-line-object-construction": "error",
         "typescript/prefer-as-const": "error",
       },
     }),
@@ -141,15 +141,19 @@ export function buildNativeSourceFromSuppression({
 }: Readonly<{ prefix: string; kind: string }>): string {
   const blanket = kind.startsWith("blanket");
   const mode = kind.replace("blanket-", "");
-  const rules = blanket ? "" : " curly, avandar/local-e2e-casing";
+  const rules = blanket
+    ? ""
+    : " curly, avandar/straight-line-object-construction";
   if (mode === "region") {
     return `export {};\n/* ${prefix}-disable${rules} */\n${NATIVE}\n${CUSTOM}\n/* ${prefix}-enable${rules} */\n`;
   }
   const directive = mode === "line" ? "disable-line" : "disable-next-line";
   const nativeRule = blanket ? "" : " curly";
-  const customRule = blanket ? "" : " avandar/local-e2e-casing";
+  const customRule = blanket
+    ? ""
+    : " avandar/straight-line-object-construction";
   if (mode === "line") {
-    return `export {};\n${NATIVE} // ${prefix}-${directive}${nativeRule}\nconst _localE2ECount = 1; console.log(_localE2ECount); // ${prefix}-${directive}${customRule}\n`;
+    return `export {};\n${NATIVE} // ${prefix}-${directive}${nativeRule}\n${CUSTOM} // ${prefix}-${directive}${customRule}\n`;
   }
   return `export {};\n// ${prefix}-${directive}${nativeRule}\n${NATIVE}\n// ${prefix}-${directive}${customRule}\n${CUSTOM}\n`;
 }
