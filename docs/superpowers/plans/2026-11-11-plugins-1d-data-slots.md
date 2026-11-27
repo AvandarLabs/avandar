@@ -24,7 +24,7 @@ Vitest, Playwright.
 
 **Spec:** `docs/superpowers/specs/2026-11-11-plugins-1d-data-slots-design.md`.
 **Builds on:** the slice 1a, 1b, and 1c specs and
-`docs/superpowers/2026-11-10-plugins-1c-handoff.md`.
+the retired plugins 1c handoff.
 
 ---
 
@@ -21366,7 +21366,7 @@ git commit -m "docs(plugins): document data slots, bundled datasets, and no-code
 on its own, and leave a handoff for the next slice. Nothing is pushed or merged.
 
 **Files:**
-- Create: `docs/superpowers/2026-11-1X-plugins-1d-handoff.md` (use the actual date)
+- Create: the retired plugins 1d handoff (use the actual date)
 - Modify: whatever the review findings require
 
 **Depends on:** Tasks 1 to 25.
@@ -21486,8 +21486,8 @@ Stop `pnpm dev` afterwards.
 
 - [ ] **Step 7: Write the handoff**
 
-Create `docs/superpowers/<today>-plugins-1d-handoff.md` in the shape of
-`docs/superpowers/2026-11-10-plugins-1c-handoff.md`: start-here steps, where
+Create the retired plugins 1d handoff in the shape of
+the retired plugins 1c handoff: start-here steps, where
 things stand, what 1d built (a table of area and path), where it left off,
 open follow-ups (including the two from 1c and 1b that this slice closed), what
 comes next (1e), the environment (switched project `feat-plugins-slots` and its
@@ -21496,7 +21496,7 @@ ports), and a kickoff prompt.
 - [ ] **Step 8: Commit**
 
 ```bash
-git add docs/superpowers/<today>-plugins-1d-handoff.md
+git add the retired plugins 1d handoff
 git commit -m "docs(plugins): hand off the plugin work after slice 1d" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
