@@ -191,7 +191,7 @@ This is the judgement scale for assigning point estimates:
 
 The write that would set `estimate: 13` or `estimate: 21` on `save_issue` is the trigger to do the breakdown **right then**, not a thing to flag and leave. Cycle planning, triage, and hierarchy planning all inherit this. Never let a 13/21 sit in the backlog unexamined just because it's technically a valid field value.
 
-**Cycle capacity reads on summed points, not issue count.** When assessing whether a cycle is over/under capacity, sum the `estimate` of committed issues against a threshold of **40 points/assigned developer/cycle**.
+**Cycle capacity reads on summed points, not issue count.** When assessing whether a cycle is over/under capacity, sum the `estimate` of committed issues against a threshold of **72 points/assigned developer/cycle**.
 
 **If a future `save_issue` call rejects an estimate, or the accepted values don't match Fibonacci+21** (i.e. team config changed), re-verify empirically: try a boundary value or two on a real issue and read back what's accepted — don't assume the scale from memory, since Team Settings can change it later.
 
@@ -280,6 +280,78 @@ When assigning labels, read the label names and their descriptions to choose the
 - `save_comment`, `save_document`, `create_issue_label`.
 
 Use the `cycle` param on `save_issue` to assign issues to a 4-week cycle (see "Cycles"); `list_cycles` to read them. There is no tool to create cycles — the feature/cadence is set in Team Settings.
+
+## Reporting issues in chat
+
+Apply these rules to every chat response that mentions issues, including
+plans, cycle reports, and read-backs.
+
+1. **Always link the issue.** Every issue ID is a Markdown link to its Linear
+   page, for example `[AVA-275](https://linear.app/avandar/issue/AVA-275)`.
+2. **Never report an issue ID on its own.** IDs mean nothing to a reader. Pair
+   each with a short human name: "Postgres bug fix
+   [AVA-275](https://linear.app/avandar/issue/AVA-275)".
+3. **Speak in logical groups when issues belong together.** When several
+   issues form one logical unit, name the unit and list its issues in
+   parentheses: "Postgres bugs group
+   ([AVA-123](https://linear.app/avandar/issue/AVA-123),
+   [AVA-124](https://linear.app/avandar/issue/AVA-124),
+   [AVA-334](https://linear.app/avandar/issue/AVA-334))". Describe plan
+   changes (added, dropped, moved, rolled over) in terms of the groups, so the
+   user can reason about planning by logical unit and not by ticket count.
+   Report a single issue on its own only when it has no natural group.
+
+## Reporting cycles and planning in chat
+
+Apply these rules whenever you describe what is in a cycle, propose a cycle
+plan, or report a change to one. They build on "Reporting issues in chat".
+
+The group table is the required centerpiece of the report, not the whole
+report. Keep giving the rest of the useful context around it, using your
+judgement: what you did, deviations, verification, "Worth knowing" risks and
+side effects, open decisions, and next actions. The rules below only say what
+the cycle summary itself must contain.
+
+1. **Lead with one table of the cycle, organized by logical group.** Use the
+   columns `Group | Issues | Points`. Each row is one logical group. The
+   Issues column names every issue in it with a short name and a linked ID.
+   The Points column sums that group's open estimates. Put the total against
+   capacity in the heading or the line above the table, for example "Cycle 8
+   by group (72 of 72 points)".
+2. **Order rows by the cycle's fill order.** Urgent work first, then groups in
+   initiative projects, then groups in projects without an initiative, then
+   standalone issues. Collect the leftover one-off issues into a "Single P1
+   fixes" style row instead of giving each its own row.
+3. **Name umbrellas without points under the table.** Parent issues that carry
+   no estimate are not a row. Mention them in one line after the table so the
+   total still reconciles.
+4. **Describe every plan change as a group change.** Say which groups were
+   added, dropped, moved, or rolled over, with their point totals. Do not
+   narrate ticket by ticket.
+5. **Always include the capacity check.** State committed points against
+   capacity (72 points per assigned developer), who is on the roster, and how
+   much buffer is left. Flag a cycle at exactly full capacity as having no
+   buffer, and name the group that slips first.
+6. **Surface what did not fit.** After the table, name the groups or issues
+   that were considered but left out, so the user can swap them in.
+7. **Add a verification table for any write.** After changing a cycle, read it
+   back from Linear and report `Check | Result` rows for open points, open
+   issues without an assignee, and open issues without an estimate.
+
+Example shape:
+
+```
+Cycle 8 by group (72 of 72 points)
+
+| Group | Issues | Points |
+| --- | --- | --- |
+| P0 fixes | Crosswalk privacy leak fix ([AVA-611](...)), Google Picker fix ([AVA-342](...)) | 8 |
+| Oxlint phase 4 group | [AVA-726](...), [AVA-727](...), ... | 26 |
+| Dashboard filters group | Filter column dropdown ([AVA-272](...)), ... | 15 |
+| Single P1 fixes | Drive refresh token leak ([AVA-386](...)), ... | 8 |
+
+The Tauri rewrite umbrella ([AVA-285](...)) also stays in the cycle with no points.
+```
 
 ## Required workflow (every request)
 
@@ -402,6 +474,8 @@ Surface these as observations in your report. Apply fixes only after the standar
 - Read before write; resolve real IDs.
 - Confirm bulk/structural/irreversible writes with `AskUserQuestion` (Apply-all / One-by-one / Cancel). Single obvious writes: just do them.
 - Report in the team's P-scheme, not raw Linear priority numbers.
+- Report issues as linked, named, grouped units, never bare IDs (see "Reporting issues in chat").
+- Report a cycle as a group table with a capacity check (see "Reporting cycles and planning in chat").
 - Prefer reusing/promoting existing structure over creating duplicates.
 
 ## Troubleshooting
