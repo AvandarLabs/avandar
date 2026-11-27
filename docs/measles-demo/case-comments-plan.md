@@ -115,7 +115,7 @@ House conventions this plan relies on:
 | `tests/e2e/helpers/seedCaseRecord.ts` | E2E setup helper |
 | `tests/e2e/case-activity.spec.ts` | E2E spec |
 | `docs/measles-demo/case-activity-architecture.md` | New architecture doc |
-| `docs/ontology-architecture.md`, `docs/production-plan-world-humanitarian-day.md` | Modify |
+| `docs/ontology-architecture.md` | Modify |
 
 ---
 
@@ -5942,7 +5942,6 @@ git commit -m "test(comments): cover posting, reacting, editing, and deleting a 
 **Files:**
 - Create: `docs/measles-demo/case-activity-architecture.md`
 - Modify: `docs/ontology-architecture.md`
-- Modify: `docs/production-plan-world-humanitarian-day.md`
 - Modify: `CLAUDE.md` (Documentation list)
 
 - [ ] **Step 1: Write `docs/measles-demo/case-activity-architecture.md`**
@@ -6055,7 +6054,7 @@ in `supabase/tests/database/case_activity/comment_audit_triggers.test.sql`._
    and in the "Layers a per-case capability touches" list, change item 4 to: `**Record page**: controls in `SingleIndividualView`; new kinds of activity go through `activityFeedItemRenderers` (see case-activity-architecture.md).`
 4. In section 16, delete the first table row (`Sync upserts every staged column...`), and change the "Not built" sentence to drop `comments,` from its list.
 
-- [ ] **Step 3: Update `docs/production-plan-world-humanitarian-day.md`**
+- [ ] **Step 3: Update Avandar's Linear roadmap**
 
 1. Replace the P5c.2 bullet with:
    `- P5c.2 **Comments / activity feed** on an ABox: built. Rich text, markdown, @mentions, reactions, edit and delete, on an append-only activity log. See [case-activity-architecture.md](case-activity-architecture.md).`
@@ -6072,7 +6071,7 @@ In `CLAUDE.md`'s Documentation list, after the permissions line, add:
 - [ ] **Step 5: Commit**
 
 ```bash
-git add docs/measles-demo/case-activity-architecture.md docs/ontology-architecture.md docs/production-plan-world-humanitarian-day.md CLAUDE.md
+git add docs/measles-demo/case-activity-architecture.md docs/ontology-architecture.md CLAUDE.md
 git commit -m "docs(comments): document the case activity architecture and update the roadmap"
 ```
 

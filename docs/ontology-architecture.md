@@ -1171,13 +1171,12 @@ and the auto-limit guard for large concepts.
 
 ## 17. Roadmap and specs
 
-- [production-plan-world-humanitarian-day.md](production-plan-world-humanitarian-day.md):
+- Avandar's Linear roadmap:
   P2 (cross-product query fabric, the ABox as a queryable source), P3.2
   (sharing for ontology and case resources), P5 (Ontology Designer: roles,
   subsumption, manual entry, incremental generation), P5b (configurable TBox,
   status sets), P5c (case management product: comments, assignment, status
-  workflow, list view). Its note that concept delete does not cascade is out of
-  date; the schema cascades.
+  workflow, list view).
 - [superpowers/specs/2026-08-18-qetl-concept-relations-design.md](superpowers/specs/2026-08-18-qetl-concept-relations-design.md):
   the concept view, spine, and determinism rules. The consolidation of the
   record page onto the view and the removal of `_runConceptQuery` it describes

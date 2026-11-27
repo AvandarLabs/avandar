@@ -371,7 +371,7 @@ confirmed failures in section 13 (an alias without `AS`, a typed literal, a
 multi-dataset statement) come from that guessing. Restoring the fail-wide
 guarantee, by returning `"all"` whenever attribution is ambiguous, is roadmap
 item P0.9 in
-[production-plan-world-humanitarian-day.md](production-plan-world-humanitarian-day.md).
+Avandar's Linear roadmap.
 
 ## 7. DuckDB coordination rules
 

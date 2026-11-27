@@ -2,7 +2,7 @@
 
 **Status:** Draft
 **Date:** 2026-10-12
-**Roadmap:** P5.6 in `docs/production-plan-world-humanitarian-day.md`
+**Roadmap:** P5.6 in Avandar's Linear roadmap
 (P5.8, P5.9, P5.10 added alongside it for three related, explicitly
 out-of-scope gaps)
 **Parents:** `docs/ontology-architecture.md` sections 6 and 13
@@ -100,11 +100,8 @@ indicator shared with the app's other long-running background tasks.
 - Status sets (P5b.1), assignment (P5c.3), comments (P5c.2). This change is a
   precondition for those, not an implementation of any of them.
 
-`docs/production-plan-world-humanitarian-day.md` is the one authoritative
-roadmap for QETL, permissions, and ontology/case-management (confirmed: no
-other `docs/production-plan*.md` or `docs/roadmap*.md` file exists;
-`docs/ontology-architecture.md` section 17 is an index back to this file and
-to `docs/superpowers/specs/`, not a second roadmap).
+Avandar's Linear roadmap is the one authoritative roadmap for QETL,
+permissions, and ontology/case-management.
 
 ## 3. Approaches
 
@@ -508,7 +505,7 @@ supabase/tests/database/
   individuals__sync_upsert_contract.test.sql   real-Postgres upsert contract (section 8.4)
 ```
 
-docs/production-plan-world-humanitarian-day.md also gains three new roadmap
+Avandar's Linear roadmap also gains three new roadmap
 items alongside this spec (not implemented by it): **P5.8** (the NULL-label
 sync crash), **P5.9** (deciding what a stale individual's product behavior
 should be), and **P5.10** (deciding whether Sync should become atomic).

@@ -436,7 +436,7 @@ Celebrate and swaps to Like, edits the comment, and deletes it. Cleanup in
   that Sync no longer rewrites `id`, `status`, or `assigned_to`; add the new
   tables to sections 3 and 4; remove "comments" from the "Not built" list in
   section 16.
-- `docs/production-plan-world-humanitarian-day.md`:
+- Avandar's Linear roadmap:
   - P5c.2 (comments): mark built, with a link to this spec.
   - P5c.5 (activity and audit log): widen it to every change to a case
     (status, assignment, manual field values, case creation) plus history

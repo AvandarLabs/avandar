@@ -20,8 +20,8 @@ backlog, not a porting list: every feature reaches `develop` with the
 `demo/measles` promotion, and each one gets a public retroactive review,
 explained in [docs/reviews/README.md](../reviews/README.md).
 
-Bug fixes ready to port to `develop`, and the PR and Linear status of
-each, are tracked in [bug-log.md](bug-log.md).
+Bug fixes that were ready to port to `develop`, and their PR and
+status, are tracked in Avandar's Linear roadmap.
 
 Out of scope: the Postgres connector. It came in through
 `1d8678750 Merge branch 'feat/postgres-connector'`, again through
@@ -463,7 +463,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68, F131 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. F131: the rail width reads `--ava-app-view-rail-width`, so the Apply view can widen it (`dd1bc5bec`). |
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
-| `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
+| Avandar's Linear roadmap | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
 | `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134, F136, F137 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. F136: regenerate for its migration, route, and messages. F137: messages only (`abdafb519`). |
 
 ### Joined cases (F69 to F76)
@@ -1742,7 +1742,7 @@ with its `@avandar/clients` patch changeset.
 `docs/measles-demo/case-comments-plan.md` are new on this branch, so port
 them to `docs/` (and the spec and plan to `docs/superpowers/`) in the PR,
 fixing the links in `AGENTS.md`, `docs/ontology-architecture.md`,
-`docs/production-plan-world-humanitarian-day.md`, and the two schema
+Avandar's Linear roadmap, and the two schema
 comments that point at the architecture doc. The one-line note in
 `docs/measles-demo/measles-outbreak-response.md` is branch-only: don't port it.
 
@@ -1783,7 +1783,7 @@ Add to **Commits to read**:
 
 | SHA | Subject | Take |
 |---|---|---|
-| `35e1acd07` | docs(measles-demo): move the case comments docs here and log them as feature F17 | MIXED: the moves of `case-comments-design.md` and `case-comments-plan.md` into `docs/measles-demo/`, the `case-activity-architecture.md` link, and the link fixes in `AGENTS.md`, `docs/ontology-architecture.md`, `docs/production-plan-world-humanitarian-day.md`, `00.enum.activity_events__kind.sql`, and `22.activity_events.sql` are what F18's **Docs** paragraph already asks for (port them to `docs/`, fixing those links). The `measles-outbreak-response.md` line and `pr-feature-log.md` are branch-only. |
+| `35e1acd07` | docs(measles-demo): move the case comments docs here and log them as feature F17 | MIXED: the moves of `case-comments-design.md` and `case-comments-plan.md` into `docs/measles-demo/`, the `case-activity-architecture.md` link, and the link fixes in `AGENTS.md`, `docs/ontology-architecture.md`, Avandar's Linear roadmap, `00.enum.activity_events__kind.sql`, and `22.activity_events.sql` are what F18's **Docs** paragraph already asks for (port them to `docs/`, fixing those links). The `measles-outbreak-response.md` line and `pr-feature-log.md` are branch-only. |
 
 ---
 
@@ -2001,7 +2001,7 @@ hunks in the case feed (`CaseActivityComposer.tsx`,
 them with F18's docs, and port the "Gadget references" section of
 `case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the
 gadget references bullet under P5c.2 in
-`docs/production-plan-world-humanitarian-day.md`.
+Avandar's Linear roadmap.
 
 **Schema:** one migration, `20261107004932_gadget_references.sql` (and its
 desktop mirror `apps/desktop/migrations/20261107004932_gadget_references.gen.sql`).
@@ -2069,7 +2069,7 @@ listed.
 
 | SHA | Subject | Take |
 |---|---|---|
-| `428060a69` | docs(measles-demo): document gadgets and log gadget references | MIXED: `docs/measles-demo/gadgets.md` (new), the "Gadget references" section of `docs/measles-demo/case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the gadget references bullet in `docs/production-plan-world-humanitarian-day.md` go here (see Docs). The `docs/measles-demo/pr-feature-log.md` hunk is branch-only: never port. |
+| `428060a69` | docs(measles-demo): document gadgets and log gadget references | MIXED: `docs/measles-demo/gadgets.md` (new), the "Gadget references" section of `docs/measles-demo/case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the gadget references bullet in Avandar's Linear roadmap go here (see Docs). The `docs/measles-demo/pr-feature-log.md` hunk is branch-only: never port. |
 | `43982e31d` | test(comments): cover linking and embedding gadgets in a case comment | All of it: `tests/e2e/case-gadgets.spec.ts` and `tests/e2e/helpers/seedDashboardWithTile.ts` (both new). |
 | `c212f382d` | docs(measles-demo): note multi-word @ queries as a gadget follow-up | All of it (`gadgets.md`). |
 | `371c85b45` | test(dashboards): stub the preview route search and cover the linked tile id | All of it. |
@@ -2458,7 +2458,7 @@ cramping them.
 |---|---|---|
 | `d8a72da58` | feat(data-catalog): preview an ODC listing's first 200 rows and open it full screen | All of it. Regenerate the `.po` catalogs. |
 | `6b815b3d3` | fix(data-catalog): preview an API-backed CSV listing from the start of its file | All of it. |
-| `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the `production-plan-world-humanitarian-day.md` P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
+| `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the Avandar's Linear roadmap P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
 
 **Files:** `src/clients/DuckDbClient/previewParquetBlob/`, the
 `previewParquetBlob` method in `DuckDbClient.ts`,
@@ -2590,7 +2590,7 @@ in `.github/workflows/demo.yaml`, `src/lib/openData/requestOpenDataParquetCopy/`
 and its call in `DataCatalogView.tsx`, the four new catalog messages,
 `docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
-bullets in `production-plan-world-humanitarian-day.md`.
+bullets in Avandar's Linear roadmap.
 
 **Schema:** `00.enum.data_catalog_listings__parquet_cache_status.sql`, the
 `parquet_cache_*` columns and constraints in `11.data_catalog_listings.sql`,
@@ -2825,7 +2825,7 @@ to a workspace and joined to country names, without a hardcoded connector.
 
 | SHA | Subject | Take |
 |---|---|---|
-| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The `production-plan-world-humanitarian-day.md` and `open-data-catalog-architecture.md` hunks go with F9. |
+| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The Avandar's Linear roadmap and `open-data-catalog-architecture.md` hunks go with F9. |
 | `f42fe266e` | docs(open-data): record the GHO spec's decisions | All of it. |
 | `905503037` | feat(open-data): store listing companions and freshness probes | All of it. |
 | `6dde864dd` | feat(catalog): recommend listings to add together, and say when a listing has no data | All of it. |
@@ -4668,7 +4668,7 @@ upsert function and listings that carry columns), and F8 (the
 - `src/lib/openData/`: `verifyOpenDataColumnTypes/`, `createColumnTypeVerificationCoordinator/`, `ColumnTypeVerifications.ts` (new)
 - `src/views/DataManagerApp/DataImportView/DataCatalogView/`: `useVerifyColumnTypesOnDwell/`, `readCatalogColumnsForAdding/`, `DataCatalogListingColumns/` (new), `DataCatalogView.tsx`, `DataCatalogListingDetail/DataCatalogListingDetail.tsx`
 - `shared/models/data-catalog-listings/DataCatalogListing/{DataCatalogListing.types.ts,DataCatalogListingParsers.ts}` (`dateColumnTypeLastVerified`) and the same fixtures as F51
-- `docs/production-plan-world-humanitarian-day.md`: the P6.6 and P6.7 bullets
+- Avandar's Linear roadmap: the P6.6 and P6.7 bullets
 - `src/i18n/locales/*/messages.{po,ts}`: regenerate
 
 **Schema:** regenerate `20261022194116_verify_catalog_listing_column_types.sql`
@@ -5372,7 +5372,7 @@ Take F61's hunks of the QETL and query column files from
 - Integration: `tests/integration/queries/{StructuredQueryTestFixtures.ts,structuredQueryConcepts.executed.test.ts}`.
 - E2E: `tests/e2e/case-statuses-data-explorer.spec.ts`, `tests/e2e/helpers/CaseTypeSeedHelpers.ts` (new).
 - Docs: F61's hunks of `docs/ontology-architecture.md` and
-  `docs/production-plan-world-humanitarian-day.md`, and plan 4.
+  Avandar's Linear roadmap, and plan 4.
 
 **Schema:** none.
 
@@ -5651,7 +5651,7 @@ page).
 
 | SHA | Subject | Take |
 |---|---|---|
-| `f177ec60b` | docs(cases): plan assigning a record to one member | MIXED: the spec, the plan, and the `docs/production-plan-world-humanitarian-day.md` hunk. The `docs/measles-demo/measles-outbreak-response.md` hunk is F9. |
+| `f177ec60b` | docs(cases): plan assigning a record to one member | MIXED: the spec, the plan, and the Avandar's Linear roadmap hunk. The `docs/measles-demo/measles-outbreak-response.md` hunk is F9. |
 | `9ddbcd1f1` | feat(cases): guard who a record can be assigned to | All of it. Regenerate the migration. |
 | `4ac9b2821` | feat(cases): filter a case type's records by assignee | All of it, including deleting `makeRecordsWhereFromStatusFilter/`. |
 | `145f99853` | feat(cases): refresh assignee lists after a record is assigned | All of it. |
@@ -5680,7 +5680,7 @@ page).
   `src/components/layouts/RootLayout/{makeMainNavbarLinksFromPermissions.ts,WorkspaceLayout/WorkspaceLayout.test.ts}`.
 - Cache: F66's hunks of `invalidateCaseStatusQueries/invalidateCaseStatusQueries.{ts,test.ts}`.
 - Docs: the spec and plan, F66's hunks of `docs/ontology-architecture.md` and
-  `docs/production-plan-world-humanitarian-day.md`.
+  Avandar's Linear roadmap.
 
 **Schema:** one migration, `20261109032546_individuals_assignment.sql` (the
 `individuals__check_assignment_change` trigger and

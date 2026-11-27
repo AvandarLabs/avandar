@@ -487,7 +487,7 @@ Full model in `docs/permissions-architecture.md`.
 
 Ordered by how directly each blocks a workflow in §4, not by estimated
 effort. Several of these are already named, independently, on the product's
-own roadmap (`docs/production-plan-world-humanitarian-day.md`); this section
+own roadmap (Avandar's Linear roadmap); this section
 cross-references those items rather than duplicating their numbering.
 
 ### 7.1 A real ingestion path for NYC/NYS open data — blocks §5.2-§5.4
@@ -549,7 +549,7 @@ workspace member by default the way a sales dashboard can be. This is
 already named on the product roadmap as P3.2 ("extend `resource_type` to
 cover GIS maps, ontology/TBox, and ABox/case resources") and depended on by
 P5c ("case-mgmt permissions") in
-`docs/production-plan-world-humanitarian-day.md`. It does not block a demo
+Avandar's Linear roadmap. It does not block a demo
 inside one workspace, since the demo audience and the data owner are the same
 people, but it must ship before any real department runs case data in
 Avandar.
@@ -557,7 +557,7 @@ Avandar.
 ### 7.4 Case-management workflow features — blocks Workflow A as a production use
 
 Named explicitly as not-yet-built in `docs/ontology-architecture.md` §16 and
-tracked as P5b/P5c in `docs/production-plan-world-humanitarian-day.md`:
+tracked as P5b/P5c in Avandar's Linear roadmap:
 
 - **No roles/relationships between records.** A case and its contacts are
   today two unrelated case types with no linking field the product

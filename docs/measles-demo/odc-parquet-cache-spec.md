@@ -355,4 +355,4 @@ are raw-bytes copies of sources, so nothing is lost.
    changed source can leave the two disagreeing. A rebuild also deletes the
    copy it replaced, which a dataset a user chose to freeze would still need.
    Handling every drift case is tracked as P6.11 in
-   `docs/production-plan-world-humanitarian-day.md` and is out of scope here.
+   Avandar's Linear roadmap and is out of scope here.
