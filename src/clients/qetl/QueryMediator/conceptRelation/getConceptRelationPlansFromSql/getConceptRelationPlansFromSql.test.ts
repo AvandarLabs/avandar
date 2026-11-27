@@ -9,7 +9,7 @@
  * query names.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
+import { ConceptRelationDeniedError } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDeniedError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
@@ -258,7 +258,7 @@ describe("getConceptRelationPlansFromSql", () => {
         rawSql: `SELECT * FROM "concept_${OTHER_CONCEPT_ID}"`,
         allowlist: _permissiveAllowlist(),
       }),
-    ).rejects.toBeInstanceOf(ConceptRelationDenied);
+    ).rejects.toBeInstanceOf(ConceptRelationDeniedError);
     expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
   });
 
@@ -294,7 +294,7 @@ describe("getConceptRelationPlansFromSql", () => {
           },
         },
       }),
-    ).rejects.toBeInstanceOf(ConceptRelationDenied);
+    ).rejects.toBeInstanceOf(ConceptRelationDeniedError);
     // The individuals are never read either: the refusal comes before the
     // spine.
     expect(individualGetAllMock).not.toHaveBeenCalled();

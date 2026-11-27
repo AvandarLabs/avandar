@@ -17,13 +17,13 @@ import type {
  * reason. Carries the machine-readable code so the import form can render the
  * right guidance rather than a generic failure.
  */
-export class PdfSniffRejection extends Error {
+export class PdfSniffRejectionError extends Error {
   readonly reason: PdfSniffError["reason"];
   readonly detail: Record<string, unknown> | undefined;
 
   constructor(error: PdfSniffError) {
     super(error.message);
-    this.name = "PdfSniffRejection";
+    this.name = "PdfSniffRejectionError";
     this.reason = error.reason;
     this.detail = error.detail;
   }
@@ -94,7 +94,7 @@ export async function sniffPdfFile(params: {
           return;
         }
         if (data.type === "error") {
-          reject(new PdfSniffRejection(data));
+          reject(new PdfSniffRejectionError(data));
         }
       });
       worker.addEventListener(
@@ -148,7 +148,7 @@ export async function extractPdfRegions(params: {
           return;
         }
         if (data.type === "error") {
-          reject(new PdfSniffRejection(data));
+          reject(new PdfSniffRejectionError(data));
         }
       });
       worker.addEventListener(

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
@@ -189,7 +189,7 @@ async function _failureCode(
   try {
     await run();
   } catch (caught) {
-    if (OpenDataAcquisitionFailed.is(caught)) {
+    if (OpenDataAcquisitionFailedError.is(caught)) {
       return caught.failure.code;
     }
     throw caught;

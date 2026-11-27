@@ -6,9 +6,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * not belong to the workspace it was submitted against.
  *
  * This is the **per-relation** denial, and it is a different condition from
- * `WorkspaceMembershipDenied`, which refuses the **principal**. A caller can
- * hold a perfectly good membership in workspace A and still name a dataset that
- * belongs only to workspace B; that is this class.
+ * `WorkspaceMembershipDeniedError`, which refuses the **principal**. A caller
+ * can hold a perfectly good membership in workspace A and still name a dataset
+ * that belongs only to workspace B; that is this class.
  *
  * As with the membership denial, a failure to *read* the workspace's dataset
  * list propagates as the underlying fetch error rather than as this type, so
@@ -17,7 +17,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * empty array as a success, and treating that as a denial would be
  * indistinguishable from a genuine refusal without it.
  */
-export class WorkspaceRelationsDenied extends Error {
+export class WorkspaceRelationsDeniedError extends Error {
   /** The workspace the query was submitted against. */
   readonly workspaceId: Workspace.Id;
 
@@ -39,7 +39,7 @@ export class WorkspaceRelationsDenied extends Error {
         `${sortedIds.join(", ")} in workspace ${options.workspaceId} ` +
         `because they do not belong to it.`,
     );
-    this.name = "WorkspaceRelationsDenied";
+    this.name = "WorkspaceRelationsDeniedError";
     this.workspaceId = options.workspaceId;
     this.deniedDatasetIds = sortedIds;
   }

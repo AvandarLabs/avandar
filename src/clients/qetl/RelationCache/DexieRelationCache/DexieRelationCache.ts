@@ -5,7 +5,7 @@ import {
   makePreparedRelationCacheKeyFromKey,
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
+import { RelationCacheWriteFailedError } from "$/models/relations/RelationCachePort/RelationCacheWriteFailedError";
 import { DexieRelationCacheEviction } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCacheEviction/DexieRelationCacheEviction";
 import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
@@ -244,7 +244,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
     try {
       await _writeOnce(entry, write.payload);
     } catch {
-      throw new RelationCacheWriteFailed(firstError);
+      throw new RelationCacheWriteFailedError(firstError);
     }
   }
 }
@@ -276,7 +276,7 @@ export const DexieRelationCache: RelationCachePort = {
    * in the same transaction, deletes every other entry sharing this row's
    * `(principalKey, tableName)` so at most one live entry survives. On a
    * quota-exceeded failure, evicts to make room and retries once; if the
-   * retry also fails, throws `RelationCacheWriteFailed`.
+   * retry also fails, throws `RelationCacheWriteFailedError`.
    */
   write: _write,
 

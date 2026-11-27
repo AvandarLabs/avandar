@@ -7,10 +7,10 @@ import type { Concept } from "$/models/ontology/Concept/Concept";
  * the caller cannot load. The plugin data slot runtime reports it as
  * `PermissionDenied`.
  *
- * Like `WorkspaceRelationsDenied`, this is a per-relation denial, not a
+ * Like `WorkspaceRelationsDeniedError`, this is a per-relation denial, not a
  * refusal of the principal.
  */
-export class ConceptRelationDenied extends Error {
+export class ConceptRelationDeniedError extends Error {
   /** The concept the query named. */
   readonly conceptId: Concept.Id;
 
@@ -35,7 +35,7 @@ export class ConceptRelationDenied extends Error {
             `${sortedIds.join(", ")} that are not reachable from this ` +
             `workspace, so it cannot be queried here.`,
     );
-    this.name = "ConceptRelationDenied";
+    this.name = "ConceptRelationDeniedError";
     this.conceptId = options.conceptId;
     this.deniedDatasetIds = sortedIds;
   }

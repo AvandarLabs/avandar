@@ -25,7 +25,7 @@ import {
   startParquetCopyBuild,
 } from "@sbfn/open-data/startParquetCopyBuild/startParquetCopyBuild.ts";
 import { object, string } from "zod";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
 import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
 import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
@@ -197,7 +197,7 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
       try {
         return await respondWithColumnTypeSample(entry);
       } catch (caught) {
-        if (OpenDataAcquisitionFailed.is(caught)) {
+        if (OpenDataAcquisitionFailedError.is(caught)) {
           return await respondWithSampleFailure({
             catalogListingId: entry.id,
             error: caught,

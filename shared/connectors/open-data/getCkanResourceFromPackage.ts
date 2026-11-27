@@ -1,4 +1,4 @@
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanPackage,
   CkanResource,
@@ -76,14 +76,14 @@ export function getCkanResourceFromPackage(params: {
     return candidate.id === ckanResourceId;
   });
   if (!resource) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-not-found",
       ckanResourceId,
     });
   }
 
   if (resource.url_type !== HOSTED_FILE_URL_TYPE) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-is-remote-api",
       ckanResourceId,
       urlType: resource.url_type,
@@ -93,7 +93,7 @@ export function getCkanResourceFromPackage(params: {
   const expectedHost = _getHost(params.baseUrl);
   const resourceHost = _getHost(resource.url);
   if (resourceHost !== expectedHost) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-host-mismatch",
       ckanResourceId,
       resourceHost,
@@ -103,7 +103,7 @@ export function getCkanResourceFromPackage(params: {
 
   const format = resource.format.toLowerCase();
   if (!READABLE_FORMATS.includes(format)) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-format-unsupported",
       ckanResourceId,
       format: resource.format,
@@ -111,7 +111,7 @@ export function getCkanResourceFromPackage(params: {
   }
 
   if (format !== expectedFormat.toLowerCase()) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-format-changed",
       ckanResourceId,
       format: resource.format,
@@ -122,7 +122,7 @@ export function getCkanResourceFromPackage(params: {
   // An absent size is not a refusal: an older upload can report none, and the
   // caller's ceiling still applies to the read itself.
   if (resource.size !== undefined && resource.size > maxBytes) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-too-large",
       ckanResourceId,
       sizeInBytes: resource.size,

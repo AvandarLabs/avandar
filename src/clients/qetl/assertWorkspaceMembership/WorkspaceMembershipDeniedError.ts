@@ -33,7 +33,7 @@ function _buildDenialMessage(
  * instead of this type. Keeping the read failure out of this class is what
  * lets a caller tell "you may not do this" apart from "we could not find out".
  */
-export class WorkspaceMembershipDenied extends Error {
+export class WorkspaceMembershipDeniedError extends Error {
   /** Which authorization condition failed. */
   readonly code: WorkspaceMembershipDeniedCode;
 
@@ -48,7 +48,7 @@ export class WorkspaceMembershipDenied extends Error {
     }>,
   ) {
     super(_buildDenialMessage(options));
-    this.name = "WorkspaceMembershipDenied";
+    this.name = "WorkspaceMembershipDeniedError";
     this.code = options.code;
     this.workspaceId = options.workspaceId;
   }

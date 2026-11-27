@@ -1,5 +1,5 @@
 import { CkanEnvelopeSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 
 /** CKAN's action API path, the same on every deployment. */
 export const CKAN_ACTION_PATH = "/api/3/action";
@@ -41,12 +41,12 @@ export function unwrapCkanActionEnvelope(
   }
   const ckanErrorType = envelope.error.__type ?? "unknown";
   if (ckanErrorType === CKAN_AUTHORIZATION_ERROR_TYPE) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "ckan-authorization-required",
       action,
     });
   }
-  throw new OpenDataAcquisitionFailed({
+  throw new OpenDataAcquisitionFailedError({
     code: "ckan-action-failed",
     action,
     ckanErrorType,

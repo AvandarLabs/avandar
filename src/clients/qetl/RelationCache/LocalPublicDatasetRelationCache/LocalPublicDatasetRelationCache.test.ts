@@ -4,7 +4,7 @@ import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
+import { RelationCacheWriteFailedError } from "$/models/relations/RelationCachePort/RelationCacheWriteFailedError";
 import { LocalPublicDatasetRelationCache } from "@/clients/qetl/RelationCache/LocalPublicDatasetRelationCache/LocalPublicDatasetRelationCache";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import {
@@ -378,7 +378,7 @@ describe("LocalPublicDatasetRelationCache.write", () => {
     expect(rows).toHaveLength(1);
   });
 
-  it("throws a typed RelationCacheWriteFailed, carrying the original cause, when the retry also fails", async () => {
+  it("throws a typed RelationCacheWriteFailedError, carrying the original cause, when the retry also fails", async () => {
     const quotaError = new DOMException(
       "The quota has been exceeded.",
       "QuotaExceededError",
@@ -396,8 +396,8 @@ describe("LocalPublicDatasetRelationCache.write", () => {
     });
 
     putSpy.mockRestore();
-    expect(failure).toBeInstanceOf(RelationCacheWriteFailed);
-    const cause = (failure as RelationCacheWriteFailed).cause as {
+    expect(failure).toBeInstanceOf(RelationCacheWriteFailedError);
+    const cause = (failure as RelationCacheWriteFailedError).cause as {
       name: string;
     };
     expect(cause.name).toBe("QuotaExceededError");

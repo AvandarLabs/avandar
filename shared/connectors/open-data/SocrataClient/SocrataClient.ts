@@ -1,4 +1,4 @@
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import {
   SocrataCountResponseSchema,
   SocrataViewMetadataSchema,
@@ -35,7 +35,7 @@ export function createSocrataClient(
       try {
         body = await http.get(url);
       } catch (cause) {
-        throw new OpenDataAcquisitionFailed(
+        throw new OpenDataAcquisitionFailedError(
           { code: "socrata-unreachable", socrataDatasetId },
           cause,
         );
@@ -56,7 +56,7 @@ export function createSocrataClient(
       try {
         body = await http.get(url);
       } catch (cause) {
-        throw new OpenDataAcquisitionFailed(
+        throw new OpenDataAcquisitionFailedError(
           { code: "socrata-unreachable", socrataDatasetId },
           cause,
         );
@@ -76,7 +76,7 @@ export function createSocrataClient(
         const bytes = await http.getBytes(url);
         return new TextDecoder().decode(bytes);
       } catch (cause) {
-        throw new OpenDataAcquisitionFailed(
+        throw new OpenDataAcquisitionFailedError(
           { code: "socrata-unreachable", socrataDatasetId },
           cause,
         );

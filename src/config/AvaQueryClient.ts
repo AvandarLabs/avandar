@@ -1,9 +1,9 @@
 import { getIsOnline } from "@avandar/browser-utils";
 import { QueryClient } from "@tanstack/react-query";
 import { SessionExpiredError } from "$/ServerApiClient";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
+import { WorkspaceMembershipDeniedError } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDeniedError";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
+import { ConceptRelationDeniedError } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDeniedError";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -43,9 +43,9 @@ export const AvaQueryClient = new QueryClient({
         // halves of authorization are listed: the principal-level refusal and
         // the per-relation ones, for a dataset list or for a queried concept.
         if (
-          error instanceof WorkspaceMembershipDenied ||
-          error instanceof WorkspaceRelationsDenied ||
-          error instanceof ConceptRelationDenied
+          error instanceof WorkspaceMembershipDeniedError ||
+          error instanceof WorkspaceRelationsDeniedError ||
+          error instanceof ConceptRelationDeniedError
         ) {
           return false;
         }

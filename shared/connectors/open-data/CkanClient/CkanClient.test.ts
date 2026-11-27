@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 const BASE_URL = "https://data.humdata.org";
@@ -195,7 +195,7 @@ describe("CkanClient.getPackage", () => {
       }),
     ).rejects.toSatisfy((error: unknown) => {
       return (
-        OpenDataAcquisitionFailed.is(error, "ckan-action-failed") &&
+        OpenDataAcquisitionFailedError.is(error, "ckan-action-failed") &&
         error.failure.code === "ckan-action-failed" &&
         error.failure.ckanErrorType === "Validation Error"
       );
@@ -222,7 +222,10 @@ describe("CkanClient.getPackage", () => {
         ckanDatasetId: DATASET_ID,
       }),
     ).rejects.toSatisfy((error: unknown) => {
-      return OpenDataAcquisitionFailed.is(error, "ckan-authorization-required");
+      return OpenDataAcquisitionFailedError.is(
+        error,
+        "ckan-authorization-required",
+      );
     });
   });
 
@@ -268,7 +271,7 @@ describe("CkanClient.getResourceBytes", () => {
         url: CSV_RESOURCE.url,
       }),
     ).rejects.toSatisfy((error: unknown) => {
-      return OpenDataAcquisitionFailed.is(error, "resource-unreachable");
+      return OpenDataAcquisitionFailedError.is(error, "resource-unreachable");
     });
   });
 
@@ -290,10 +293,10 @@ describe("CkanClient.getResourceBytes", () => {
         return caught;
       });
 
-    expect(OpenDataAcquisitionFailed.is(error)).toBe(true);
-    const failure = (error as OpenDataAcquisitionFailed).failure;
+    expect(OpenDataAcquisitionFailedError.is(error)).toBe(true);
+    const failure = (error as OpenDataAcquisitionFailedError).failure;
     expect(JSON.stringify(failure)).not.toContain("https://");
-    expect((error as OpenDataAcquisitionFailed).message).not.toContain(
+    expect((error as OpenDataAcquisitionFailedError).message).not.toContain(
       "https://",
     );
   });

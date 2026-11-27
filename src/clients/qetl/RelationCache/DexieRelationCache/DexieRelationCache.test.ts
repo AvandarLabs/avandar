@@ -5,7 +5,7 @@ import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
+import { RelationCacheWriteFailedError } from "$/models/relations/RelationCachePort/RelationCacheWriteFailedError";
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import {
   AvaDexieVersionManager,
@@ -588,7 +588,7 @@ describe("DexieRelationCache.write quota handling", () => {
     expect(rows).toHaveLength(1);
   });
 
-  it("throws a typed RelationCacheWriteFailed, carrying the original cause, when the retry also fails", async () => {
+  it("throws a typed RelationCacheWriteFailedError, carrying the original cause, when the retry also fails", async () => {
     const quotaError = new DOMException(
       "The quota has been exceeded.",
       "QuotaExceededError",
@@ -606,12 +606,12 @@ describe("DexieRelationCache.write quota handling", () => {
     );
 
     putSpy.mockRestore();
-    expect(failure).toBeInstanceOf(RelationCacheWriteFailed);
+    expect(failure).toBeInstanceOf(RelationCacheWriteFailedError);
     // Dexie wraps a scope's thrown error into its own `DexieError` before
     // the transaction promise rejects, so the cause is that wrapper (with
     // `.name` still `"QuotaExceededError"` and `.inner` pointing at the
     // original DOMException), not the raw DOMException instance itself.
-    const cause = (failure as RelationCacheWriteFailed).cause as {
+    const cause = (failure as RelationCacheWriteFailedError).cause as {
       name: string;
       inner: unknown;
     };
@@ -619,10 +619,10 @@ describe("DexieRelationCache.write quota handling", () => {
     expect(cause.inner).toBe(quotaError);
   });
 
-  it("propagates an eviction-infrastructure failure during the quota retry as-is, without wrapping it as RelationCacheWriteFailed", async () => {
+  it("propagates an eviction-infrastructure failure during the quota retry as-is, without wrapping it as RelationCacheWriteFailedError", async () => {
     // If evictToBudget itself throws while write() is trying to make room
     // for a quota-exceeded retry, that is a genuine Dexie fault, not a
-    // cache-full condition. Wrapping it as RelationCacheWriteFailed would
+    // cache-full condition. Wrapping it as RelationCacheWriteFailedError would
     // let a caller swallow real corruption alongside "could not store
     // this," defeating the point of the typed error, so this pins that the
     // eviction failure reaches the caller unwrapped rather than being
@@ -652,7 +652,7 @@ describe("DexieRelationCache.write quota handling", () => {
     putSpy.mockRestore();
     orderBySpy.mockRestore();
     expect(failure).toBe(evictionFault);
-    expect(failure).not.toBeInstanceOf(RelationCacheWriteFailed);
+    expect(failure).not.toBeInstanceOf(RelationCacheWriteFailedError);
   });
 
   it("propagates a non-quota failure as-is, without attempting eviction", async () => {

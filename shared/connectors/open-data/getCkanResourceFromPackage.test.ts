@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanPackage,
   CkanResource,
@@ -61,7 +61,7 @@ function _failureCode(run: () => unknown): OpenDataAcquisitionFailureCode {
   try {
     run();
   } catch (caught) {
-    if (OpenDataAcquisitionFailed.is(caught)) {
+    if (OpenDataAcquisitionFailedError.is(caught)) {
       return caught.failure.code;
     }
     throw caught;
