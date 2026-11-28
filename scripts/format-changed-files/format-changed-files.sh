@@ -2,7 +2,8 @@
 # Formats files changed on the current branch relative to its base branch.
 #
 # Runs oxfmt, prettier (SQL only), oxlint --fix, and stylelint --fix on files
-# changed vs the merge-base with origin/develop or origin/main.
+# changed vs the merge-base with origin/develop or origin/main, then lints
+# those files again without --fix and fails on any error that remains.
 #
 # Usable in two contexts:
 #   1. Manually:  `pnpm format`
@@ -10,6 +11,7 @@
 #
 # Exit codes:
 #   0  no changed files needed formatting (or no base branch resolved)
+#   1  lint errors remain after fixing, or the fixers never settled
 #   2  formatters modified one or more files; review and commit before push
 #
 # The script does not read stdin and does not depend on hook-only env vars,
@@ -151,7 +153,7 @@ echo "Formatting ${#EXISTING[@]} changed file(s)..." >&2
 # We need to detect whether the formatters actually rewrote any file. We
 # can't just compare the working tree to HEAD afterwards: the caller may
 # already have uncommitted edits (e.g. `pnpm format` invoked mid-feature),
-# and those would falsely trip the change-detection in Stage 9. Hashing
+# and those would falsely trip the change-detection in Stage 10. Hashing
 # each file with `git hash-object` lets us compare pre-format vs
 # post-format content directly.
 #
@@ -209,24 +211,79 @@ for f in "${EXISTING[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# Stage 8: oxlint --fix on JS/TS, stylelint --fix on CSS
+# Stage 8: oxlint --fix on JS/TS, stylelint --fix on CSS, until stable
+#
+# One `oxlint --fix` run does not always finish the job. oxlint applies one
+# round of non-overlapping edits per run, so when two repairs touch the same
+# code, one is dropped and still reported. For example,
+# `avandar/optional-array-candidates` removes a `let` declaration that
+# `prefer-const` also wants to rewrite, and only the next run lands the
+# second repair. So the fixers repeat until a pass changes nothing. The cap
+# stops two repairs that keep undoing each other from looping forever.
+#
+# Errors are tolerated (`|| true`) here because Stage 9 reports them.
 # ---------------------------------------------------------------------------
+MAX_FIX_PASSES=5
+LINTED=()
+[ ${#JSTS[@]} -gt 0 ] && LINTED+=("${JSTS[@]}")
+[ ${#CSS[@]} -gt 0 ] && LINTED+=("${CSS[@]}")
+
+hash_linted_files() {
+  local f
+  for f in "${LINTED[@]}"; do
+    git hash-object "$f" 2>/dev/null || echo ""
+  done
+}
+
+IS_FIX_STABLE=1
+if [ ${#LINTED[@]} -gt 0 ]; then
+  IS_FIX_STABLE=0
+  for ((pass = 1; pass <= MAX_FIX_PASSES; pass++)); do
+    hashes_before_pass="$(hash_linted_files)"
+    if [ ${#JSTS[@]} -gt 0 ]; then
+      pnpm exec oxlint --fix --no-error-on-unmatched-pattern "${JSTS[@]}" \
+        >/dev/null 2>&1 || true
+    fi
+    if [ ${#CSS[@]} -gt 0 ]; then
+      pnpm exec stylelint --fix --allow-empty-input "${CSS[@]}" \
+        >/dev/null 2>&1 || true
+    fi
+    if [ "$(hash_linted_files)" = "$hashes_before_pass" ]; then
+      IS_FIX_STABLE=1
+      break
+    fi
+  done
+fi
+
+# ---------------------------------------------------------------------------
+# Stage 9: lint again without --fix and record any error that remains
+#
+# These are the oxlint and stylelint checks `pnpm lint` runs in CI, run on
+# the changed files, so an error that no fixer can repair blocks the push
+# here instead of failing CI afterwards. CI only stylelints `src/` and
+# `apps/ava-video-producer/`, while this stage checks every changed CSS
+# file.
+# ---------------------------------------------------------------------------
+HAS_LINT_ERRORS=0
 if [ ${#JSTS[@]} -gt 0 ]; then
-  pnpm exec oxlint --fix --no-error-on-unmatched-pattern "${JSTS[@]}" >&2 || true
+  pnpm exec oxlint --report-unused-disable-directives-severity=error \
+    --no-error-on-unmatched-pattern "${JSTS[@]}" >&2 || HAS_LINT_ERRORS=1
 fi
 
 if [ ${#CSS[@]} -gt 0 ]; then
-  pnpm exec stylelint --fix --allow-empty-input "${CSS[@]}" >&2 || true
+  pnpm exec stylelint --allow-empty-input "${CSS[@]}" >&2 || HAS_LINT_ERRORS=1
 fi
 
 # ---------------------------------------------------------------------------
-# Stage 9: detect whether the formatters rewrote anything
+# Stage 10: detect whether the formatters rewrote anything
 #
 # Compare each file's pre-format hash (from Stage 5b) with its current
 # hash. Any mismatch means a formatter rewrote that file. Exit non-zero so
 # the caller (or pre-push hook) surfaces the changes; the exit-2 signal
 # lets CI / hooks block on "please review and commit these reformatted
-# files".
+# files". Fixers that never settled, or lint errors that remain, take
+# priority and exit 1, after the rewritten files are listed, so one run
+# reports everything to fix.
 # ---------------------------------------------------------------------------
 REWRITTEN=()
 for i in "${!EXISTING[@]}"; do
@@ -241,6 +298,22 @@ if [ ${#REWRITTEN[@]} -gt 0 ]; then
   echo "" >&2
   echo "Formatters/linters modified the following files. Review and commit them:" >&2
   printf '%s\n' "${REWRITTEN[@]}" >&2
+fi
+
+if [ "$IS_FIX_STABLE" -eq 0 ]; then
+  echo "" >&2
+  echo "Lint fixers did not settle within $MAX_FIX_PASSES passes." >&2
+  echo "Two repairs may be undoing each other. Fix the code by hand." >&2
+  exit 1
+fi
+
+if [ "$HAS_LINT_ERRORS" -eq 1 ]; then
+  echo "" >&2
+  echo "Lint errors remain that no fixer could repair. Fix them by hand." >&2
+  exit 1
+fi
+
+if [ ${#REWRITTEN[@]} -gt 0 ]; then
   exit 2
 fi
 
